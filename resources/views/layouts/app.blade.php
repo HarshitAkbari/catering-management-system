@@ -114,21 +114,20 @@
             <!-- Page Content -->
             <main class="flex-1 overflow-y-auto p-6">
                 @if(session('success'))
-                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                        {{ session('success') }}
-                    </div>
+                    <x-alert type="success" dismissible>{{ session('success') }}</x-alert>
                 @endif
 
                 @if(session('error'))
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                        {{ session('error') }}
-                    </div>
+                    <x-alert type="error" dismissible>{{ session('error') }}</x-alert>
                 @endif
 
                 @yield('content')
             </main>
         </div>
     </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
     <script>
         function toggleSidebar() {
