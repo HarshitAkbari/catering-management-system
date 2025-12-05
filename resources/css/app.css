@@ -170,3 +170,166 @@ textarea.success {
     @apply focus:border-green-500 dark:focus:border-green-400;
     @apply focus:ring-green-500/20;
 }
+
+/* Modern Button Styles */
+.btn {
+    @apply inline-flex items-center justify-center px-4 py-2 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-primary {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105 focus:ring-blue-500;
+}
+
+.btn-secondary {
+    @apply bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 shadow hover:shadow-md focus:ring-gray-500;
+}
+
+.btn-success {
+    @apply bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:scale-105 focus:ring-emerald-500;
+}
+
+.btn-danger {
+    @apply bg-gradient-to-r from-red-600 to-pink-600 text-white hover:from-red-700 hover:to-pink-700 shadow-lg hover:shadow-xl transform hover:scale-105 focus:ring-red-500;
+}
+
+/* Card Enhancements */
+.card {
+    @apply bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden;
+}
+
+.card-header {
+    @apply px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700;
+}
+
+.card-body {
+    @apply p-6;
+}
+
+/* Badge Styles */
+.badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.badge-primary {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300;
+}
+
+.badge-success {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300;
+}
+
+.badge-warning {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300;
+}
+
+.badge-danger {
+    @apply bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300;
+}
+
+.badge-info {
+    @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300;
+}
+
+/* Table Enhancements */
+.table {
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.table thead {
+    @apply bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800;
+}
+
+.table thead th {
+    @apply px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider;
+}
+
+.table tbody {
+    @apply bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700;
+}
+
+.table tbody tr {
+    @apply hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150;
+}
+
+.table tbody td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white;
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Loading Spinner */
+.spinner {
+    @apply inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
+}
+
+/* Gradient Text */
+.gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
+}
+
+/* Glass Morphism Effect */
+.glass {
+    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-gray-200/50 dark:border-gray-700/50;
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+}
+
+/* Pulse Animation for Notifications */
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    50% {
+        opacity: 0.8;
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+}
+
+.pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Focus Visible Enhancement */
+*:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 rounded;
+}
+
+/* Smooth Transitions for All Interactive Elements */
+a, button, input, select, textarea {
+    @apply transition-all duration-200;
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        @apply bg-white text-black;
+    }
+    
+    .card {
+        @apply shadow-none border border-gray-300;
+    }
+}
