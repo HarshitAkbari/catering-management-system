@@ -67,38 +67,87 @@
         </div>
     </div>
 
-    <!-- Upcoming Events -->
+    <!-- Alerts & Notifications -->
+    @if($lowStockItems > 0 || $pendingPayments->count() > 0)
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Upcoming Events</h2>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Alerts & Notifications</h2>
         </div>
-        <div class="p-6">
-            @if($upcomingEvents->count() > 0)
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Order #</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Event Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            @foreach($upcomingEvents as $event)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $event->order_number }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $event->customer->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $event->event_date->format('M d, Y') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">₹{{ number_format($event->estimated_cost, 2) }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+        <div class="p-6 space-y-3">
+            @if($lowStockItems > 0)
+                <div class="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $lowStockItems }} items are low on stock</span>
+                    </div>
+                    <a href="{{ route('inventory.low-stock') }}" class="text-sm text-blue-600 hover:text-blue-800">View</a>
                 </div>
-            @else
-                <p class="text-gray-500 dark:text-gray-400">No upcoming events</p>
             @endif
+            @if($pendingPayments->count() > 0)
+                <div class="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-300 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
+                            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $pendingPayments->count() }} orders have pending payments</span>
+                    </div>
+                    <a href="{{ route('orders.index') }}?payment_status=pending" class="text-sm text-blue-600 hover:text-blue-800">View</a>
+                </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Upcoming Events -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Upcoming Events</h2>
+            </div>
+            <div class="p-6">
+                @if($upcomingEvents->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($upcomingEvents as $event)
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $event->order_number }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $event->customer->name }} - {{ $event->event_date->format('M d, Y') }}</p>
+                                </div>
+                                <a href="{{ route('orders.show', $event) }}" class="text-sm text-blue-600 hover:text-blue-800">View</a>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-500 dark:text-gray-400">No upcoming events</p>
+                @endif
+            </div>
+        </div>
+
+        <!-- Today's Deliveries -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Today's Deliveries</h2>
+            </div>
+            <div class="p-6">
+                @if($todayDeliveries->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($todayDeliveries as $delivery)
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $delivery->order_number }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $delivery->customer->name }} - {{ ucfirst($delivery->event_time) }}</p>
+                                </div>
+                                <a href="{{ route('orders.show', $delivery) }}" class="text-sm text-blue-600 hover:text-blue-800">View</a>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-500 dark:text-gray-400">No deliveries scheduled for today</p>
+                @endif
+            </div>
         </div>
     </div>
 </div>

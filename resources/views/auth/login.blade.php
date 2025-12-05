@@ -6,50 +6,78 @@
     <title>Login - Catering Management</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen">
     <div class="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-        <div class="w-full max-w-md space-y-8">
-            <div>
-                <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-                    Sign in to your account
-                </h2>
+        <div class="w-full max-w-md">
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
+                <div class="mb-8">
+                    <h2 class="text-center text-4xl font-bold text-white mb-2">
+                        Sign in to your account
+                    </h2>
+                </div>
+                <form class="space-y-6" method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="space-y-5">
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-white mb-2">Email address</label>
+                            <input 
+                                id="email" 
+                                name="email" 
+                                type="email" 
+                                required 
+                                autofocus 
+                                value="{{ old('email') }}" 
+                                class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Enter your email"
+                            >
+                            @error('email')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="password" class="block text-sm font-semibold text-white mb-2">Password</label>
+                            <input 
+                                id="password" 
+                                name="password" 
+                                type="password" 
+                                required 
+                                class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Enter your password"
+                            >
+                            @error('password')
+                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input 
+                                id="remember" 
+                                name="remember" 
+                                type="checkbox" 
+                                class="h-4 w-4 rounded border-gray-600 bg-gray-800/50 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                            >
+                            <label for="remember" class="ml-2 block text-sm text-white">Remember me</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button 
+                            type="submit" 
+                            class="w-full py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent"
+                        >
+                            Sign in
+                        </button>
+                    </div>
+
+                    <div class="text-center pt-4">
+                        <a href="{{ route('register') }}" class="text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200">
+                            Don't have an account? Register
+                        </a>
+                    </div>
+                </form>
             </div>
-            <form class="mt-8 space-y-6" method="POST" action="{{ route('login') }}">
-                @csrf
-                <div class="space-y-4 rounded-md shadow-sm">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
-                        <input id="email" name="email" type="email" required autofocus value="{{ old('email') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        @error('email')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                        <input id="password" name="password" type="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        @error('password')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input id="remember" name="remember" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <label for="remember" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Remember me</label>
-                    </div>
-                </div>
-
-                <div>
-                    <button type="submit" class="group relative flex w-full justify-center rounded-md bg-blue-600 py-2 px-3 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        Sign in
-                    </button>
-                </div>
-
-                <div class="text-center">
-                    <a href="{{ route('register') }}" class="text-sm text-blue-600 hover:text-blue-500">Don't have an account? Register</a>
-                </div>
-            </form>
         </div>
     </div>
 </body>
