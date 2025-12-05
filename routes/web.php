@@ -4,9 +4,16 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -38,4 +45,63 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     
     // Payments
     Route::resource('payments', PaymentController::class);
+    
+    // Inventory
+    Route::resource('inventory', InventoryController::class);
+    Route::get('inventory/stock-in', [InventoryController::class, 'stockIn'])->name('inventory.stock-in');
+    Route::post('inventory/stock-in', [InventoryController::class, 'storeStockIn'])->name('inventory.stock-in.store');
+    Route::get('inventory/stock-out', [InventoryController::class, 'stockOut'])->name('inventory.stock-out');
+    Route::post('inventory/stock-out', [InventoryController::class, 'storeStockOut'])->name('inventory.stock-out.store');
+    Route::get('inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.low-stock');
+    
+    // Vendors
+    Route::resource('vendors', VendorController::class);
+    
+    // Staff
+    Route::resource('staff', StaffController::class);
+    Route::get('orders/{order}/assign-staff', [StaffController::class, 'assignToEvent'])->name('staff.assign');
+    Route::post('orders/{order}/assign-staff', [StaffController::class, 'storeAssignment'])->name('staff.assign.store');
+    Route::get('staff/attendance', [StaffController::class, 'attendance'])->name('staff.attendance');
+    Route::post('staff/attendance', [StaffController::class, 'storeAttendance'])->name('staff.attendance.store');
+    
+    // Equipment
+    Route::resource('equipment', EquipmentController::class);
+    Route::get('orders/{order}/assign-equipment', [EquipmentController::class, 'assignToEvent'])->name('equipment.assign');
+    Route::post('orders/{order}/assign-equipment', [EquipmentController::class, 'storeAssignment'])->name('equipment.assign.store');
+    Route::get('equipment/maintenance', [EquipmentController::class, 'maintenance'])->name('equipment.maintenance');
+    
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('orders', [ReportController::class, 'orders'])->name('orders');
+        Route::get('payments', [ReportController::class, 'payments'])->name('payments');
+        Route::get('expenses', [ReportController::class, 'expenses'])->name('expenses');
+        Route::get('customers', [ReportController::class, 'customers'])->name('customers');
+        Route::get('staff', [ReportController::class, 'staff'])->name('staff');
+        Route::get('profit-loss', [ReportController::class, 'profitLoss'])->name('profit-loss');
+        Route::get('export', [ReportController::class, 'export'])->name('export');
+    });
+    
+    // Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [SettingController::class, 'index'])->name('index');
+        Route::post('/', [SettingController::class, 'update'])->name('update');
+        Route::get('company-profile', [SettingController::class, 'companyProfile'])->name('company-profile');
+        Route::post('company-profile', [SettingController::class, 'updateCompanyProfile'])->name('company-profile.update');
+        Route::get('invoice-branding', [SettingController::class, 'invoiceBranding'])->name('invoice-branding');
+        Route::post('invoice-branding', [SettingController::class, 'updateInvoiceBranding'])->name('invoice-branding.update');
+        Route::get('event-types', [SettingController::class, 'eventTypes'])->name('event-types');
+        Route::post('event-types', [SettingController::class, 'storeEventType'])->name('event-types.store');
+        Route::put('event-types/{eventType}', [SettingController::class, 'updateEventType'])->name('event-types.update');
+        Route::delete('event-types/{eventType}', [SettingController::class, 'destroyEventType'])->name('event-types.destroy');
+        Route::get('notifications', [SettingController::class, 'notifications'])->name('notifications');
+        Route::post('notifications', [SettingController::class, 'updateNotifications'])->name('notifications.update');
+    });
+    
+    // Roles & Permissions
+    Route::resource('roles', RoleController::class)->except(['show']);
+    Route::get('users/{user}/assign-roles', [RoleController::class, 'assignRole'])->name('roles.assign');
+    Route::post('users/{user}/assign-roles', [RoleController::class, 'storeRoleAssignment'])->name('roles.assign.store');
+    
+    // Orders Calendar
+    Route::get('orders/calendar', [OrderController::class, 'calendar'])->name('orders.calendar');
 });

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Traits\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -67,5 +68,25 @@ class Order extends Model
     public function invoice(): HasOne
     {
         return $this->hasOne(Invoice::class);
+    }
+
+    /**
+     * Get the staff assigned to the order.
+     */
+    public function staff(): BelongsToMany
+    {
+        return $this->belongsToMany(Staff::class, 'event_staff')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the equipment assigned to the order.
+     */
+    public function equipment(): BelongsToMany
+    {
+        return $this->belongsToMany(Equipment::class, 'event_equipment')
+            ->withPivot('quantity')
+            ->withTimestamps();
     }
 }

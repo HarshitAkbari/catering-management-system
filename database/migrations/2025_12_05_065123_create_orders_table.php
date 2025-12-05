@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('address');
             $table->string('order_type')->nullable();
             $table->integer('guest_count');
-            $table->unsignedBigInteger('menu_package_id')->nullable();
+            $table->foreignId('menu_package_id')->nullable()->constrained('packages')->onDelete('set null');
             $table->decimal('estimated_cost', 10, 2);
             $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])->default('pending');
             $table->enum('payment_status', ['pending', 'partial', 'paid'])->default('pending');

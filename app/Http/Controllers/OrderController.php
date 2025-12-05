@@ -157,4 +157,21 @@ class OrderController extends Controller
         $order->delete();
         return redirect()->route('orders.index')->with('success', 'Order deleted successfully!');
     }
+
+    public function calendar()
+    {
+        $orders = Order::where('tenant_id', auth()->user()->tenant_id)
+            ->with('customer')
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'title' => $order->customer->name . ' - ' . $order->order_number,
+                    'start' => $order->event_date->format('Y-m-d'),
+                    'url' => route('orders.show', $order),
+                ];
+            });
+
+        return view('orders.calendar', compact('orders'));
+    }
 }
