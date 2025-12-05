@@ -1,0 +1,177 @@
+/**
+ * Toast Notification Utility
+ * Provides a simple API for showing toast notifications
+ */
+class Toast {
+    /**
+     * Show a toast notification
+     * @param {string} message - The message to display
+     * @param {string} type - The type of toast (success, error, warning, info)
+     * @param {number} duration - Duration in milliseconds (0 = no auto-dismiss)
+     * @param {string} position - Position on screen (top-right, top-left, bottom-right, bottom-left)
+     */
+    static show(message, type = 'info', duration = 5000, position = 'top-right') {
+        // Ensure Alpine.js is loaded
+        if (typeof window.Alpine === 'undefined') {
+            console.error('Alpine.js is required for toast notifications');
+            return;
+        }
+
+        // Get or create toast container
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'fixed z-50';
+            document.body.appendChild(container);
+        }
+
+        // Create toast element
+        const toastId = 'toast-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.setAttribute('x-data', '{ show: true }');
+        toast.setAttribute('x-show', 'show');
+        toast.setAttribute('x-transition:enter', 'transition ease-out duration-300');
+        toast.setAttribute('x-transition:enter-start', 'opacity-0 transform translate-y-2');
+        toast.setAttribute('x-transition:enter-end', 'opacity-100 transform translate-y-0');
+        toast.setAttribute('x-transition:leave', 'transition ease-in duration-200');
+        toast.setAttribute('x-transition:leave-start', 'opacity-100');
+        toast.setAttribute('x-transition:leave-end', 'opacity-0');
+        toast.setAttribute('role', 'alert');
+
+        // Type configuration
+        const typeConfig = {
+            success: {
+                bg: 'bg-green-50 dark:bg-green-800',
+                text: 'text-green-500 dark:text-green-200',
+                icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
+            },
+            error: {
+                bg: 'bg-red-50 dark:bg-red-800',
+                text: 'text-red-500 dark:text-red-200',
+                icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>',
+            },
+            warning: {
+                bg: 'bg-yellow-50 dark:bg-yellow-800',
+                text: 'text-yellow-500 dark:text-yellow-200',
+                icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+            },
+            info: {
+                bg: 'bg-blue-50 dark:bg-blue-800',
+                text: 'text-blue-500 dark:text-blue-200',
+                icon: '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>',
+            },
+        };
+
+        const config = typeConfig[type] || typeConfig.info;
+
+        // Position classes
+        const positionClasses = {
+            'top-right': 'top-4 right-4',
+            'top-left': 'top-4 left-4',
+            'bottom-right': 'bottom-4 right-4',
+            'bottom-left': 'bottom-4 left-4',
+        };
+
+        const positionClass = positionClasses[position] || positionClasses['top-right'];
+
+        // Set toast HTML
+        toast.className = `flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 ${config.bg} rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 fixed ${positionClass} z-50`;
+        toast.innerHTML = `
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${config.text} rounded-lg">
+                ${config.icon}
+            </div>
+            <div class="ml-3 text-sm font-normal">${message}</div>
+            <button
+                type="button"
+                class="ml-auto -mx-1.5 -my-1.5 ${config.text} rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:focus:ring-gray-600 dark:hover:bg-gray-700"
+                onclick="this.closest('[role=\\'alert\\']').remove()"
+                aria-label="Close"
+            >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+        `;
+
+        // Append to container
+        container.appendChild(toast);
+
+        // Initialize Alpine.js on the new element
+        window.Alpine.initTree(toast);
+
+        // Auto-dismiss if duration is set
+        if (duration > 0) {
+            setTimeout(() => {
+                const toastElement = document.getElementById(toastId);
+                if (toastElement) {
+                    // Try to get Alpine data, if available
+                    try {
+                        const alpineData = window.Alpine.$data ? window.Alpine.$data(toastElement) : null;
+                        if (alpineData && alpineData.show !== undefined) {
+                            alpineData.show = false;
+                            setTimeout(() => {
+                                if (toastElement.parentNode) {
+                                    toastElement.remove();
+                                }
+                            }, 200); // Wait for transition
+                        } else {
+                            // Fallback: directly remove if Alpine data not available
+                            toastElement.style.opacity = '0';
+                            setTimeout(() => {
+                                if (toastElement.parentNode) {
+                                    toastElement.remove();
+                                }
+                            }, 200);
+                        }
+                    } catch (e) {
+                        // Fallback: directly remove on error
+                        toastElement.style.opacity = '0';
+                        setTimeout(() => {
+                            if (toastElement.parentNode) {
+                                toastElement.remove();
+                            }
+                        }, 200);
+                    }
+                }
+            }, duration);
+        }
+
+        return toastId;
+    }
+
+    /**
+     * Show success toast
+     */
+    static success(message, duration = 5000, position = 'top-right') {
+        return this.show(message, 'success', duration, position);
+    }
+
+    /**
+     * Show error toast
+     */
+    static error(message, duration = 5000, position = 'top-right') {
+        return this.show(message, 'error', duration, position);
+    }
+
+    /**
+     * Show warning toast
+     */
+    static warning(message, duration = 5000, position = 'top-right') {
+        return this.show(message, 'warning', duration, position);
+    }
+
+    /**
+     * Show info toast
+     */
+    static info(message, duration = 5000, position = 'top-right') {
+        return this.show(message, 'info', duration, position);
+    }
+}
+
+// Make Toast available globally
+window.Toast = Toast;
+
+export default Toast;
+

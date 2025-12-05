@@ -4,6 +4,7 @@ import Alpine from 'alpinejs';
 import Chart from 'chart.js/auto';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import './toast';
 
 // Initialize Alpine.js
 window.Alpine = Alpine;
