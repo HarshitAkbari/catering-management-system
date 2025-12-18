@@ -16,13 +16,14 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->string('order_number')->unique();
-            $table->date('event_date');
-            $table->enum('event_time', ['morning', 'afternoon', 'evening', 'night_snack']);
+            $table->string('reference_number')->nullable();
+            $table->date('event_date')->nullable();
+            $table->enum('event_time', ['morning', 'afternoon', 'evening', 'night_snack'])->nullable();
+            $table->string('event_menu')->nullable();
             $table->text('address');
             $table->string('order_type')->nullable();
-            $table->integer('guest_count');
-            $table->foreignId('menu_package_id')->nullable()->constrained('packages')->onDelete('set null');
-            $table->decimal('estimated_cost', 10, 2);
+            $table->integer('guest_count')->nullable();
+            $table->decimal('estimated_cost', 10, 2)->nullable();
             $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])->default('pending');
             $table->enum('payment_status', ['pending', 'partial', 'paid'])->default('pending');
             $table->timestamps();
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->index(['tenant_id', 'order_number']);
             $table->index(['tenant_id', 'event_date']);
             $table->index(['tenant_id', 'status']);
+            $table->index('reference_number');
         });
     }
 

@@ -19,12 +19,13 @@ class Order extends Model
         'tenant_id',
         'customer_id',
         'order_number',
+        'reference_number',
         'event_date',
         'event_time',
+        'event_menu',
         'address',
         'order_type',
         'guest_count',
-        'menu_package_id',
         'estimated_cost',
         'status',
         'payment_status',
@@ -55,29 +56,11 @@ class Order extends Model
     }
 
     /**
-     * Get the package for the order.
-     */
-    public function package(): BelongsTo
-    {
-        return $this->belongsTo(Package::class, 'menu_package_id');
-    }
-
-    /**
      * Get the invoice for the order.
      */
     public function invoice(): HasOne
     {
         return $this->hasOne(Invoice::class);
-    }
-
-    /**
-     * Get the staff assigned to the order.
-     */
-    public function staff(): BelongsToMany
-    {
-        return $this->belongsToMany(Staff::class, 'event_staff')
-            ->withPivot('role')
-            ->withTimestamps();
     }
 
     /**

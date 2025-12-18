@@ -6,13 +6,11 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\StaffController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,35 +38,26 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // Customers
     Route::resource('customers', CustomerController::class);
     
-    // Menu
-    Route::resource('menu', MenuController::class);
-    
     // Payments
     Route::resource('payments', PaymentController::class);
+    Route::post('payments/update-group', [PaymentController::class, 'updateGroupPaymentStatus'])->name('payments.update-group');
     
-    // Inventory
-    Route::resource('inventory', InventoryController::class);
+    // Inventory - Specific routes must come BEFORE resource route
     Route::get('inventory/stock-in', [InventoryController::class, 'stockIn'])->name('inventory.stock-in');
     Route::post('inventory/stock-in', [InventoryController::class, 'storeStockIn'])->name('inventory.stock-in.store');
     Route::get('inventory/stock-out', [InventoryController::class, 'stockOut'])->name('inventory.stock-out');
     Route::post('inventory/stock-out', [InventoryController::class, 'storeStockOut'])->name('inventory.stock-out.store');
     Route::get('inventory/low-stock', [InventoryController::class, 'lowStock'])->name('inventory.low-stock');
+    Route::resource('inventory', InventoryController::class);
     
     // Vendors
     Route::resource('vendors', VendorController::class);
     
-    // Staff
-    Route::resource('staff', StaffController::class);
-    Route::get('orders/{order}/assign-staff', [StaffController::class, 'assignToEvent'])->name('staff.assign');
-    Route::post('orders/{order}/assign-staff', [StaffController::class, 'storeAssignment'])->name('staff.assign.store');
-    Route::get('staff/attendance', [StaffController::class, 'attendance'])->name('staff.attendance');
-    Route::post('staff/attendance', [StaffController::class, 'storeAttendance'])->name('staff.attendance.store');
-    
-    // Equipment
-    Route::resource('equipment', EquipmentController::class);
+    // Equipment - Specific routes must come BEFORE resource route
+    Route::get('equipment/maintenance', [EquipmentController::class, 'maintenance'])->name('equipment.maintenance');
     Route::get('orders/{order}/assign-equipment', [EquipmentController::class, 'assignToEvent'])->name('equipment.assign');
     Route::post('orders/{order}/assign-equipment', [EquipmentController::class, 'storeAssignment'])->name('equipment.assign.store');
-    Route::get('equipment/maintenance', [EquipmentController::class, 'maintenance'])->name('equipment.maintenance');
+    Route::resource('equipment', EquipmentController::class);
     
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {
@@ -76,7 +65,6 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::get('payments', [ReportController::class, 'payments'])->name('payments');
         Route::get('expenses', [ReportController::class, 'expenses'])->name('expenses');
         Route::get('customers', [ReportController::class, 'customers'])->name('customers');
-        Route::get('staff', [ReportController::class, 'staff'])->name('staff');
         Route::get('profit-loss', [ReportController::class, 'profitLoss'])->name('profit-loss');
         Route::get('export', [ReportController::class, 'export'])->name('export');
     });

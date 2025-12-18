@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Models\Staff;
 use App\Models\StockTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +20,7 @@ class ReportController extends Controller
 
         $orders = Order::where('tenant_id', auth()->user()->tenant_id)
             ->whereBetween('event_date', [$startDate, $endDate])
-            ->with('customer', 'package')
+            ->with('customer')
             ->orderBy('event_date', 'desc')
             ->get();
 
@@ -92,23 +91,6 @@ class ReportController extends Controller
         $returningCustomers = $customers->where('orders_count', '>', 1);
 
         return view('reports.customers', compact('customers', 'returningCustomers'));
-    }
-
-    public function staff(Request $request)
-    {
-        $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
-        $endDate = $request->get('end_date', now()->format('Y-m-d'));
-
-        $staff = Staff::where('tenant_id', auth()->user()->tenant_id)
-            ->withCount(['orders' => function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('event_date', [$startDate, $endDate]);
-            }])
-            ->with(['attendance' => function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('date', [$startDate, $endDate]);
-            }])
-            ->get();
-
-        return view('reports.staff', compact('staff', 'startDate', 'endDate'));
     }
 
     public function profitLoss(Request $request)
