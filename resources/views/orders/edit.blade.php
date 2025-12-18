@@ -53,16 +53,6 @@
                 </div>
 
                 <div>
-                    <label for="menu_package_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Menu Package</label>
-                    <select name="menu_package_id" id="menu_package_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="">Select Package</option>
-                        @foreach($packages as $package)
-                            <option value="{{ $package->id }}" {{ old('menu_package_id', $order->menu_package_id) == $package->id ? 'selected' : '' }}>{{ $package->name }} - ₹{{ number_format($package->price, 2) }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
                     <label for="estimated_cost" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estimated Cost</label>
                     <input type="number" name="estimated_cost" id="estimated_cost" required step="0.01" min="0" value="{{ old('estimated_cost', $order->estimated_cost) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 </div>
