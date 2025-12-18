@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\InventoryItem;
+use App\Services\BreadcrumbService;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +27,13 @@ class AppServiceProvider extends ServiceProvider
         Route::bind('inventory', function ($value) {
             return InventoryItem::where('tenant_id', auth()->user()->tenant_id)
                 ->findOrFail($value);
+        });
+
+        // Share breadcrumbs with all views
+        View::composer('*', function ($view) {
+            $breadcrumbService = new BreadcrumbService();
+            $breadcrumbs = $breadcrumbService->generate();
+            $view->with('breadcrumbs', $breadcrumbs);
         });
     }
 }

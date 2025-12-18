@@ -137,6 +137,8 @@
                     <x-alert type="error" dismissible>{{ session('error') }}</x-alert>
                 @endif
 
+                <x-breadcrumb :breadcrumbs="$breadcrumbs ?? []" />
+
                 @yield('content')
             </main>
         </div>
