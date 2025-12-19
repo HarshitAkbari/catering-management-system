@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->string('order_number')->unique();
-            $table->string('reference_number')->nullable();
+            $table->string('order_number');
             $table->date('event_date')->nullable();
             $table->enum('event_time', ['morning', 'afternoon', 'evening', 'night_snack'])->nullable();
             $table->string('event_menu')->nullable();
@@ -31,7 +30,6 @@ return new class extends Migration
             $table->index(['tenant_id', 'order_number']);
             $table->index(['tenant_id', 'event_date']);
             $table->index(['tenant_id', 'status']);
-            $table->index('reference_number');
         });
     }
 

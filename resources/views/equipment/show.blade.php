@@ -19,9 +19,7 @@
                 @if($equipment->category)<div><dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Category</dt><dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $equipment->category }}</dd></div>@endif
                 <div><dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Quantity</dt><dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $equipment->quantity }}</dd></div>
                 <div><dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Available Quantity</dt><dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $equipment->available_quantity }}</dd></div>
-                <div><dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt><dd class="mt-1"><span class="px-2 py-1 text-xs font-semibold rounded-full {{ $equipment->status === 'available' ? 'bg-green-100 text-green-800' : ($equipment->status === 'maintenance' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">{{ ucfirst($equipment->status) }}</span></dd></div>
-                @if($equipment->last_maintenance_date)<div><dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Last Maintenance</dt><dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $equipment->last_maintenance_date->format('M d, Y') }}</dd></div>@endif
-                @if($equipment->next_maintenance_date)<div><dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Next Maintenance</dt><dd class="mt-1 text-sm text-gray-900 dark:text-white {{ $equipment->isMaintenanceDue() ? 'text-red-600 font-semibold' : '' }}">{{ $equipment->next_maintenance_date->format('M d, Y') }}</dd></div>@endif
+                <div><dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt><dd class="mt-1"><span class="px-2 py-1 text-xs font-semibold rounded-full {{ $equipment->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">{{ ucfirst($equipment->status) }}</span></dd></div>
             </dl>
         </div>
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">

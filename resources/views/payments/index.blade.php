@@ -50,8 +50,8 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                @if($group['reference_number'])
-                                    <button type="button" onclick="openPaymentModal('{{ $group['reference_number'] }}', {{ $group['orders']->count() }}, '{{ $paymentStatus }}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                @if($group['orders']->count() > 1)
+                                    <button type="button" onclick="openPaymentModal('{{ $group['order_number'] }}', {{ $group['orders']->count() }}, '{{ $paymentStatus }}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
                                         Update Payment
                                     </button>
                                 @else
@@ -81,9 +81,9 @@
         @csrf
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reference Number</label>
-                <input type="text" id="modal-reference-number" readonly class="w-full rounded-md border-gray-300 shadow-sm bg-gray-100 dark:bg-gray-600 dark:border-gray-600 dark:text-white">
-                <input type="hidden" name="reference_number" id="hidden-reference-number">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Order Number</label>
+                <input type="text" id="modal-order-number" readonly class="w-full rounded-md border-gray-300 shadow-sm bg-gray-100 dark:bg-gray-600 dark:border-gray-600 dark:text-white">
+                <input type="hidden" name="order_number" id="hidden-order-number">
             </div>
             
             <div>
@@ -113,9 +113,9 @@
 </x-modal>
 
 <script>
-    function openPaymentModal(referenceNumber, orderCount, currentStatus) {
-        document.getElementById('modal-reference-number').value = referenceNumber;
-        document.getElementById('hidden-reference-number').value = referenceNumber;
+    function openPaymentModal(orderNumber, orderCount, currentStatus) {
+        document.getElementById('modal-order-number').value = orderNumber;
+        document.getElementById('hidden-order-number').value = orderNumber;
         document.getElementById('modal-order-count').value = orderCount + ' order(s)';
         document.getElementById('modal-payment-status').value = currentStatus === 'mixed' ? 'pending' : currentStatus;
         openModal('payment-modal');

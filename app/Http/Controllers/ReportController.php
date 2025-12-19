@@ -18,15 +18,37 @@ class ReportController extends Controller
         $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
 
-        $orders = Order::where('tenant_id', auth()->user()->tenant_id)
+        // Get all orders with customer relationship
+        $allOrders = Order::where('tenant_id', auth()->user()->tenant_id)
             ->whereBetween('event_date', [$startDate, $endDate])
             ->with('customer')
-            ->orderBy('event_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
+        // Group orders by order_number
+        $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) {
+            $firstOrder = $orderGroup->first();
+            return [
+                'order_number' => $orderNumber,
+                'customer' => $firstOrder->customer,
+                'total_amount' => $orderGroup->sum('estimated_cost'),
+                'status' => $this->getGroupStatus($orderGroup),
+                'payment_status' => $this->getGroupPaymentStatus($orderGroup),
+                'orders' => $orderGroup,
+                'created_at' => $firstOrder->created_at,
+                'event_date' => $orderGroup->min('event_date'),
+            ];
+        })->values();
+
+        // Sort by created_at
+        $orders = $groupedOrders
+            ->sortByDesc('created_at')
+            ->values();
+
+        // Calculate summary based on grouped orders
         $summary = [
             'total_orders' => $orders->count(),
-            'total_amount' => $orders->sum('estimated_cost'),
+            'total_amount' => $orders->sum('total_amount'),
             'confirmed' => $orders->where('status', 'confirmed')->count(),
             'completed' => $orders->where('status', 'completed')->count(),
             'pending' => $orders->where('status', 'pending')->count(),
@@ -121,6 +143,24 @@ class ReportController extends Controller
         // This would typically use a package like Laravel Excel or DomPDF
         // For now, we'll just redirect back with a message
         return back()->with('info', 'Export functionality will be implemented with PDF/Excel packages.');
+    }
+
+    /**
+     * Get group status - returns status if all orders have same status, otherwise "mixed"
+     */
+    private function getGroupStatus($orderGroup): string
+    {
+        $statuses = $orderGroup->pluck('status')->unique()->filter();
+        return $statuses->count() === 1 ? $statuses->first() : 'mixed';
+    }
+
+    /**
+     * Get group payment status - returns payment status if all orders have same status, otherwise "mixed"
+     */
+    private function getGroupPaymentStatus($orderGroup): string
+    {
+        $paymentStatuses = $orderGroup->pluck('payment_status')->unique()->filter();
+        return $paymentStatuses->count() === 1 ? $paymentStatuses->first() : 'mixed';
     }
 }
 
