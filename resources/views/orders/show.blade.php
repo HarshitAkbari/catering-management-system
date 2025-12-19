@@ -22,8 +22,8 @@
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Summary</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Reference Number</p>
-                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ $order->reference_number ?? 'N/A' }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Order Number</p>
+                <p class="text-lg font-medium text-gray-900 dark:text-white">{{ $order->order_number }}</p>
             </div>
             <div>
                 <p class="text-sm text-gray-600 dark:text-gray-400">Customer</p>

@@ -20,15 +20,11 @@ class Equipment extends Model
         'quantity',
         'available_quantity',
         'status',
-        'last_maintenance_date',
-        'next_maintenance_date',
     ];
 
     protected function casts(): array
     {
         return [
-            'last_maintenance_date' => 'date',
-            'next_maintenance_date' => 'date',
             'status' => 'string',
         ];
     }
@@ -49,18 +45,6 @@ class Equipment extends Model
         return $this->belongsToMany(Order::class, 'event_equipment')
             ->withPivot('quantity')
             ->withTimestamps();
-    }
-
-    /**
-     * Check if maintenance is due.
-     */
-    public function isMaintenanceDue(): bool
-    {
-        if (!$this->next_maintenance_date) {
-            return false;
-        }
-
-        return $this->next_maintenance_date->isPast();
     }
 }
 

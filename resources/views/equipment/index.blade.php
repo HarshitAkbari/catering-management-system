@@ -7,7 +7,6 @@
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Equipment</h1>
         <div class="flex space-x-3">
-            <a href="{{ route('equipment.maintenance') }}" class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg">Maintenance</a>
             <a href="{{ route('equipment.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">Add Equipment</a>
         </div>
     </div>
@@ -31,7 +30,7 @@
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $item->category ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $item->quantity }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $item->available_quantity }}</td>
-                            <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full {{ $item->status === 'available' ? 'bg-green-100 text-green-800' : ($item->status === 'maintenance' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">{{ ucfirst($item->status) }}</span></td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full {{ $item->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">{{ ucfirst($item->status) }}</span></td>
                             <td class="px-6 py-4 text-sm font-medium">
                                 <a href="{{ route('equipment.show', $item) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
                                 <a href="{{ route('equipment.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>

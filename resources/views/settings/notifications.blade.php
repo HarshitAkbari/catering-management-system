@@ -13,7 +13,6 @@
                 <div class="flex items-center justify-between"><label class="text-sm font-medium text-gray-700 dark:text-gray-300">Email Notifications</label><input type="checkbox" name="email_enabled" value="1" {{ ($settings['email_enabled'] ?? false) ? 'checked' : '' }} class="rounded border-gray-300"></div>
                 <div class="flex items-center justify-between"><label class="text-sm font-medium text-gray-700 dark:text-gray-300">Low Stock Alerts</label><input type="checkbox" name="low_stock_alert" value="1" {{ ($settings['low_stock_alert'] ?? true) ? 'checked' : '' }} class="rounded border-gray-300"></div>
                 <div class="flex items-center justify-between"><label class="text-sm font-medium text-gray-700 dark:text-gray-300">Payment Reminders</label><input type="checkbox" name="payment_reminder" value="1" {{ ($settings['payment_reminder'] ?? true) ? 'checked' : '' }} class="rounded border-gray-300"></div>
-                <div class="flex items-center justify-between"><label class="text-sm font-medium text-gray-700 dark:text-gray-300">Maintenance Reminders</label><input type="checkbox" name="maintenance_reminder" value="1" {{ ($settings['maintenance_reminder'] ?? true) ? 'checked' : '' }} class="rounded border-gray-300"></div>
             </div>
             <div class="mt-6 flex justify-end space-x-3">
                 <a href="{{ route('settings.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</a>

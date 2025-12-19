@@ -138,7 +138,6 @@ class SettingController extends Controller
             'email_enabled' => Setting::getValue('email_enabled', false),
             'low_stock_alert' => Setting::getValue('low_stock_alert', true),
             'payment_reminder' => Setting::getValue('payment_reminder', true),
-            'maintenance_reminder' => Setting::getValue('maintenance_reminder', true),
         ];
 
         return view('settings.notifications', compact('settings'));
@@ -151,7 +150,6 @@ class SettingController extends Controller
             'email_enabled' => 'nullable|boolean',
             'low_stock_alert' => 'nullable|boolean',
             'payment_reminder' => 'nullable|boolean',
-            'maintenance_reminder' => 'nullable|boolean',
         ]);
 
         foreach ($validated as $key => $value) {

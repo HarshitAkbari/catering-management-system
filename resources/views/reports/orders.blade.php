@@ -22,8 +22,31 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Order #</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Customer</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Event Date</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Amount</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th></tr></thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse($orders as $order)
-                        <tr><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $order->order_number }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $order->customer->name }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $order->event_date->format('M d, Y') }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">₹{{ number_format($order->estimated_cost, 2) }}</td><td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full {{ $order->status === 'confirmed' ? 'bg-green-100 text-green-800' : ($order->status === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">{{ ucfirst($order->status) }}</span></td></tr>
+                    @forelse($orders as $group)
+                        @php
+                            $status = $group['status'];
+                        @endphp
+                        <tr>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                                {{ $group['order_number'] }}
+                                @if($group['orders']->count() > 1)
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">({{ $group['orders']->count() }} orders)</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $group['customer']->name }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $group['event_date']->format('M d, Y') }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">₹{{ number_format($group['total_amount'], 2) }}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                    {{ $status === 'confirmed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : '' }}
+                                    {{ $status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : '' }}
+                                    {{ $status === 'completed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' : '' }}
+                                    {{ $status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : '' }}
+                                    {{ $status === 'mixed' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : '' }}">
+                                    {{ ucfirst($status) }}
+                                </span>
+                            </td>
+                        </tr>
                     @empty
                         <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No orders found</td></tr>
                     @endforelse

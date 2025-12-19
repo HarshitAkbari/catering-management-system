@@ -54,7 +54,6 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::resource('vendors', VendorController::class);
     
     // Equipment - Specific routes must come BEFORE resource route
-    Route::get('equipment/maintenance', [EquipmentController::class, 'maintenance'])->name('equipment.maintenance');
     Route::get('orders/{order}/assign-equipment', [EquipmentController::class, 'assignToEvent'])->name('equipment.assign');
     Route::post('orders/{order}/assign-equipment', [EquipmentController::class, 'storeAssignment'])->name('equipment.assign.store');
     Route::resource('equipment', EquipmentController::class);

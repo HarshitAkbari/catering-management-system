@@ -21,15 +21,11 @@ class PaymentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        // Separate orders with and without reference_number
-        $ordersWithRef = $allOrders->filter(fn($order) => !empty($order->reference_number));
-        $ordersWithoutRef = $allOrders->filter(fn($order) => empty($order->reference_number));
-        
-        // Group orders by reference_number
-        $groupedOrders = $ordersWithRef->groupBy('reference_number')->map(function ($orderGroup, $referenceNumber) {
+        // Group orders by order_number
+        $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) {
             $firstOrder = $orderGroup->first();
             return [
-                'reference_number' => $referenceNumber,
+                'order_number' => $orderNumber,
                 'customer' => $firstOrder->customer,
                 'total_amount' => $orderGroup->sum('estimated_cost'),
                 'payment_status' => $this->getGroupPaymentStatus($orderGroup),
@@ -38,20 +34,8 @@ class PaymentController extends Controller
             ];
         })->values();
         
-        // Add individual orders without reference_number as separate entries
-        $individualOrders = $ordersWithoutRef->map(function ($order) {
-            return [
-                'reference_number' => null,
-                'customer' => $order->customer,
-                'total_amount' => $order->estimated_cost,
-                'payment_status' => $order->payment_status,
-                'orders' => collect([$order]),
-                'created_at' => $order->created_at,
-            ];
-        });
-        
-        // Merge grouped and individual orders, then sort by created_at
-        $allGroupedOrders = $groupedOrders->concat($individualOrders)
+        // Sort by created_at
+        $allGroupedOrders = $groupedOrders
             ->sortByDesc('created_at')
             ->values();
         
@@ -76,15 +60,15 @@ class PaymentController extends Controller
     public function updateGroupPaymentStatus(Request $request)
     {
         $validated = $request->validate([
-            'reference_number' => 'required|string',
+            'order_number' => 'required|string',
             'payment_status' => 'required|in:pending,partial,paid',
         ]);
         
         $tenantId = auth()->user()->tenant_id;
         
-        // Update all orders with same reference_number
+        // Update all orders with same order_number
         $updatedCount = Order::where('tenant_id', $tenantId)
-            ->where('reference_number', $validated['reference_number'])
+            ->where('order_number', $validated['order_number'])
             ->update(['payment_status' => $validated['payment_status']]);
         
         return redirect()->route('payments.index')
