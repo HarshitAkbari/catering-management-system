@@ -31,9 +31,7 @@ class EquipmentController extends Controller
             'category' => 'nullable|string|max:255',
             'quantity' => 'required|integer|min:0',
             'available_quantity' => 'required|integer|min:0',
-            'status' => 'required|in:available,maintenance,damaged',
-            'last_maintenance_date' => 'nullable|date',
-            'next_maintenance_date' => 'nullable|date',
+            'status' => 'required|in:available,damaged',
         ]);
 
         Equipment::create([
@@ -63,9 +61,7 @@ class EquipmentController extends Controller
             'category' => 'nullable|string|max:255',
             'quantity' => 'required|integer|min:0',
             'available_quantity' => 'required|integer|min:0',
-            'status' => 'required|in:available,maintenance,damaged',
-            'last_maintenance_date' => 'nullable|date',
-            'next_maintenance_date' => 'nullable|date',
+            'status' => 'required|in:available,damaged',
         ]);
 
         $equipment->update($validated);
@@ -110,19 +106,6 @@ class EquipmentController extends Controller
         $order->equipment()->sync($syncData);
 
         return redirect()->route('orders.show', $order)->with('success', 'Equipment assigned successfully!');
-    }
-
-    public function maintenance()
-    {
-        $equipment = Equipment::where('tenant_id', auth()->user()->tenant_id)
-            ->where(function ($query) {
-                $query->where('status', 'maintenance')
-                    ->orWhere('next_maintenance_date', '<=', now());
-            })
-            ->orderBy('next_maintenance_date')
-            ->get();
-
-        return view('equipment.maintenance', compact('equipment'));
     }
 }
 

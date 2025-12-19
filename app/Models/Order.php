@@ -19,7 +19,6 @@ class Order extends Model
         'tenant_id',
         'customer_id',
         'order_number',
-        'reference_number',
         'event_date',
         'event_time',
         'event_menu',

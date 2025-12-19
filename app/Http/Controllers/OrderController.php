@@ -22,15 +22,11 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        // Separate orders with and without reference_number
-        $ordersWithRef = $allOrders->filter(fn($order) => !empty($order->reference_number));
-        $ordersWithoutRef = $allOrders->filter(fn($order) => empty($order->reference_number));
-        
-        // Group orders by reference_number
-        $groupedOrders = $ordersWithRef->groupBy('reference_number')->map(function ($orderGroup, $referenceNumber) {
+        // Group orders by order_number
+        $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) {
             $firstOrder = $orderGroup->first();
             return [
-                'reference_number' => $referenceNumber,
+                'order_number' => $orderNumber,
                 'customer' => $firstOrder->customer,
                 'total_amount' => $orderGroup->sum('estimated_cost'),
                 'status' => $this->getGroupStatus($orderGroup),
@@ -40,21 +36,8 @@ class OrderController extends Controller
             ];
         })->values();
         
-        // Add individual orders without reference_number as separate entries
-        $individualOrders = $ordersWithoutRef->map(function ($order) {
-            return [
-                'reference_number' => null,
-                'customer' => $order->customer,
-                'total_amount' => $order->estimated_cost,
-                'status' => $order->status,
-                'payment_status' => $order->payment_status,
-                'orders' => collect([$order]),
-                'created_at' => $order->created_at,
-            ];
-        });
-        
-        // Merge grouped and individual orders, then sort by created_at
-        $allGroupedOrders = $groupedOrders->concat($individualOrders)
+        // Sort by created_at
+        $allGroupedOrders = $groupedOrders
             ->sortByDesc('created_at')
             ->values();
         
@@ -144,27 +127,33 @@ class OrderController extends Controller
             $customer->update($updateData);
         }
 
-        // Generate unique reference number
-        $referenceNumber = 'REF-' . strtoupper(Str::random(8));
-        while (Order::withoutGlobalScopes()->where('tenant_id', $tenantId)->where('reference_number', $referenceNumber)->exists()) {
-            $referenceNumber = 'REF-' . strtoupper(Str::random(8));
+        // Determine order number for this batch
+        // Check if an order exists for the same customer and first event date
+        $firstEventDate = $validated['events'][0]['event_date'];
+        $existingOrder = Order::where('tenant_id', $tenantId)
+            ->where('customer_id', $customer->id)
+            ->where('event_date', $firstEventDate)
+            ->first();
+
+        if ($existingOrder) {
+            // Reuse existing order number for all events in this batch
+            $orderNumber = $existingOrder->order_number;
+        } else {
+            // Generate unique order number for this batch
+            $orderNumber = 'ORD-' . strtoupper(Str::random(8));
+            while (Order::where('tenant_id', $tenantId)->where('order_number', $orderNumber)->exists()) {
+                $orderNumber = 'ORD-' . strtoupper(Str::random(8));
+            }
         }
 
         // Create orders for each event
         $createdOrders = [];
         foreach ($validated['events'] as $event) {
-            // Generate unique order number
-            $orderNumber = 'ORD-' . strtoupper(Str::random(8));
-            while (Order::withoutGlobalScopes()->where('tenant_id', $tenantId)->where('order_number', $orderNumber)->exists()) {
-                $orderNumber = 'ORD-' . strtoupper(Str::random(8));
-            }
-
             try {
                 $order = Order::create([
                     'tenant_id' => $tenantId,
                     'customer_id' => $customer->id,
                     'order_number' => $orderNumber,
-                    'reference_number' => $referenceNumber,
                     'address' => $validated['address'],
                     'event_date' => $event['event_date'],
                     'event_time' => $event['event_time'],
@@ -198,8 +187,8 @@ class OrderController extends Controller
 
         $eventCount = count($createdOrders);
         $message = $eventCount === 1 
-            ? "Order created successfully with reference number: {$referenceNumber}!"
-            : "{$eventCount} orders created successfully with reference number: {$referenceNumber}!";
+            ? "Order created successfully with order number: {$orderNumber}!"
+            : "{$eventCount} orders created successfully with order number: {$orderNumber}!";
 
         return redirect()->route('orders.index')->with('success', $message);
     }
@@ -208,18 +197,13 @@ class OrderController extends Controller
     {
         $order->load('customer', 'invoice.payments');
         
-        // If order has reference_number, load all orders with same reference_number
-        if (!empty($order->reference_number)) {
-            $relatedOrders = Order::with('customer')
-                ->where('tenant_id', auth()->user()->tenant_id)
-                ->where('reference_number', $order->reference_number)
-                ->orderBy('event_date', 'asc')
-                ->orderBy('event_time', 'asc')
-                ->get();
-        } else {
-            // Single order without reference_number
-            $relatedOrders = collect([$order]);
-        }
+        // Load all orders with same order_number
+        $relatedOrders = Order::with('customer')
+            ->where('tenant_id', auth()->user()->tenant_id)
+            ->where('order_number', $order->order_number)
+            ->orderBy('event_date', 'asc')
+            ->orderBy('event_time', 'asc')
+            ->get();
         
         return view('orders.show', compact('order', 'relatedOrders'));
     }
