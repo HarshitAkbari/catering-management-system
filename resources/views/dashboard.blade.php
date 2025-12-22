@@ -134,6 +134,86 @@
     </div>
     @endif
 
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Revenue Trend Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                            Revenue Trend (Last 6 Months)
+                        </h2>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 ml-7">Based on actual payments received</p>
+                    </div>
+                    <div class="relative group">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="absolute right-0 top-6 w-64 p-3 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                            Revenue is calculated from actual payments recorded in the system, grouped by payment date. This shows cash received, not order totals or invoice amounts.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6">
+                <canvas id="revenueTrendChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- Orders Over Time Chart -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                    </svg>
+                    Orders Over Time
+                </h2>
+            </div>
+            <div class="p-6">
+                <canvas id="ordersOverTimeChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Payment Status Distribution -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
+                        <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    Payment Status Distribution
+                </h2>
+            </div>
+            <div class="p-6">
+                <canvas id="paymentStatusChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue Comparison -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Monthly Revenue Comparison
+                </h2>
+            </div>
+            <div class="p-6">
+                <canvas id="monthlyComparisonChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Upcoming Events -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
@@ -214,5 +294,192 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = @json($chartData);
+    const isDarkMode = document.documentElement.classList.contains('dark');
+
+    // Chart.js default configuration
+    Chart.defaults.color = isDarkMode ? '#9CA3AF' : '#6B7280';
+    Chart.defaults.borderColor = isDarkMode ? '#374151' : '#E5E7EB';
+    Chart.defaults.backgroundColor = isDarkMode ? '#1F2937' : '#FFFFFF';
+
+    // Revenue Trend Chart (Line Chart)
+    const revenueCtx = document.getElementById('revenueTrendChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.revenue_trend.labels,
+                datasets: [{
+                    label: 'Revenue (Payments Received) (₹)',
+                    data: chartData.revenue_trend.data,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '₹' + parseFloat(context.parsed.y).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Orders Over Time Chart (Bar Chart)
+    const ordersCtx = document.getElementById('ordersOverTimeChart');
+    if (ordersCtx) {
+        new Chart(ordersCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.orders_over_time.labels,
+                datasets: [
+                    {
+                        label: 'Confirmed',
+                        data: chartData.orders_over_time.confirmed,
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: 'rgb(16, 185, 129)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Completed',
+                        data: chartData.orders_over_time.completed,
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderColor: 'rgb(59, 130, 246)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Payment Status Distribution (Doughnut Chart)
+    const paymentStatusCtx = document.getElementById('paymentStatusChart');
+    if (paymentStatusCtx) {
+        new Chart(paymentStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.payment_status.labels,
+                datasets: [{
+                    data: chartData.payment_status.data,
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                    ],
+                    borderColor: [
+                        'rgb(239, 68, 68)',
+                        'rgb(245, 158, 11)',
+                        'rgb(16, 185, 129)',
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    }
+
+    // Monthly Revenue Comparison (Bar Chart)
+    const monthlyCtx = document.getElementById('monthlyComparisonChart');
+    if (monthlyCtx) {
+        new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.monthly_comparison.labels,
+                datasets: [{
+                    label: 'Revenue (₹)',
+                    data: [chartData.monthly_comparison.previous, chartData.monthly_comparison.current],
+                    backgroundColor: [
+                        'rgba(156, 163, 175, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                    ],
+                    borderColor: [
+                        'rgb(156, 163, 175)',
+                        'rgb(59, 130, 246)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '₹' + parseFloat(context.parsed.y).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+@endpush
 @endsection
 

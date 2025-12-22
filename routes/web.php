@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
@@ -41,6 +42,12 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // Payments
     Route::resource('payments', PaymentController::class);
     Route::post('payments/update-group', [PaymentController::class, 'updateGroupPaymentStatus'])->name('payments.update-group');
+    
+    // Invoices
+    Route::get('invoices/generate/{orderNumber}', [InvoiceController::class, 'generate'])->name('invoices.generate');
+    Route::get('invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
+    Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     
     // Inventory - Specific routes must come BEFORE resource route
     Route::get('inventory/stock-in', [InventoryController::class, 'stockIn'])->name('inventory.stock-in');
@@ -91,4 +98,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     
     // Orders Calendar
     Route::get('orders/calendar', [OrderController::class, 'calendar'])->name('orders.calendar');
+    
+    // Global Search
+    Route::get('search', [\App\Http\Controllers\SearchController::class, 'search'])->name('search');
 });
