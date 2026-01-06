@@ -25,6 +25,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+    Route::get('/forgot-password', function () {
+        return view('auth.forgot-password');
+    })->name('forgot-password');
+    Route::get('/lock-screen', function () {
+        return view('auth.lock-screen');
+    })->name('lock-screen');
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
