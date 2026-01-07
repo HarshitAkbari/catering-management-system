@@ -50,15 +50,31 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                @if($group['orders']->count() > 1)
-                                    <button type="button" onclick="openPaymentModal('{{ $group['order_number'] }}', {{ $group['orders']->count() }}, '{{ $paymentStatus }}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        Update Payment
-                                    </button>
-                                @else
-                                    <a href="{{ route('orders.edit', $group['orders']->first()) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                        Update Payment
-                                    </a>
-                                @endif
+                                <div class="flex items-center space-x-3">
+                                    @if($group['invoice'])
+                                        <a href="{{ route('invoices.show', $group['invoice']) }}" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 font-medium">
+                                            View Invoice
+                                        </a>
+                                        <span class="text-gray-400">|</span>
+                                        <a href="{{ route('invoices.download', $group['invoice']) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                            Download PDF
+                                        </a>
+                                    @else
+                                        <a href="{{ route('invoices.generate', $group['order_number']) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium">
+                                            Generate Invoice
+                                        </a>
+                                    @endif
+                                    <span class="text-gray-400">|</span>
+                                    @if($group['orders']->count() > 1)
+                                        <button type="button" onclick="openPaymentModal('{{ $group['order_number'] }}', {{ $group['orders']->count() }}, '{{ $paymentStatus }}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                            Update Payment
+                                        </button>
+                                    @else
+                                        <a href="{{ route('orders.edit', $group['orders']->first()) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                            Update Payment
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

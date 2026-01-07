@@ -1,85 +1,66 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Catering Management</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen">
-    <div class="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-        <div class="w-full max-w-md">
-            <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
-                <div class="mb-8">
-                    <h2 class="text-center text-4xl font-bold text-white mb-2">
-                        Sign in to your account
-                    </h2>
-                </div>
-                <form class="space-y-6" method="POST" action="{{ route('login') }}">
-                    @csrf
-                    <div class="space-y-5">
-                        <div>
-                            <label for="email" class="block text-sm font-semibold text-white mb-2">Email address</label>
-                            <input 
-                                id="email" 
-                                name="email" 
-                                type="email" 
-                                required 
-                                autofocus 
-                                value="{{ old('email') }}" 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                placeholder="Enter your email"
-                            >
-                            @error('email')
-                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div>
-                            <label for="password" class="block text-sm font-semibold text-white mb-2">Password</label>
-                            <input 
-                                id="password" 
-                                name="password" 
-                                type="password" 
-                                required 
-                                class="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                placeholder="Enter your password"
-                            >
-                            @error('password')
-                                <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    </div>
+{{-- Extends layout --}}
+@extends('layout.fullwidth2')
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input 
-                                id="remember" 
-                                name="remember" 
-                                type="checkbox" 
-                                class="h-4 w-4 rounded border-gray-600 bg-gray-800/50 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
-                            >
-                            <label for="remember" class="ml-2 block text-sm text-white">Remember me</label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <button 
-                            type="submit" 
-                            class="w-full py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent"
-                        >
-                            Sign in
-                        </button>
-                    </div>
-
-                    <div class="text-center pt-4">
-                        <a href="{{ route('register') }}" class="text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200">
-                            Don't have an account? Register
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-
+{{-- Content --}}
+@section('content')
+   <div class="col-xl-12 mt-3">
+		<div class="card">
+			<div class="card-body p-0">
+				<div class="row m-0">
+					<div class="col-xl-6 col-md-6 sign text-center">
+						<div>
+							<div class="text-center my-5">
+								<a href="{{ route('dashboard') }}"><img width="200" src="{{ asset('images/logo-full.png') }}" alt=""></a>
+							</div>
+							<img src="{{ asset('images/log.png') }}" class="education-img" alt="Login">
+						</div>	
+					</div>
+					<div class="col-xl-6 col-md-6">
+						<div class="sign-in-your">
+							<h4 class="fs-20 font-w800 text-black">Sign in your account</h4>
+							<span>Welcome back! Login with your data that you entered<br> during registration</span>
+							<div class="login-social">
+								<a href="javascript:void(0);" class="btn font-w800 d-block my-4"><i class="fab fa-google me-2 text-primary"></i>Login with Google</a>
+								<a href="javascript:void(0);" class="btn font-w800 d-block my-4"><i class="fab fa-facebook-f me-2 facebook-log"></i>Login with Facebook</a>
+							</div>
+							<form method="POST" action="{{ route('login') }}">
+								@csrf
+								<div class="mb-3">
+									<label class="mb-1"><strong>Email</strong></label>
+									<input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+									@error('email')
+										<div class="invalid-feedback">{{ $message }}</div>
+									@enderror
+								</div>
+								<div class="mb-3">
+									<label class="mb-1"><strong>Password</strong></label>
+									<input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
+									@error('password')
+										<div class="invalid-feedback">{{ $message }}</div>
+									@enderror
+								</div>
+								<div class="row d-flex justify-content-between mt-4 mb-2">
+									<div class="mb-3">
+									   <div class="form-check custom-checkbox ms-1">
+											<input type="checkbox" name="remember" class="form-check-input" id="remember">
+											<label class="form-check-label" for="remember">Remember my preference</label>
+										</div>
+									</div>
+									<div class="mb-3">
+										<a href="{{ route('forgot-password') }}">Forgot Password?</a>
+									</div>
+								</div>
+								<div class="text-center">
+									<button type="submit" class="btn btn-primary btn-block">Sign Me In</button>
+								</div>
+							</form>
+							<div class="text-center mt-3">
+								<p>Don't have an account? <a class="text-primary" href="{{ route('register') }}">Register</a></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+@endsection

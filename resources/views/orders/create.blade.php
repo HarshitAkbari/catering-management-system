@@ -1,329 +1,387 @@
-@extends('layouts.app')
-
-@section('title', 'Create Order')
+@extends('layout.default')
 
 @section('content')
-<div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Create New Order</h1>
+	<div class="container-fluid">
+		<div class="row page-titles">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item active"><a href="javascript:void(0)">Orders</a></li>
+				<li class="breadcrumb-item"><a href="javascript:void(0)">Create</a></li>
+			</ol>
+        </div>
+        <!-- row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Create New Order</h4>
+                    </div>
+                    <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>There were errors with your submission:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
-    @if ($errors->any())
-        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                        There were errors with your submission:
-                    </h3>
-                    <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                        <ul class="list-disc list-inside space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                        <div class="form-validation">
+                            <form class="needs-validation" action="{{ route('orders.store') }}" method="POST" novalidate>
+                                @csrf
+
+                                <div class="row">
+                                        <div class="row">
+                                            <!-- First Row: 3 Columns -->
+                                            <div class="col-md-4 mb-4">
+                                                <label class="form-label" for="customer_name">Customer Name
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                                    placeholder="Enter customer name.." value="{{ old('customer_name') }}" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a customer name.
+                                                </div>
+                                                @error('customer_name')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <label class="form-label" for="customer_email">Customer Email
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="email" class="form-control" id="customer_email" name="customer_email" 
+                                                    placeholder="Enter customer email.." value="{{ old('customer_email') }}" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a valid email.
+                                                </div>
+                                                @error('customer_email')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <label class="form-label" for="customer_mobile">Contact Number
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" 
+                                                    placeholder="Enter contact number.." value="{{ old('customer_mobile') }}" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a contact number.
+                                                </div>
+                                                @error('customer_mobile')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Second Row: Full Width Address -->
+                                        <div class="row">
+                                            <div class="col-12 mb-4">
+                                                <label class="form-label" for="address">Address
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <textarea class="form-control" id="address" name="address" rows="3" 
+                                                    placeholder="Enter address.." required>{{ old('address') }}</textarea>
+                                                <div class="invalid-feedback">
+                                                    Please enter an address.
+                                                </div>
+                                                @error('address')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Add Event Button -->
+                                        <div class="mb-4">
+                                            <button type="button" id="add-event-btn" class="btn btn-success">
+                                                <i class="bi bi-plus-circle me-2"></i>Add Event
+                                            </button>
+                                        </div>
+                                </div>
+
+                                <!-- Events Table -->
+                                <div class="row">
+                                        <div id="events-container" class="mt-4 d-none">
+                                            <h5 class="mb-3">Events</h5>
+                                            @error('events')
+                                                <div class="alert alert-danger">{{ $message }}</div>
+                                            @enderror
+                                            @error('events.*')
+                                                <div class="alert alert-danger">{{ $message }}</div>
+                                            @enderror
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Event Date</th>
+                                                            <th>Event Time</th>
+                                                            <th>Event Menu</th>
+                                                            <th>Guest Count</th>
+                                                            <th>Order Type</th>
+                                                            <th>Dish Price</th>
+                                                            <th>Cost</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="events-table-body">
+                                                        <!-- Events will be added here dynamically -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                </div>
+
+                                <!-- Hidden input for events data -->
+                                <input type="hidden" name="events" id="events-data" value="">
+
+                                <div class="row mt-4">
+                                    <div class="col-xl-8 col-lg-10 mx-auto">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="{{ route('orders.index') }}" class="btn btn-secondary">Cancel</a>
+                                            <button type="submit" id="submit-btn" class="btn btn-primary">Create Order</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    @endif
+    </div>
+@endsection
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <form action="{{ route('orders.store') }}" method="POST">
-            @csrf
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="customer_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer Name</label>
-                    <input type="text" name="customer_name" id="customer_name" required value="{{ old('customer_name') }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    @error('customer_name')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="customer_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer Email</label>
-                    <input type="email" name="customer_email" id="customer_email" required value="{{ old('customer_email') }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    @error('customer_email')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="customer_mobile" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contact Number</label>
-                    <input type="text" name="customer_mobile" id="customer_mobile" required value="{{ old('customer_mobile') }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    @error('customer_mobile')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="md:col-span-2">
-                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
-                    <textarea name="address" id="address" rows="3" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ old('address') }}</textarea>
-                    @error('address')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="md:col-span-2">
-                    <button type="button" id="add-event-btn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                        Add Event
-                    </button>
-                </div>
+<!-- Event Modal -->
+<div class="modal fade" id="event-modal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Add Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="modal-body">
+                <form id="event-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-event-date" class="form-label">Event Date <span class="text-danger">*</span></label>
+                            <input type="date" id="modal-event-date" required class="form-control">
+                        </div>
 
-            <!-- Events Table -->
-            <div id="events-container" class="mt-6 hidden">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Events</h2>
-                @error('events')
-                    <p class="mb-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-                @error('events.*')
-                    <p class="mb-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Event Date</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Event Time</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Event Menu</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Guest Count</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Order Type</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Dish Price</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cost</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="events-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            <!-- Events will be added here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-event-time" class="form-label">Event Time <span class="text-danger">*</span></label>
+                            <select id="modal-event-time" required class="form-control default-select">
+                                <option value="">Select Time</option>
+                                <option value="morning">Morning</option>
+                                <option value="afternoon">Afternoon</option>
+                                <option value="evening">Evening</option>
+                                <option value="night_snack">Snack</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="modal-event-menu" class="form-label">Event Menu <span class="text-danger">*</span></label>
+                            <input type="text" id="modal-event-menu" required class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-guest-count" class="form-label">Guest Count <span class="text-danger">*</span></label>
+                            <input type="number" id="modal-guest-count" min="1" required class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-order-type" class="form-label">Order Type</label>
+                            <select id="modal-order-type" class="form-control default-select">
+                                <option value="">Select Order Type</option>
+                                <option value="full_service">Full Service</option>
+                                <option value="preparation_only">Preparation Only</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-dish-price" class="form-label">Dish Price <span class="text-danger">*</span></label>
+                            <input type="number" id="modal-dish-price" step="0.01" min="0" required class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-cost" class="form-label">Cost</label>
+                            <input type="text" id="modal-cost" readonly class="form-control" value="0.00">
+                        </div>
+                    </div>
+                </form>
             </div>
-
-            <!-- Hidden input for events data -->
-            <input type="hidden" name="events" id="events-data" value="">
-
-            <div class="mt-6 flex justify-end space-x-3">
-                <a href="{{ route('orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</a>
-                <button type="submit" id="submit-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Create Order</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="save-event-btn" class="btn btn-primary">Add Event</button>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<!-- Event Modal -->
-<x-modal id="event-modal" title="Add Event" size="large">
-    <form id="event-form" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="modal-event-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Event Date</label>
-                <input type="date" id="modal-event-date" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            </div>
+@section('scripts')
+    <script>
+        (function () {
+          'use strict'
 
-            <div>
-                <label for="modal-event-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Event Time</label>
-                <select id="modal-event-time" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    <option value="">Select Time</option>
-                    <option value="morning">Morning</option>
-                    <option value="afternoon">Afternoon</option>
-                    <option value="evening">Evening</option>
-                    <option value="night_snack">Snack</option>
-                </select>
-            </div>
+          // Fetch all the forms we want to apply custom Bootstrap validation styles to
+          var forms = document.querySelectorAll('.needs-validation')
 
-            <div class="md:col-span-2">
-                <label for="modal-event-menu" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Event Menu</label>
-                <input type="text" id="modal-event-menu" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            </div>
+          // Loop over them and prevent submission
+          Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+              form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }
 
-            <div>
-                <label for="modal-guest-count" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guest Count</label>
-                <input type="number" id="modal-guest-count" min="1" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            </div>
+                form.classList.add('was-validated')
+              }, false)
+            })
+        })()
 
-            <div>
-                <label for="modal-order-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Order Type</label>
-                <select id="modal-order-type" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    <option value="">Select Order Type</option>
-                    <option value="full_service">Full Service</option>
-                    <option value="preparation_only">Preparation Only</option>
-                </select>
-            </div>
+        let events = [];
+        let editingIndex = -1;
+        let eventModal;
 
-            <div>
-                <label for="modal-dish-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Dish Price</label>
-                <input type="number" id="modal-dish-price" step="0.01" min="0" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            </div>
+        document.addEventListener('DOMContentLoaded', function() {
+            eventModal = new bootstrap.Modal(document.getElementById('event-modal'));
 
-            <div>
-                <label for="modal-cost" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cost</label>
-                <input type="text" id="modal-cost" readonly class="w-full rounded-md border-gray-300 shadow-sm bg-gray-100 dark:bg-gray-600 dark:border-gray-600 dark:text-white" value="0.00">
-            </div>
-        </div>
-    </form>
+            // Open modal when Add Event button is clicked
+            document.getElementById('add-event-btn').addEventListener('click', function() {
+                editingIndex = -1;
+                resetEventForm();
+                eventModal.show();
+            });
 
-    <x-slot name="footer">
-        <button type="button" onclick="closeModal('event-modal')" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition-colors">
-            Cancel
-        </button>
-        <button type="button" id="save-event-btn" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors">
-            Add Event
-        </button>
-    </x-slot>
-</x-modal>
+            // Calculate cost when guest count or dish price changes
+            document.getElementById('modal-guest-count').addEventListener('input', calculateCost);
+            document.getElementById('modal-dish-price').addEventListener('input', calculateCost);
 
-<script>
-    let events = [];
-    let editingIndex = -1;
+            // Save event
+            document.getElementById('save-event-btn').addEventListener('click', function() {
+                const form = document.getElementById('event-form');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
 
-    // Open modal when Add Event button is clicked
-    document.getElementById('add-event-btn').addEventListener('click', function() {
-        editingIndex = -1;
-        resetEventForm();
-        openModal('event-modal');
-    });
+                const eventData = {
+                    event_date: document.getElementById('modal-event-date').value,
+                    event_time: document.getElementById('modal-event-time').value,
+                    event_menu: document.getElementById('modal-event-menu').value,
+                    guest_count: parseInt(document.getElementById('modal-guest-count').value),
+                    order_type: document.getElementById('modal-order-type').value || null,
+                    dish_price: parseFloat(document.getElementById('modal-dish-price').value),
+                    cost: parseFloat(document.getElementById('modal-cost').value)
+                };
 
-    // Calculate cost when guest count or dish price changes
-    document.getElementById('modal-guest-count').addEventListener('input', calculateCost);
-    document.getElementById('modal-dish-price').addEventListener('input', calculateCost);
+                if (editingIndex >= 0) {
+                    events[editingIndex] = eventData;
+                } else {
+                    events.push(eventData);
+                }
 
-    function calculateCost() {
-        const guestCount = parseFloat(document.getElementById('modal-guest-count').value) || 0;
-        const dishPrice = parseFloat(document.getElementById('modal-dish-price').value) || 0;
-        const cost = guestCount * dishPrice;
-        document.getElementById('modal-cost').value = cost.toFixed(2);
-    }
+                updateEventsTable();
+                updateEventsData();
+                eventModal.hide();
+                resetEventForm();
+            });
 
-    // Save event
-    document.getElementById('save-event-btn').addEventListener('click', function() {
-        const form = document.getElementById('event-form');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
+            // Validate events before form submission
+            document.querySelector('form[action="{{ route('orders.store') }}"]').addEventListener('submit', function(e) {
+                updateEventsData();
+                
+                if (events.length === 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+        });
+
+        function calculateCost() {
+            const guestCount = parseFloat(document.getElementById('modal-guest-count').value) || 0;
+            const dishPrice = parseFloat(document.getElementById('modal-dish-price').value) || 0;
+            const cost = guestCount * dishPrice;
+            document.getElementById('modal-cost').value = cost.toFixed(2);
         }
 
-        const eventData = {
-            event_date: document.getElementById('modal-event-date').value,
-            event_time: document.getElementById('modal-event-time').value,
-            event_menu: document.getElementById('modal-event-menu').value,
-            guest_count: parseInt(document.getElementById('modal-guest-count').value),
-            order_type: document.getElementById('modal-order-type').value || null,
-            dish_price: parseFloat(document.getElementById('modal-dish-price').value),
-            cost: parseFloat(document.getElementById('modal-cost').value)
-        };
-
-        if (editingIndex >= 0) {
-            // Update existing event
-            events[editingIndex] = eventData;
-        } else {
-            // Add new event
-            events.push(eventData);
+        function resetEventForm() {
+            document.getElementById('event-form').reset();
+            document.getElementById('modal-cost').value = '0.00';
+            document.getElementById('save-event-btn').textContent = 'Add Event';
         }
 
-        updateEventsTable();
-        updateEventsData();
-        closeModal('event-modal');
-        resetEventForm();
-    });
+        function updateEventsTable() {
+            const tbody = document.getElementById('events-table-body');
+            const container = document.getElementById('events-container');
+            
+            if (events.length === 0) {
+                container.classList.add('d-none');
+                tbody.innerHTML = '';
+                return;
+            }
 
-    function resetEventForm() {
-        document.getElementById('event-form').reset();
-        document.getElementById('modal-cost').value = '0.00';
-        document.getElementById('save-event-btn').textContent = 'Add Event';
-    }
+            container.classList.remove('d-none');
+            tbody.innerHTML = events.map((event, index) => {
+                const eventTimeLabels = {
+                    'morning': 'Morning',
+                    'afternoon': 'Afternoon',
+                    'evening': 'Evening',
+                    'night_snack': 'Snack'
+                };
 
-    function updateEventsTable() {
-        const tbody = document.getElementById('events-table-body');
-        const container = document.getElementById('events-container');
-        
-        if (events.length === 0) {
-            container.classList.add('hidden');
-            tbody.innerHTML = '';
-            return;
+                const orderTypeLabels = {
+                    'full_service': 'Full Service',
+                    'preparation_only': 'Preparation Only'
+                };
+
+                return `
+                    <tr>
+                        <td>${event.event_date}</td>
+                        <td>${eventTimeLabels[event.event_time] || event.event_time}</td>
+                        <td>${event.event_menu}</td>
+                        <td>${event.guest_count}</td>
+                        <td>${orderTypeLabels[event.order_type] || event.order_type || '-'}</td>
+                        <td>₹${event.dish_price.toFixed(2)}</td>
+                        <td><strong>₹${event.cost.toFixed(2)}</strong></td>
+                        <td>
+                            <button type="button" onclick="editEvent(${index})" class="btn btn-sm btn-primary me-1">Edit</button>
+                            <button type="button" onclick="deleteEvent(${index})" class="btn btn-sm btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        container.classList.remove('hidden');
-        tbody.innerHTML = events.map((event, index) => {
-            const eventTimeLabels = {
-                'morning': 'Morning',
-                'afternoon': 'Afternoon',
-                'evening': 'Evening',
-                'night_snack': 'Snack'
-            };
-
-            const orderTypeLabels = {
-                'full_service': 'Full Service',
-                'preparation_only': 'Preparation Only'
-            };
-
-            return `
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">${event.event_date}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">${eventTimeLabels[event.event_time] || event.event_time}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">${event.event_menu}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">${event.guest_count}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">${orderTypeLabels[event.order_type] || event.order_type || '-'}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">${event.dish_price.toFixed(2)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${event.cost.toFixed(2)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                        <button type="button" onclick="editEvent(${index})" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Edit</button>
-                        <button type="button" onclick="deleteEvent(${index})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    function editEvent(index) {
-        editingIndex = index;
-        const event = events[index];
-        
-        document.getElementById('modal-event-date').value = event.event_date;
-        document.getElementById('modal-event-time').value = event.event_time;
-        document.getElementById('modal-event-menu').value = event.event_menu;
-        document.getElementById('modal-guest-count').value = event.guest_count;
-        document.getElementById('modal-order-type').value = event.order_type || '';
-        document.getElementById('modal-dish-price').value = event.dish_price;
-        document.getElementById('modal-cost').value = event.cost.toFixed(2);
-        document.getElementById('save-event-btn').textContent = 'Update Event';
-        
-        openModal('event-modal');
-    }
-
-    function deleteEvent(index) {
-        if (confirm('Are you sure you want to delete this event?')) {
-            events.splice(index, 1);
-            updateEventsTable();
-            updateEventsData();
+        function editEvent(index) {
+            editingIndex = index;
+            const event = events[index];
+            
+            document.getElementById('modal-event-date').value = event.event_date;
+            document.getElementById('modal-event-time').value = event.event_time;
+            document.getElementById('modal-event-menu').value = event.event_menu;
+            document.getElementById('modal-guest-count').value = event.guest_count;
+            document.getElementById('modal-order-type').value = event.order_type || '';
+            document.getElementById('modal-dish-price').value = event.dish_price;
+            document.getElementById('modal-cost').value = event.cost.toFixed(2);
+            document.getElementById('save-event-btn').textContent = 'Update Event';
+            
+            eventModal.show();
         }
-    }
 
-    function updateEventsData() {
-        document.getElementById('events-data').value = JSON.stringify(events);
-    }
-
-    // Validate events before form submission
-    document.querySelector('form[action="{{ route('orders.store') }}"]').addEventListener('submit', function(e) {
-        // Ensure events data is up to date
-        updateEventsData();
-        
-        if (events.length === 0) {
-            e.preventDefault();
-            alert('Please add at least one event before submitting.');
-            return false;
+        function deleteEvent(index) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                events.splice(index, 1);
+                updateEventsTable();
+                updateEventsData();
+            }
         }
-        
-        // Log for debugging (remove in production)
-        console.log('Submitting events:', events);
-        console.log('Events JSON:', document.getElementById('events-data').value);
-    });
-</script>
+
+        function updateEventsData() {
+            document.getElementById('events-data').value = JSON.stringify(events);
+        }
+    </script>
 @endsection
-

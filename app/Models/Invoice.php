@@ -57,4 +57,37 @@ class Invoice extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    /**
+     * Get all orders with the same order_number as the invoice's order.
+     */
+    public function relatedOrders()
+    {
+        if (!$this->order) {
+            return collect();
+        }
+
+        return Order::where('tenant_id', $this->tenant_id)
+            ->where('order_number', $this->order->order_number)
+            ->with('customer')
+            ->orderBy('event_date')
+            ->get();
+    }
+
+    /**
+     * Calculate the total amount from all related orders.
+     */
+    public function calculateTotalFromOrders(): float
+    {
+        $orders = $this->relatedOrders();
+        return (float) $orders->sum('estimated_cost');
+    }
+
+    /**
+     * Get the customer from the invoice's order.
+     */
+    public function getCustomerAttribute()
+    {
+        return $this->order?->customer;
+    }
 }

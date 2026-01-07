@@ -22,8 +22,14 @@ class PaymentController extends Controller
             ->get();
         
         // Group orders by order_number
-        $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) {
+        $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) use ($tenantId) {
             $firstOrder = $orderGroup->first();
+            
+            // Check if invoice exists for any order in this group
+            $invoice = Invoice::where('tenant_id', $tenantId)
+                ->whereIn('order_id', $orderGroup->pluck('id'))
+                ->first();
+            
             return [
                 'order_number' => $orderNumber,
                 'customer' => $firstOrder->customer,
@@ -31,6 +37,7 @@ class PaymentController extends Controller
                 'payment_status' => $this->getGroupPaymentStatus($orderGroup),
                 'orders' => $orderGroup,
                 'created_at' => $firstOrder->created_at,
+                'invoice' => $invoice,
             ];
         })->values();
         
