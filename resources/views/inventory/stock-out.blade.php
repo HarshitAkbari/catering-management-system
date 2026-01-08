@@ -2,51 +2,108 @@
 
 @section('title', 'Stock Out')
 
-@section('content')
-<div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Stock Out</h1>
+@section('page_content')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('inventory.index') }}">Inventory</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">Stock Out</a></li>
+    </ol>
+</div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <form action="{{ route('inventory.stock-out.store') }}" method="POST">
-            @csrf
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Stock Out</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-validation">
+                    <form class="needs-validation" action="{{ route('inventory.stock-out.store') }}" method="POST" novalidate>
+                        @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="inventory_item_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Inventory Item</label>
-                    <select name="inventory_item_id" id="inventory_item_id" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="">Select Item</option>
-                        @foreach($inventoryItems as $item)
-                            <option value="{{ $item->id }}" data-stock="{{ $item->current_stock }}">{{ $item->name }} (Available: {{ number_format($item->current_stock, 2) }} {{ $item->unit }})</option>
-                        @endforeach
-                    </select>
-                    @error('inventory_item_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="inventory_item_id">Inventory Item
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select name="inventory_item_id" id="inventory_item_id" required class="form-control default-select">
+                                    <option value="">Select Item</option>
+                                    @foreach($inventoryItems as $item)
+                                        <option value="{{ $item->id }}" data-stock="{{ $item->current_stock }}" {{ old('inventory_item_id') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->name }} (Available: {{ number_format($item->current_stock, 2) }} {{ $item->unit }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select an inventory item.
+                                </div>
+                                @error('inventory_item_id')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                <div>
-                    <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
-                    <input type="number" name="quantity" id="quantity" required step="0.01" min="0.01" value="{{ old('quantity') }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                    @error('quantity')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label" for="quantity">Quantity
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                    step="0.01" min="0.01" value="{{ old('quantity') }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter a quantity.
+                                </div>
+                                @error('quantity')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                <div class="md:col-span-2">
-                    <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
-                    <textarea name="notes" id="notes" rows="3" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ old('notes') }}</textarea>
-                    @error('notes')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label" for="notes">Notes</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                    placeholder="Enter notes..">{{ old('notes') }}</textarea>
+                                @error('notes')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-xl-8 col-lg-10 mx-auto">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary">Cancel</a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-box-arrow-up me-2"></i>Reduce Stock
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="mt-6 flex justify-end space-x-3">
-                <a href="{{ route('inventory.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</a>
-                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Reduce Stock</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 @endsection
 
+@section('scripts')
+<script>
+    (function () {
+      'use strict'
+
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+</script>
+@endsection
