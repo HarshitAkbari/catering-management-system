@@ -1,27 +1,153 @@
-@extends('layouts.app')
+@extends('layout.default')
 
 @section('title', 'Edit Equipment')
 
 @section('content')
-<div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Equipment</h1>
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <form action="{{ route('equipment.update', $equipment) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label><input type="text" name="name" required value="{{ old('name', $equipment->name) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">@error('name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label><input type="text" name="category" value="{{ old('category', $equipment->category) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">@error('category')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Total Quantity</label><input type="number" name="quantity" required min="0" value="{{ old('quantity', $equipment->quantity) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">@error('quantity')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Available Quantity</label><input type="number" name="available_quantity" required min="0" value="{{ old('available_quantity', $equipment->available_quantity) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">@error('available_quantity')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
-                <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label><select name="status" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"><option value="available" {{ $equipment->status === 'available' ? 'selected' : '' }}>Available</option><option value="damaged" {{ $equipment->status === 'damaged' ? 'selected' : '' }}>Damaged</option></select>@error('status')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror</div>
+<div class="container-fluid">
+    <div class="row page-titles">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('equipment.index') }}">Equipment</a></li>
+            <li class="breadcrumb-item active"><a href="javascript:void(0)">Edit Equipment</a></li>
+        </ol>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Edit Equipment</h4>
+                </div>
+                <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>There were errors with your submission:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <div class="form-validation">
+                        <form class="needs-validation" action="{{ route('equipment.update', $equipment) }}" method="POST" id="equipmentForm" novalidate>
+                            @csrf
+                            @method('PUT')
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 mb-3">
+                                    <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $equipment->name) }}" placeholder="Enter equipment name.." required>
+                                    <div class="invalid-feedback">
+                                        Please enter a equipment name.
+                                    </div>
+                                    @error('name')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-6 col-md-6 mb-3">
+                                    <label class="form-label" for="category">Category</label>
+                                    <input type="text" name="category" id="category" class="form-control @error('category') is-invalid @enderror" value="{{ old('category', $equipment->category) }}" placeholder="e.g., Tables, Chairs">
+                                    @error('category')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-6 col-md-6 mb-3">
+                                    <label class="form-label" for="quantity">Total Quantity <span class="text-danger">*</span></label>
+                                    <input type="number" name="quantity" id="quantity" class="form-control @error('quantity') is-invalid @enderror" value="{{ old('quantity', $equipment->quantity) }}" placeholder="Enter total quantity.." required min="0">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid quantity (minimum 0).
+                                    </div>
+                                    @error('quantity')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-6 col-md-6 mb-3">
+                                    <label class="form-label" for="available_quantity">Available Quantity <span class="text-danger">*</span></label>
+                                    <input type="number" name="available_quantity" id="available_quantity" class="form-control @error('available_quantity') is-invalid @enderror" value="{{ old('available_quantity', $equipment->available_quantity) }}" placeholder="Enter available quantity.." required min="0">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid available quantity (minimum 0).
+                                    </div>
+                                    <small class="form-text text-muted">Available quantity cannot exceed total quantity</small>
+                                    @error('available_quantity')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-6 col-md-6 mb-3">
+                                    <label class="form-label" for="status">Status <span class="text-danger">*</span></label>
+                                    <select name="status" id="status" class="form-control default-select @error('status') is-invalid @enderror" required>
+                                        <option value="">Select Status</option>
+                                        <option value="available" {{ old('status', $equipment->status) === 'available' ? 'selected' : '' }}>Available</option>
+                                        <option value="damaged" {{ old('status', $equipment->status) === 'damaged' ? 'selected' : '' }}>Damaged</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a status.
+                                    </div>
+                                    @error('status')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{{ route('equipment.index') }}" class="btn btn-secondary">Cancel</a>
+                                        <button type="submit" class="btn btn-primary">Update Equipment</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <a href="{{ route('equipment.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</a>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update Equipment</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-@endsection
 
+@section('scripts')
+<script>
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('equipmentForm');
+        const quantityInput = document.getElementById('quantity');
+        const availableQuantityInput = document.getElementById('available_quantity');
+        
+        function validateQuantities() {
+            const quantity = parseInt(quantityInput.value) || 0;
+            const availableQuantity = parseInt(availableQuantityInput.value) || 0;
+            
+            if (availableQuantity > quantity) {
+                availableQuantityInput.setCustomValidity('Available quantity cannot exceed total quantity');
+                availableQuantityInput.classList.add('is-invalid');
+            } else {
+                availableQuantityInput.setCustomValidity('');
+                if (form.classList.contains('was-validated')) {
+                    availableQuantityInput.classList.remove('is-invalid');
+                }
+            }
+        }
+        
+        quantityInput.addEventListener('input', validateQuantities);
+        availableQuantityInput.addEventListener('input', validateQuantities);
+    });
+</script>
+@endsection
+@endsection
