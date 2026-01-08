@@ -30,7 +30,16 @@ class EquipmentController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'nullable|string|max:255',
             'quantity' => 'required|integer|min:0',
-            'available_quantity' => 'required|integer|min:0',
+            'available_quantity' => [
+                'required',
+                'integer',
+                'min:0',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value > $request->input('quantity')) {
+                        $fail('The available quantity cannot exceed the total quantity.');
+                    }
+                },
+            ],
             'status' => 'required|in:available,damaged',
         ]);
 
@@ -60,7 +69,16 @@ class EquipmentController extends Controller
             'name' => 'required|string|max:255',
             'category' => 'nullable|string|max:255',
             'quantity' => 'required|integer|min:0',
-            'available_quantity' => 'required|integer|min:0',
+            'available_quantity' => [
+                'required',
+                'integer',
+                'min:0',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value > $request->input('quantity')) {
+                        $fail('The available quantity cannot exceed the total quantity.');
+                    }
+                },
+            ],
             'status' => 'required|in:available,damaged',
         ]);
 
@@ -97,6 +115,18 @@ class EquipmentController extends Controller
 
         $equipmentIds = $validated['equipment_ids'];
         $quantities = $validated['quantities'];
+
+        // Validate that assigned quantities don't exceed available quantities
+        foreach ($equipmentIds as $index => $equipmentId) {
+            $equipment = Equipment::find($equipmentId);
+            $requestedQuantity = $quantities[$index] ?? 1;
+            
+            if ($equipment && $requestedQuantity > $equipment->available_quantity) {
+                return back()->withErrors([
+                    'quantities.' . $index => "The requested quantity ({$requestedQuantity}) exceeds available quantity ({$equipment->available_quantity}) for {$equipment->name}."
+                ])->withInput();
+            }
+        }
 
         $syncData = [];
         foreach ($equipmentIds as $index => $equipmentId) {

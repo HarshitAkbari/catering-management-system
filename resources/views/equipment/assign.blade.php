@@ -1,85 +1,171 @@
-@extends('layouts.app')
+@extends('layout.default')
 
 @section('title', 'Assign Equipment')
 
 @section('content')
-<div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Assign Equipment to Event</h1>
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="mb-4">
-            <p class="text-sm text-gray-600 dark:text-gray-400">Order: <span class="font-semibold">{{ $order->order_number }}</span></p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Event Date: <span class="font-semibold">{{ $order->event_date->format('M d, Y') }}</span></p>
+<div class="container-fluid">
+    <div class="row page-titles">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('orders.index') }}">Orders</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('orders.show', $order) }}">Order Details</a></li>
+            <li class="breadcrumb-item active"><a href="javascript:void(0)">Assign Equipment</a></li>
+        </ol>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Assign Equipment to Event</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-lg-6 col-md-6">
+                            <p class="mb-0"><span class="text-muted">Order :</span> <strong>{{ $order->order_number }}</strong></p>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <p class="mb-0"><span class="text-muted">Event Date :</span> <strong>{{ $order->event_date->format('M d, Y') }}</strong></p>
+                        </div>
+                    </div>
+                    <form action="{{ route('equipment.assign.store', $order) }}" method="POST" id="assignForm">
+                        @csrf
+                        <div id="equipment-container">
+                            @foreach($assignedEquipment as $assignedItem)
+                                <div class="row mb-3 equipment-item">
+                                    <div class="col-lg-6 col-md-6 mb-3">
+                                        <label class="form-label">Equipment <span class="text-danger">*</span></label>
+                                        <select name="equipment_ids[]" class="form-control default-select @error('equipment_ids.*') is-invalid @enderror" required>
+                                            <option value="">Select Equipment</option>
+                                            @foreach($equipment as $eqItem)
+                                                <option value="{{ $eqItem->id }}" {{ $assignedItem->id == $eqItem->id ? 'selected' : '' }}>
+                                                    {{ $eqItem->name }} (Available: {{ $eqItem->available_quantity }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('equipment_ids.*')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 mb-3">
+                                        <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                                        <input type="number" name="quantities[]" class="form-control @error('quantities.*') is-invalid @enderror" value="{{ $assignedItem->pivot->quantity ?? 1 }}" required min="1">
+                                        @error('quantities.*')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 mb-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row" onclick="removeEquipmentRow(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                            @if($assignedEquipment->isEmpty())
+                                <div class="row mb-3 equipment-item">
+                                    <div class="col-lg-6 col-md-6 mb-3">
+                                        <label class="form-label">Equipment <span class="text-danger">*</span></label>
+                                        <select name="equipment_ids[]" class="form-control default-select" required>
+                                            <option value="">Select Equipment</option>
+                                            @foreach($equipment as $eqItem)
+                                                <option value="{{ $eqItem->id }}">{{ $eqItem->name }} (Available: {{ $eqItem->available_quantity }})</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 mb-3">
+                                        <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                                        <input type="number" name="quantities[]" class="form-control" value="1" required min="1">
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 mb-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger btn-sm remove-row" onclick="removeEquipmentRow(this)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="addEquipmentRow()">
+                                    <i class="bi bi-plus-circle me-1"></i>Add Another Equipment
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ route('orders.show', $order) }}" class="btn btn-secondary">Cancel</a>
+                                    <button type="submit" class="btn btn-primary">Assign Equipment</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <form action="{{ route('equipment.assign.store', $order) }}" method="POST">
-            @csrf
-            <div id="equipment-container" class="space-y-4">
-                @foreach($assignedEquipment as $index => $item)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 equipment-item">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Equipment</label>
-                            <select name="equipment_ids[]" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                <option value="">Select Equipment</option>
-                                @foreach($equipment as $item)
-                                    <option value="{{ $item->id }}" {{ $assignedEquipment->contains($item->id) ? 'selected' : '' }}>{{ $item->name }} (Available: {{ $item->available_quantity }})</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
-                            <input type="number" name="quantities[]" value="{{ $item->pivot->quantity ?? 1 }}" required min="1" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        </div>
-                    </div>
-                @endforeach
-                @if($assignedEquipment->isEmpty())
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 equipment-item">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Equipment</label>
-                            <select name="equipment_ids[]" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                <option value="">Select Equipment</option>
-                                @foreach($equipment as $item)
-                                    <option value="{{ $item->id }}">{{ $item->name }} (Available: {{ $item->available_quantity }})</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
-                            <input type="number" name="quantities[]" value="1" required min="1" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        </div>
-                    </div>
-                @endif
-            </div>
-            <div class="mt-4">
-                <button type="button" onclick="addEquipmentRow()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">Add Another Equipment</button>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <a href="{{ route('orders.show', $order) }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</a>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Assign Equipment</button>
-            </div>
-        </form>
     </div>
 </div>
+
 <script>
+const equipmentOptions = @json($equipment->map(function($item) {
+    return [
+        'id' => $item->id,
+        'name' => $item->name,
+        'available' => $item->available_quantity
+    ];
+}));
+
 function addEquipmentRow() {
     const container = document.getElementById('equipment-container');
     const newRow = document.createElement('div');
-    newRow.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 equipment-item';
+    newRow.className = 'row mb-3 equipment-item';
+    
+    let optionsHtml = '<option value="">Select Equipment</option>';
+    equipmentOptions.forEach(function(item) {
+        optionsHtml += `<option value="${item.id}">${item.name} (Available: ${item.available})</option>`;
+    });
+    
     newRow.innerHTML = `
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Equipment</label>
-            <select name="equipment_ids[]" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <option value="">Select Equipment</option>
-                @foreach($equipment as $item)
-                    <option value="{{ $item->id }}">{{ $item->name }} (Available: {{ $item->available_quantity }})</option>
-                @endforeach
+        <div class="col-lg-6 col-md-6 mb-3">
+            <label class="form-label">Equipment <span class="text-danger">*</span></label>
+            <select name="equipment_ids[]" class="form-control default-select" required>
+                ${optionsHtml}
             </select>
         </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantity</label>
-            <input type="number" name="quantities[]" value="1" required min="1" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        <div class="col-lg-5 col-md-5 mb-3">
+            <label class="form-label">Quantity <span class="text-danger">*</span></label>
+            <input type="number" name="quantities[]" class="form-control" value="1" required min="1">
+        </div>
+        <div class="col-lg-1 col-md-1 mb-3 d-flex align-items-end">
+            <button type="button" class="btn btn-danger btn-sm remove-row" onclick="removeEquipmentRow(this)">
+                <i class="bi bi-trash"></i>
+            </button>
         </div>
     `;
     container.appendChild(newRow);
+    
+    // Reinitialize nice select for the new dropdown
+    if (typeof jQuery !== 'undefined' && jQuery('.default-select').length > 0) {
+        jQuery(newRow).find('.default-select').niceSelect();
+    }
 }
+
+function removeEquipmentRow(button) {
+    const row = button.closest('.equipment-item');
+    if (row && document.querySelectorAll('.equipment-item').length > 1) {
+        row.remove();
+    } else {
+        alert('At least one equipment item is required.');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('assignForm');
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
 </script>
 @endsection
-

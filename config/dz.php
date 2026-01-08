@@ -43,8 +43,38 @@ return [
 		],
 		'pagelevel' => [
 			'css' => [
+				'ReportController_profitLoss' => [
+				],
+				'ReportController_payments' => [
+				],
+				'ReportController_orders' => [
+				],
+				'ReportController_expenses' => [
+				],
+				'ReportController_customers' => [
+				],
 			],
 			'js' => [
+				'ReportController_profitLoss' => [
+					'vendor/chart.js/Chart.bundle.min.js',
+					'vendor/apexchart/apexchart.js',
+				],
+				'ReportController_payments' => [
+					'vendor/chart.js/Chart.bundle.min.js',
+					'vendor/apexchart/apexchart.js',
+				],
+				'ReportController_orders' => [
+					'vendor/chart.js/Chart.bundle.min.js',
+					'vendor/apexchart/apexchart.js',
+				],
+				'ReportController_expenses' => [
+					'vendor/chart.js/Chart.bundle.min.js',
+					'vendor/apexchart/apexchart.js',
+				],
+				'ReportController_customers' => [
+					'vendor/chart.js/Chart.bundle.min.js',
+					'vendor/apexchart/apexchart.js',
+				],
 			]
 		],
 	]
