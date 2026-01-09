@@ -14,7 +14,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table id="ordersTable" class="datatable table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th>Customer Name</th>
@@ -70,13 +70,9 @@
                         </tbody>
                     </table>
                 </div>
-                @if(method_exists($orders, 'links'))
-                    <div class="mt-3">
-                        {{ $orders->links() }}
-                    </div>
-                @endif
             </div>
         </div>
     </div>
 </div>
 @endsection
+

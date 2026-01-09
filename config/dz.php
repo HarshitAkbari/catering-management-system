@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Catering Management'),
+    'name' => env('DZ_APP_NAME', 'Catering Pro'),
 
 
     'public' => [
@@ -28,6 +28,7 @@ return [
 		'global' => [
 			'css' => [
 				'vendor/jquery-nice-select/css/nice-select.css',
+				'vendor/datatables/css/jquery.dataTables.min.css',
 				'css/style.css',
 			],
 			'js' => [
@@ -36,7 +37,8 @@ return [
 					'vendor/jquery-nice-select/js/jquery.nice-select.min.js',	
 				],
 				'bottom'=>[
-					'js/custom.min.js',
+					'vendor/datatables/js/jquery.dataTables.min.js',
+					'js/custom.js',
 					'js/dlabnav-init.js',
 				],
 			],

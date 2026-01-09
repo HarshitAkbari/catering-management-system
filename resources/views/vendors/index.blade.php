@@ -20,7 +20,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-sm mb-0 table-striped">
+                        <table class="datatable table table-sm mb-0 table-striped">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -93,11 +93,6 @@
                             </tbody>
                         </table>
                     </div>
-                    @if($vendors->hasPages())
-                        <div class="d-flex justify-content-center mt-3">
-                            {{ $vendors->links() }}
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
