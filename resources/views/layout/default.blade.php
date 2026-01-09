@@ -216,6 +216,13 @@
     <!--**********************************
         Scripts
     ***********************************-->
+    
+    <!-- APP Configuration -->
+    <script>
+        window.APP_CONFIG = {
+            defaultPageLength: 15
+        };
+    </script>
 
     @if(!empty(config('dz.public.global.js.top')))
         @foreach(config('dz.public.global.js.top') as $script)

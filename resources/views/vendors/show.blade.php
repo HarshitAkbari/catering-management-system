@@ -61,7 +61,7 @@
                 <div class="card-body">
                     @if($vendor->stockTransactions->count() > 0)
                         <div class="table-responsive">
-                            <table class="table table-sm mb-0 table-striped">
+                            <table class="datatable table table-sm mb-0 table-striped">
                                 <thead>
                                     <tr>
                                         <th>Item Name</th>

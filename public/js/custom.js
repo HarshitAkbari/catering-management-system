@@ -423,6 +423,144 @@
 		}
 	}
 	
+	var handleDataTable = function(){
+		'use strict';
+		
+		// Wait for DataTables to be available
+		if(typeof $.fn.DataTable === 'undefined') {
+			// Retry after a short delay if DataTables isn't loaded yet
+			setTimeout(function() {
+				handleDataTable();
+			}, 100);
+			return;
+		}
+		
+		// Default page length from APP_CONFIG or fallback to 15
+		var defaultPageLength = (window.APP_CONFIG && window.APP_CONFIG.defaultPageLength) ? window.APP_CONFIG.defaultPageLength : 15;
+		
+		// Standard datatable - full features
+		if($('.datatable').length > 0) {
+			$('.datatable').each(function() {
+				var $table = $(this);
+				var tableId = $table.attr('id') || '';
+				
+				// Check if table has data-order-column and data-order-dir attributes
+				var orderColumn = $table.data('order-column');
+				var orderDir = $table.data('order-dir');
+				
+				// Build columnDefs - exclude last column if it contains "Action" or "Actions" in header
+				var columnDefs = [];
+				var lastHeader = $table.find('thead th').last().text().trim().toLowerCase();
+				if(lastHeader.includes('action')) {
+					var totalCols = $table.find('thead th').length;
+					columnDefs.push({
+						orderable: false,
+						targets: totalCols - 1
+					});
+				}
+				
+				var options = {
+					pageLength: defaultPageLength,
+					lengthMenu: [[10, 15, 25, 50, -1], [10, 15, 25, 50, "All"]],
+					language: {
+						search: "Search:",
+						lengthMenu: "Show _MENU_ entries",
+						info: "Showing _START_ to _END_ of _TOTAL_ entries",
+						infoEmpty: "Showing 0 to 0 of 0 entries",
+						infoFiltered: "(filtered from _MAX_ total entries)",
+						paginate: {
+							next: '<i class="bi bi-chevron-right" aria-hidden="true"></i>',
+							previous: '<i class="bi bi-chevron-left" aria-hidden="true"></i>'
+						}
+					}
+				};
+				
+				// Add columnDefs if needed
+				if(columnDefs.length > 0) {
+					options.columnDefs = columnDefs;
+				}
+				
+				// Add ordering if specified
+				if(orderColumn !== undefined && orderDir !== undefined) {
+					options.order = [[parseInt(orderColumn), orderDir]];
+				}
+				
+				$table.DataTable(options);
+			});
+		}
+		
+		// datatable-no-initial-order - same features but no initial sort
+		if($('.datatable-no-initial-order').length > 0) {
+			$('.datatable-no-initial-order').each(function() {
+				var $table = $(this);
+				
+				// Check for custom order attributes
+				var orderColumn = $table.data('order-column');
+				var orderDir = $table.data('order-dir');
+				
+				// Build columnDefs - exclude last column if it contains "Action" or "Actions" in header
+				var columnDefs = [];
+				var lastHeader = $table.find('thead th').last().text().trim().toLowerCase();
+				if(lastHeader.includes('action')) {
+					var totalCols = $table.find('thead th').length;
+					columnDefs.push({
+						orderable: false,
+						targets: totalCols - 1
+					});
+				}
+				
+				var options = {
+					pageLength: defaultPageLength,
+					lengthMenu: [[10, 15, 25, 50, -1], [10, 15, 25, 50, "All"]],
+					order: [], // No initial ordering
+					language: {
+						search: "Search:",
+						lengthMenu: "Show _MENU_ entries",
+						info: "Showing _START_ to _END_ of _TOTAL_ entries",
+						infoEmpty: "Showing 0 to 0 of 0 entries",
+						infoFiltered: "(filtered from _MAX_ total entries)",
+						paginate: {
+							next: '<i class="bi bi-chevron-right" aria-hidden="true"></i>',
+							previous: '<i class="bi bi-chevron-left" aria-hidden="true"></i>'
+						}
+					}
+				};
+				
+				// Add columnDefs if needed
+				if(columnDefs.length > 0) {
+					options.columnDefs = columnDefs;
+				}
+				
+				// Override with custom order if specified
+				if(orderColumn !== undefined && orderDir !== undefined) {
+					options.order = [[parseInt(orderColumn), orderDir]];
+				}
+				
+				$table.DataTable(options);
+			});
+		}
+		
+		// datatable-simple - minimal features (no paging, search, or ordering)
+		if($('.datatable-simple').length > 0) {
+			$('.datatable-simple').each(function() {
+				var $table = $(this);
+				
+				$table.DataTable({
+					paging: false,
+					searching: false,
+					ordering: false,
+					info: false,
+					language: {
+						paginate: {
+							next: '<i class="bi bi-chevron-right" aria-hidden="true"></i>',
+							previous: '<i class="bi bi-chevron-left" aria-hidden="true"></i>'
+						}
+					}
+				});
+			});
+		}
+	}
+	
 	/* Function ============ */
 	return {
 		init:function(){
@@ -453,6 +591,11 @@
 			headerFix();
 			handleChartSidebar();
 			MagnificPopup();
+			handleDataTable();
+		},
+		
+		initDataTable: function(){
+			handleDataTable();
 		},
 		
 		load:function(){
@@ -484,6 +627,8 @@ jQuery(document).ready(function() {
 jQuery(window).on('load',function () {
 	'use strict'; 
 	GetSkills.load();
+	// Initialize DataTables after all scripts are loaded
+	GetSkills.initDataTable();
 	setTimeout(function(){
 			GetSkills.handleMenuPosition();
 	}, 1000);

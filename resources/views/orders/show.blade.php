@@ -59,7 +59,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm table-striped mb-0">
+                    <table class="datatable table table-sm table-striped mb-0">
                         <thead>
                             <tr>
                                 <th class="align-middle">Order Number</th>
