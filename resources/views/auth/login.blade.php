@@ -19,10 +19,10 @@
 						<div class="sign-in-your">
 							<h4 class="fs-20 font-w800 text-black">Sign in your account</h4>
 							<span>Welcome back! Login with your data that you entered<br> during registration</span>
-							<div class="login-social">
+							{{-- <div class="login-social">
 								<a href="javascript:void(0);" class="btn font-w800 d-block my-4"><i class="fab fa-google me-2 text-primary"></i>Login with Google</a>
 								<a href="javascript:void(0);" class="btn font-w800 d-block my-4"><i class="fab fa-facebook-f me-2 facebook-log"></i>Login with Facebook</a>
-							</div>
+							</div> --}}
 							<form method="POST" action="{{ route('login') }}">
 								@csrf
 								<div class="mb-3">

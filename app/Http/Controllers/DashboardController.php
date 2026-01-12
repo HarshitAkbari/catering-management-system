@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\Payment;
@@ -28,6 +29,12 @@ class DashboardController extends Controller
             'completed_events' => Order::where('tenant_id', $tenantId)
                 ->where('status', 'completed')
                 ->count(),
+            'total_customers' => Customer::where('tenant_id', $tenantId)->count(),
+            'this_month_revenue' => Payment::where('tenant_id', $tenantId)
+                ->whereMonth('payment_date', now()->month)
+                ->whereYear('payment_date', now()->year)
+                ->sum('amount'),
+            'total_revenue' => Payment::where('tenant_id', $tenantId)->sum('amount'),
         ];
 
         $upcomingEvents = Order::where('tenant_id', $tenantId)
