@@ -6,22 +6,8 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header">
                 <h4 class="card-title">Inventory</h4>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('inventory.low-stock') }}" class="btn btn-warning btn-sm">
-                        <i class="bi bi-exclamation-triangle me-2"></i>Low Stock Alerts
-                    </a>
-                    <a href="{{ route('inventory.stock-in') }}" class="btn btn-success btn-sm">
-                        <i class="bi bi-box-arrow-in-down me-2"></i>Stock In
-                    </a>
-                    <a href="{{ route('inventory.stock-out') }}" class="btn btn-danger btn-sm">
-                        <i class="bi bi-box-arrow-up me-2"></i>Stock Out
-                    </a>
-                    <a href="{{ route('inventory.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle me-2"></i>Add Item
-                    </a>
-                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">

@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Repositories\OrderRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -23,7 +24,7 @@ class OrderService extends BaseService
     /**
      * Get orders grouped by order number for tenant
      */
-    public function getGroupedOrders(int $tenantId): Collection
+    public function getGroupedOrders(int $tenantId): SupportCollection
     {
         $allOrders = $this->repository->getByTenant($tenantId, ['customer']);
         
@@ -169,7 +170,7 @@ class OrderService extends BaseService
     /**
      * Get orders for calendar view
      */
-    public function getCalendarOrders(int $tenantId): Collection
+    public function getCalendarOrders(int $tenantId): SupportCollection
     {
         return $this->repository->getByTenant($tenantId, ['customer'])->map(function ($order) {
             return [

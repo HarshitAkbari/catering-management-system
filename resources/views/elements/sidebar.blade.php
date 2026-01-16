@@ -9,10 +9,15 @@
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li><a href="{{ route('orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'mm-active' : '' }}" aria-expanded="false">
+            <li><a class="has-arrow {{ request()->routeIs('orders.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('orders.*') ? 'true' : 'false' }}">
                     <i class="bi bi-file-text"></i>
                     <span class="nav-text">Orders</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('orders.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('orders.index') }}" class="{{ request()->routeIs('orders.index') ? 'mm-active' : '' }}">Orders</a></li>
+                    <li><a href="{{ route('orders.create') }}" class="{{ request()->routeIs('orders.create') ? 'mm-active' : '' }}">Create Order</a></li>
+                    <li><a href="{{ route('orders.calendar') }}" class="{{ request()->routeIs('orders.calendar') ? 'mm-active' : '' }}">Order Calendar</a></li>
+                </ul>
             </li>
             <li><a href="{{ route('customers.index') }}" class="{{ request()->routeIs('customers.*') ? 'mm-active' : '' }}" aria-expanded="false">
                     <i class="bi bi-people"></i>
