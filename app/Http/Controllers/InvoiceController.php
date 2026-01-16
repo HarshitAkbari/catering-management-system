@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\Order;
-use App\Models\Setting;
 use App\Services\InvoiceNumberService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -90,11 +89,11 @@ class InvoiceController extends Controller
             ->orderBy('event_date')
             ->get();
 
-        // Get invoice branding settings
+        // Invoice branding settings (no longer configurable)
         $settings = [
-            'invoice_logo' => Setting::getValue('invoice_logo'),
-            'invoice_footer_text' => Setting::getValue('invoice_footer_text'),
-            'invoice_terms' => Setting::getValue('invoice_terms'),
+            'invoice_logo' => null,
+            'invoice_footer_text' => null,
+            'invoice_terms' => null,
         ];
 
         return view('invoices.show', compact('invoice', 'orders', 'settings'));
@@ -120,11 +119,11 @@ class InvoiceController extends Controller
             ->orderBy('event_date')
             ->get();
 
-        // Get invoice branding settings
+        // Invoice branding settings (no longer configurable)
         $settings = [
-            'invoice_logo' => Setting::getValue('invoice_logo'),
-            'invoice_footer_text' => Setting::getValue('invoice_footer_text'),
-            'invoice_terms' => Setting::getValue('invoice_terms'),
+            'invoice_logo' => null,
+            'invoice_footer_text' => null,
+            'invoice_terms' => null,
         ];
 
         // Render the invoice view to HTML

@@ -4,12 +4,6 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('customers.index') }}">Customers</a></li>
-            <li class="breadcrumb-item active"><a href="javascript:void(0)">Customer Details</a></li>
-        </ol>
-    </div>
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
