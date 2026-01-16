@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private readonly UserService $userService
+    ) {}
+
     /**
      * Display a listing of users for the current tenant.
      */
     public function index()
     {
-        $users = User::where('tenant_id', auth()->user()->tenant_id)
-            ->with('roles')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $tenantId = auth()->user()->tenant_id;
+        $users = $this->userService->getByTenant($tenantId);
 
         return view('users.index', compact('users'));
     }
@@ -31,9 +32,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::where('tenant_id', auth()->user()->tenant_id)
-            ->orderBy('name')
-            ->get();
+        $tenantId = auth()->user()->tenant_id;
+        $roles = $this->userService->getRolesForTenant($tenantId);
 
         return view('users.create', compact('roles'));
     }
@@ -63,27 +63,12 @@ class UserController extends Controller
             'role_ids.*' => ['exists:roles,id'],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'tenant_id' => $tenantId,
-            'role' => $validated['role'],
-            'status' => $validated['status'],
-        ]);
+        $result = $this->userService->createUser($validated, $tenantId);
 
-        // Sync roles if provided
-        if (isset($validated['role_ids'])) {
-            // Ensure role_ids belong to the same tenant
-            $validRoleIds = Role::where('tenant_id', $tenantId)
-                ->whereIn('id', $validated['role_ids'])
-                ->pluck('id')
-                ->toArray();
-            
-            $user->roles()->sync($validRoleIds);
-        } else {
-            // Sync enum role with Role model
-            $user->syncRoleModel();
+        if (!$result['status']) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $result['message']]);
         }
 
         return redirect()->route('users.index')
@@ -95,14 +80,13 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        // Ensure user belongs to the same tenant
-        if ($user->tenant_id !== auth()->user()->tenant_id) {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($user->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
 
-        $roles = Role::where('tenant_id', auth()->user()->tenant_id)
-            ->orderBy('name')
-            ->get();
+        $roles = $this->userService->getRolesForTenant($tenantId);
 
         return view('users.edit', compact('user', 'roles'));
     }
@@ -112,12 +96,11 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // Ensure user belongs to the same tenant
-        if ($user->tenant_id !== auth()->user()->tenant_id) {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($user->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
-
-        $tenantId = auth()->user()->tenant_id;
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -137,29 +120,12 @@ class UserController extends Controller
             'role_ids.*' => ['exists:roles,id'],
         ]);
 
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
-        $user->role = $validated['role'];
-        $user->status = $validated['status'];
+        $result = $this->userService->updateUser($user, $validated, $tenantId);
 
-        if (!empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }
-
-        $user->save();
-
-        // Sync roles if provided
-        if (isset($validated['role_ids'])) {
-            // Ensure role_ids belong to the same tenant
-            $validRoleIds = Role::where('tenant_id', $tenantId)
-                ->whereIn('id', $validated['role_ids'])
-                ->pluck('id')
-                ->toArray();
-            
-            $user->roles()->sync($validRoleIds);
-        } else {
-            // Sync enum role with Role model
-            $user->syncRoleModel();
+        if (!$result['status']) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $result['message']]);
         }
 
         return redirect()->route('users.index')
@@ -171,21 +137,20 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Ensure user belongs to the same tenant
-        if ($user->tenant_id !== auth()->user()->tenant_id) {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($user->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
 
-        // Prevent deleting yourself
-        if ($user->id === auth()->id()) {
-            return redirect()->route('users.index')
-                ->with('error', 'You cannot delete your own account.');
-        }
+        $result = $this->userService->deleteUser($user, auth()->id());
 
-        $user->delete();
+        if (!$result['status']) {
+            return redirect()->route('users.index')
+                ->with('error', $result['message']);
+        }
 
         return redirect()->route('users.index')
             ->with('success', 'User deleted successfully.');
     }
 }
-

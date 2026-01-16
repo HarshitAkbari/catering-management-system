@@ -6,8 +6,14 @@ namespace App\Services;
 
 use App\Models\User;
 
-class PermissionService
+class PermissionService extends BaseService
 {
+    public function __construct()
+    {
+        // PermissionService doesn't use a repository as it's a utility service
+        // We'll create a dummy repository just to satisfy BaseService constructor
+        parent::__construct(new \App\Repositories\PermissionRepository(new \App\Models\Permission()));
+    }
     /**
      * Check if user has a specific permission.
      * Supports both module-level and action-level permissions.
