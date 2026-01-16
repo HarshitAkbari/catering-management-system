@@ -1,169 +1,362 @@
-@extends('layouts.app')
+@extends('layout.default')
 
 @section('title', 'Payments Report')
 
 @section('content')
-<div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Payments Report</h1>
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <form method="GET" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label><input type="date" name="start_date" value="{{ $startDate }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div>
-            <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label><input type="date" name="end_date" value="{{ $endDate }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div>
-            <div class="flex items-end"><button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Filter</button></div>
-            <div class="flex items-end">
-                <a href="{{ route('reports.export', ['type' => 'payments', 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center justify-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Export Excel
-                </a>
-            </div>
-        </form>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-            <div class="bg-blue-50 dark:bg-blue-900 rounded-lg p-4"><p class="text-sm text-gray-600 dark:text-gray-400">Total Payments</p><p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $summary['total_payments'] }}</p></div>
-            <div class="bg-green-50 dark:bg-green-900 rounded-lg p-4"><p class="text-sm text-gray-600 dark:text-gray-400">Total Amount</p><p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ number_format($summary['total_amount'], 2) }}</p></div>
-            <div class="bg-yellow-50 dark:bg-yellow-900 rounded-lg p-4"><p class="text-sm text-gray-600 dark:text-gray-400">Cash</p><p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ number_format($summary['cash'], 2) }}</p></div>
-            <div class="bg-purple-50 dark:bg-purple-900 rounded-lg p-4"><p class="text-sm text-gray-600 dark:text-gray-400">UPI</p><p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ number_format($summary['upi'], 2) }}</p></div>
-            <div class="bg-red-50 dark:bg-red-900 rounded-lg p-4"><p class="text-sm text-gray-600 dark:text-gray-400">Bank Transfer</p><p class="text-2xl font-bold text-gray-900 dark:text-white">₹{{ number_format($summary['bank_transfer'], 2) }}</p></div>
-        </div>
+<div class="container-fluid">
+    <div class="row page-titles">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="javascript:void(0)">Reports</a></li>
+            <li class="breadcrumb-item active"><a href="javascript:void(0)">Payments</a></li>
+        </ol>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Payments Report</h4>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="mb-4">
+                        <div class="row">
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" name="start_date" value="{{ $startDate }}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" name="end_date" value="{{ $endDate }}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label class="form-label">&nbsp;</label>
+                                    <a href="{{ route('reports.export', ['type' => 'payments', 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-success btn-block">
+                                        <i class="fa fa-download me-2"></i>Export Excel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <!-- Payment Trends Chart -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Payment Trends</h3>
-                </div>
-                <div class="p-6">
-                    <canvas id="paymentTrendsChart" height="100"></canvas>
-                </div>
-            </div>
+                    <!-- Summary Cards -->
+                    <div class="row">
+                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                            <div class="widget-stat card bg-primary">
+                                <div class="card-body p-4">
+                                    <div class="media ai-icon">
+                                        <span class="me-3 bgl-primary text-primary">
+                                            <i class="flaticon-381-user-7"></i>
+                                        </span>
+                                        <div class="media-body">
+                                            <p class="mb-1">Total Payments</p>
+                                            <h4 class="mb-0">{{ $summary['total_payments'] }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                            <div class="widget-stat card bg-success">
+                                <div class="card-body p-4">
+                                    <div class="media ai-icon">
+                                        <span class="me-3 bgl-success text-success">
+                                            <i class="flaticon-381-heart"></i>
+                                        </span>
+                                        <div class="media-body">
+                                            <p class="mb-1">Total Amount</p>
+                                            <h4 class="mb-0">₹{{ number_format($summary['total_amount'], 2) }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                            <div class="widget-stat card bg-warning">
+                                <div class="card-body p-4">
+                                    <div class="media ai-icon">
+                                        <span class="me-3 bgl-warning text-warning">
+                                            <i class="flaticon-381-calendar-1"></i>
+                                        </span>
+                                        <div class="media-body">
+                                            <p class="mb-1">Cash</p>
+                                            <h4 class="mb-0">₹{{ number_format($summary['cash'], 2) }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                            <div class="widget-stat card bg-info">
+                                <div class="card-body p-4">
+                                    <div class="media ai-icon">
+                                        <span class="me-3 bgl-info text-info">
+                                            <i class="flaticon-381-diamond"></i>
+                                        </span>
+                                        <div class="media-body">
+                                            <p class="mb-1">UPI</p>
+                                            <h4 class="mb-0">₹{{ number_format($summary['upi'], 2) }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                            <div class="widget-stat card bg-danger">
+                                <div class="card-body p-4">
+                                    <div class="media ai-icon">
+                                        <span class="me-3 bgl-danger text-danger">
+                                            <i class="flaticon-381-settings-2"></i>
+                                        </span>
+                                        <div class="media-body">
+                                            <p class="mb-1">Bank Transfer</p>
+                                            <h4 class="mb-0">₹{{ number_format($summary['bank_transfer'], 2) }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Payment Method Distribution -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="px-6 py-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Payment Method Distribution</h3>
-                </div>
-                <div class="p-6">
-                    <canvas id="paymentMethodChart" height="100"></canvas>
+                    <!-- Charts Section -->
+                    <div class="row mt-4">
+                        <div class="col-xl-6 col-lg-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header border-0 pb-0">
+                                    <h4 class="card-title">Payment Trends</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="paymentTrendsChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header border-0 pb-0">
+                                    <h4 class="card-title">Payment Method Distribution</h4>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="paymentMethodChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payments Table -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header border-0 pb-0">
+                                    <h4 class="card-title">Payment Details</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="datatable table table-responsive-md">
+                                            <thead>
+                                                <tr>
+                                                    <th><strong>Date</strong></th>
+                                                    <th><strong>Order</strong></th>
+                                                    <th><strong>Amount</strong></th>
+                                                    <th><strong>Mode</strong></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($payments as $payment)
+                                                    <tr>
+                                                        <td>{{ $payment->payment_date->format('M d, Y') }}</td>
+                                                        <td>{{ $payment->invoice->order->order_number ?? '-' }}</td>
+                                                        <td>₹{{ number_format($payment->amount, 2) }}</td>
+                                                        <td><span class="badge light badge-primary">{{ ucfirst(str_replace('_', ' ', $payment->payment_mode)) }}</span></td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">No payments found</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Date</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Order</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Amount</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Mode</th></tr></thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse($payments as $payment)
-                        <tr><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $payment->payment_date->format('M d, Y') }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $payment->invoice->order->order_number ?? '-' }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">₹{{ number_format($payment->amount, 2) }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ ucfirst(str_replace('_', ' ', $payment->payment_mode)) }}</td></tr>
-                    @empty
-                        <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No payments found</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
+@endsection
 
-@push('scripts')
+@section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const chartData = @json($chartData ?? []);
-    const isDarkMode = document.documentElement.classList.contains('dark');
+(function($) {
+    "use strict";
+    
+    $(document).ready(function() {
+        const chartData = @json($chartData ?? []);
+        const isDarkMode = $('body').hasClass('dark-mode') || $('html').hasClass('dark');
 
-    Chart.defaults.color = isDarkMode ? '#9CA3AF' : '#6B7280';
-    Chart.defaults.borderColor = isDarkMode ? '#374151' : '#E5E7EB';
+        // Chart.js defaults
+        if (typeof Chart !== 'undefined') {
+            Chart.defaults.color = isDarkMode ? '#9CA3AF' : '#6B7280';
+            Chart.defaults.borderColor = isDarkMode ? '#374151' : '#E5E7EB';
+            Chart.defaults.defaultFontFamily = 'Poppins';
+        }
 
-    // Payment Trends Chart
-    const trendsCtx = document.getElementById('paymentTrendsChart');
-    if (trendsCtx && chartData.trends) {
-        new Chart(trendsCtx, {
-            type: 'line',
-            data: {
-                labels: chartData.trends.labels,
-                datasets: [{
-                    label: 'Payment Amount (₹)',
-                    data: chartData.trends.data,
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
+        // Payment Trends Chart (ApexCharts Area Chart)
+        if ($('#paymentTrendsChart').length > 0 && chartData.trends) {
+            var trendsOptions = {
+                series: [{
+                    name: 'Payment Amount',
+                    data: chartData.trends.data
+                }],
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    toolbar: {
+                        show: false
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return '₹' + parseFloat(context.parsed.y).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            }
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                colors: ['var(--primary)'],
+                stroke: {
+                    width: 3,
+                    curve: 'smooth',
+                    lineCap: 'round'
+                },
+                markers: {
+                    size: 6,
+                    strokeWidth: 3,
+                    strokeColors: '#fff',
+                    hover: {
+                        size: 8
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                grid: {
+                    borderColor: isDarkMode ? '#374151' : '#E5E7EB',
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: false
                         }
                     }
                 },
-                scales: {
+                xaxis: {
+                    categories: chartData.trends.labels,
+                    labels: {
+                        style: {
+                            colors: isDarkMode ? '#9CA3AF' : '#6B7280',
+                            fontSize: '14px',
+                            fontFamily: 'Poppins'
+                        }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            colors: isDarkMode ? '#9CA3AF' : '#6B7280',
+                            fontSize: '14px',
+                            fontFamily: 'Poppins'
+                        },
+                        formatter: function(value) {
+                            return '₹' + value.toLocaleString('en-IN');
+                        }
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        shadeIntensity: 0.3,
+                        gradientToColors: ['var(--primary)'],
+                        inverseColors: false,
+                        opacityFrom: 0.4,
+                        opacityTo: 0.1,
+                        stops: [0, 100]
+                    }
+                },
+                tooltip: {
                     y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₹' + value.toLocaleString('en-IN');
-                            }
+                        formatter: function(value) {
+                            return '₹' + parseFloat(value).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         }
                     }
                 }
-            }
-        });
-    }
+            };
 
-    // Payment Method Distribution Chart
-    const methodCtx = document.getElementById('paymentMethodChart');
-    if (methodCtx && chartData.methods) {
-        new Chart(methodCtx, {
-            type: 'pie',
-            data: {
-                labels: chartData.methods.labels,
-                datasets: [{
-                    data: chartData.methods.data,
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(245, 158, 11, 0.8)',
-                        'rgba(239, 68, 68, 0.8)',
-                    ],
-                    borderColor: [
-                        'rgb(59, 130, 246)',
-                        'rgb(16, 185, 129)',
-                        'rgb(245, 158, 11)',
-                        'rgb(239, 68, 68)',
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                return label + ': ₹' + parseFloat(value).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            var trendsChart = new ApexCharts(document.querySelector("#paymentTrendsChart"), trendsOptions);
+            trendsChart.render();
+        }
+
+        // Payment Method Distribution Chart (Chart.js Pie Chart)
+        if ($('#paymentMethodChart').length > 0 && chartData.methods) {
+            const methodCtx = document.getElementById('paymentMethodChart').getContext('2d');
+            
+            new Chart(methodCtx, {
+                type: 'pie',
+                data: {
+                    labels: chartData.methods.labels,
+                    datasets: [{
+                        data: chartData.methods.data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(16, 185, 129)',
+                            'rgb(245, 158, 11)',
+                            'rgb(239, 68, 68)',
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return label + ': ₹' + parseFloat(value).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' (' + percentage + '%)';
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-    }
-});
+            });
+        }
+    });
+})(jQuery);
 </script>
-@endpush
 @endsection
-

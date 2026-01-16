@@ -2,77 +2,95 @@
 
 @section('title', 'Inventory')
 
-@section('content')
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Inventory</h1>
-        <div class="flex space-x-3">
-            <a href="{{ route('inventory.low-stock') }}" class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg">
-                Low Stock Alerts
-            </a>
-            <a href="{{ route('inventory.stock-in') }}" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg">
-                Stock In
-            </a>
-            <a href="{{ route('inventory.stock-out') }}" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg">
-                Stock Out
-            </a>
-            <a href="{{ route('inventory.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg">
-                Add Item
-            </a>
-        </div>
-    </div>
+@section('page_content')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">Inventory</a></li>
+    </ol>
+</div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Stock</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Minimum Stock</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price/Unit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse($inventoryItems as $item)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $item->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $item->unit }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ number_format($item->current_stock, 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ number_format($item->minimum_stock, 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">₹{{ number_format($item->price_per_unit, 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if($item->isLowStock())
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Low Stock</span>
-                                @else
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">In Stock</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('inventory.show', $item) }}" class="text-blue-600 hover:text-blue-900 mr-3">View</a>
-                                <a href="{{ route('inventory.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                <form action="{{ route('inventory.destroy', $item) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No inventory items found</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-            {{ $inventoryItems->links() }}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title">Inventory</h4>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('inventory.low-stock') }}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Low Stock Alerts
+                    </a>
+                    <a href="{{ route('inventory.stock-in') }}" class="btn btn-success btn-sm">
+                        <i class="bi bi-box-arrow-in-down me-2"></i>Stock In
+                    </a>
+                    <a href="{{ route('inventory.stock-out') }}" class="btn btn-danger btn-sm">
+                        <i class="bi bi-box-arrow-up me-2"></i>Stock Out
+                    </a>
+                    <a href="{{ route('inventory.create') }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-2"></i>Add Item
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Unit</th>
+                                <th>Current Stock</th>
+                                <th>Minimum Stock</th>
+                                <th>Price/Unit</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($inventoryItems as $item)
+                                <tr>
+                                    <td>{{ $item->name }}</td>
+                                    <td>{{ $item->unit }}</td>
+                                    <td>{{ number_format($item->current_stock, 2) }}</td>
+                                    <td>{{ number_format($item->minimum_stock, 2) }}</td>
+                                    <td>₹{{ number_format($item->price_per_unit, 2) }}</td>
+                                    <td>
+                                        @if($item->isLowStock())
+                                            <span class="badge badge-danger">Low Stock</span>
+                                        @else
+                                            <span class="badge badge-success">In Stock</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('inventory.show', $item) }}" class="btn btn-primary btn-sm" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ route('inventory.edit', $item) }}" class="btn btn-info btn-sm" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('inventory.destroy', $item) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <p class="text-muted">No inventory items found</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if(method_exists($inventoryItems, 'links'))
+                    <div class="mt-3">
+                        {{ $inventoryItems->links() }}
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </div>
 @endsection
-
