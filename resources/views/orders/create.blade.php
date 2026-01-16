@@ -17,7 +17,7 @@
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <div class="alert alert-alt alert-danger solid alert-dismissible fade show" role="alert">
                                 <strong>There were errors with your submission:</strong>
                                 <ul class="mb-0 mt-2">
                                     @foreach ($errors->all() as $error)
@@ -106,13 +106,13 @@
                                         <div id="events-container" class="mt-4 d-none">
                                             <h5 class="mb-3">Events</h5>
                                             @error('events')
-                                                <div class="alert alert-danger">{{ $message }}</div>
+                                                <div class="alert alert-alt alert-danger solid">{{ $message }}</div>
                                             @enderror
                                             @error('events.*')
-                                                <div class="alert alert-danger">{{ $message }}</div>
+                                                <div class="alert alert-alt alert-danger solid">{{ $message }}</div>
                                             @enderror
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-bordered">
+                                                <table class="datatable-simple table table-striped table-bordered">
                                                     <thead>
                                                         <tr>
                                                             <th>Event Date</th>
