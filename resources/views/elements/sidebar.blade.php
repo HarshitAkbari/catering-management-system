@@ -51,11 +51,13 @@
                     <li><a href="{{ route('reports.profit-loss') }}" class="{{ request()->routeIs('reports.profit-loss') ? 'mm-active' : '' }}">Profit & Loss</a></li>
                 </ul>
             </li>
-            <li><a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.*') ? 'mm-active' : '' }}" aria-expanded="false">
-                    <i class="bi bi-gear"></i>
-                    <span class="nav-text">Settings</span>
+            @hasPermission('users.view')
+            <li><a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'mm-active' : '' }}" aria-expanded="false">
+                    <i class="bi bi-people-fill"></i>
+                    <span class="nav-text">Users</span>
                 </a>
             </li>
+            @endhasPermission
         </ul>
         <div class="copyright">
             <p><strong>Catering Management System</strong> © {{ date('Y') }} All Rights Reserved</p>

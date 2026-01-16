@@ -3,12 +3,6 @@
 @section('title', 'Inventory')
 
 @section('page_content')
-<div class="row page-titles">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item active"><a href="javascript:void(0)">Inventory</a></li>
-    </ol>
-</div>
-
 <div class="row">
     <div class="col-12">
         <div class="card">
