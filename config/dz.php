@@ -55,6 +55,9 @@ return [
 				],
 				'ReportController_customers' => [
 				],
+				'OrderController_calendar' => [
+					'vendor/fullcalendar/lib/main.min.css',
+				],
 			],
 			'js' => [
 				'ReportController_profitLoss' => [
@@ -76,6 +79,9 @@ return [
 				'ReportController_customers' => [
 					'vendor/chart.js/Chart.bundle.min.js',
 					'vendor/apexchart/apexchart.js',
+				],
+				'OrderController_calendar' => [
+					'vendor/fullcalendar/lib/main.min.js',
 				],
 			]
 		],
