@@ -2,49 +2,68 @@
 
 @section('title', 'Low Stock Alerts')
 
-@section('content')
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Low Stock Alerts</h1>
-        <a href="{{ route('inventory.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg">Back to Inventory</a>
-    </div>
+@section('page_content')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('inventory.index') }}">Inventory</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">Low Stock Alerts</a></li>
+    </ol>
+</div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Current Stock</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Minimum Stock</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Deficit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse($lowStockItems as $item)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $item->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $item->unit }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">{{ number_format($item->current_stock, 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ number_format($item->minimum_stock, 2) }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">
-                                {{ number_format($item->minimum_stock - $item->current_stock, 2) }} {{ $item->unit }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('inventory.stock-in') }}?item={{ $item->id }}" class="text-green-600 hover:text-green-900">Add Stock</a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No low stock items. All items are well stocked!</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title">Low Stock Alerts</h4>
+                <a href="{{ route('inventory.index') }}" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Inventory
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Unit</th>
+                                <th>Current Stock</th>
+                                <th>Minimum Stock</th>
+                                <th>Deficit</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($lowStockItems as $item)
+                                <tr>
+                                    <td>{{ $item->name }}</td>
+                                    <td>{{ $item->unit }}</td>
+                                    <td><strong class="text-danger">{{ number_format($item->current_stock, 2) }}</strong></td>
+                                    <td>{{ number_format($item->minimum_stock, 2) }}</td>
+                                    <td><strong class="text-danger">{{ number_format($item->minimum_stock - $item->current_stock, 2) }} {{ $item->unit }}</strong></td>
+                                    <td>
+                                        <a href="{{ route('inventory.stock-in') }}?item={{ $item->id }}" class="btn btn-success btn-sm">
+                                            <i class="bi bi-box-arrow-in-down me-2"></i>Add Stock
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <p class="text-muted mb-1">No low stock items</p>
+                                            <p class="text-muted small">All items are well stocked!</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 @endsection
-

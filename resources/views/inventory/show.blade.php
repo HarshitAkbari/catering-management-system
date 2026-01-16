@@ -2,121 +2,128 @@
 
 @section('title', 'Inventory Item Details')
 
-@section('content')
-<div class="space-y-6">
-    <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $inventoryItem->name }}</h1>
-        <div class="flex space-x-3">
-            <a href="{{ route('inventory.edit', $inventoryItem) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg">Edit</a>
-            <a href="{{ route('inventory.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg">Back</a>
+@section('page_content')
+<div class="row page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ route('inventory.index') }}">Inventory</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">Item Details</a></li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title">{{ $inventoryItem->name }}</h4>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('inventory.edit', $inventoryItem) }}" class="btn btn-info btn-sm">
+                        <i class="bi bi-pencil me-2"></i>Edit
+                    </a>
+                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-2"></i>Back
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $inventoryItem->name }}</strong></p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <p class="mb-0"><span class="text-muted">Unit :</span> <strong>{{ $inventoryItem->unit }}</strong></p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <p class="mb-0"><span class="text-muted">Current Stock :</span> <strong>{{ number_format($inventoryItem->current_stock, 2) }}</strong></p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <p class="mb-0"><span class="text-muted">Minimum Stock :</span> <strong>{{ number_format($inventoryItem->minimum_stock, 2) }}</strong></p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <p class="mb-0"><span class="text-muted">Price Per Unit :</span> <strong>₹{{ number_format($inventoryItem->price_per_unit, 2) }}</strong></p>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <p class="mb-0"><span class="text-muted">Status :</span> 
+                            @if($inventoryItem->isLowStock())
+                                <span class="badge badge-danger">Low Stock</span>
+                            @else
+                                <span class="badge badge-success">In Stock</span>
+                            @endif
+                        </p>
+                    </div>
+                    @if($inventoryItem->description)
+                    <div class="col-lg-12 mb-3">
+                        <p class="mb-0"><span class="text-muted">Description :</span> <strong>{{ $inventoryItem->description }}</strong></p>
+                    </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="space-y-6">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Item Information</h2>
-            <dl class="space-y-3">
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $inventoryItem->name }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Unit</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $inventoryItem->unit }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Current Stock</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ number_format($inventoryItem->current_stock, 2) }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Minimum Stock</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ number_format($inventoryItem->minimum_stock, 2) }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Price Per Unit</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">₹{{ number_format($inventoryItem->price_per_unit, 2) }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
-                    <dd class="mt-1">
-                        @if($inventoryItem->isLowStock())
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Low Stock</span>
-                        @else
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">In Stock</span>
-                        @endif
-                    </dd>
-                </div>
-                @if($inventoryItem->description)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $inventoryItem->description }}</dd>
-                </div>
-                @endif
-            </dl>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Transactions</h2>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Recent Transactions</h4>
             </div>
-            <div class="overflow-x-auto">
-                <table class="datatable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Vendor</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date/Time</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse($inventoryItem->stockTransactions->take(10) as $transaction)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium {{ $transaction->type === 'in' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                        {{ strtoupper($transaction->type) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {{ number_format($transaction->quantity, 2) }} {{ $inventoryItem->unit }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    @if($transaction->price)
-                                        ₹{{ number_format($transaction->price, 2) }}
-                                    @else
-                                        <span class="text-gray-400 dark:text-gray-500">-</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    @if($transaction->vendor)
-                                        {{ $transaction->vendor->name }}
-                                    @else
-                                        <span class="text-gray-400 dark:text-gray-500">-</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $transaction->created_at->format('M d, Y H:i') }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                    @if($transaction->notes)
-                                        {{ $transaction->notes }}
-                                    @else
-                                        <span class="text-gray-400 dark:text-gray-500">-</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0 table-striped">
+                        <thead>
                             <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No transactions yet</td>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Vendor</th>
+                                <th>Date/Time</th>
+                                <th>Notes</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse($inventoryItem->stockTransactions->take(10) as $transaction)
+                                <tr>
+                                    <td>
+                                        <span class="badge {{ $transaction->type === 'in' ? 'badge-success' : 'badge-danger' }}">
+                                            {{ strtoupper($transaction->type) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ number_format($transaction->quantity, 2) }} {{ $inventoryItem->unit }}</td>
+                                    <td>
+                                        @if($transaction->price)
+                                            ₹{{ number_format($transaction->price, 2) }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($transaction->vendor)
+                                            {{ $transaction->vendor->name }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $transaction->created_at->format('M d, Y H:i') }}</td>
+                                    <td>
+                                        @if($transaction->notes)
+                                            {{ $transaction->notes }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <p class="text-muted">No transactions yet</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
-
