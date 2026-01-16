@@ -37,24 +37,9 @@ class OrderController extends Controller
         })->values();
         
         // Sort by created_at
-        $allGroupedOrders = $groupedOrders
+        $orders = $groupedOrders
             ->sortByDesc('created_at')
             ->values();
-        
-        // Manual pagination
-        $currentPage = request()->get('page', 1);
-        $perPage = 15;
-        $items = $allGroupedOrders->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        $total = $allGroupedOrders->count();
-        
-        // Create paginator manually
-        $orders = new \Illuminate\Pagination\LengthAwarePaginator(
-            $items,
-            $total,
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
 
         return view('orders.index', compact('orders'));
     }
