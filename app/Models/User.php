@@ -70,19 +70,95 @@ class User extends Authenticatable
 
     /**
      * Check if user has a specific role.
+     * Checks both enum role field and Role model.
      */
     public function hasRole(string $roleName): bool
     {
+        // First check enum role field for quick lookup
+        if (strtolower($this->role) === strtolower($roleName)) {
+            return true;
+        }
+        
+        // Then check Role model
         return $this->roles()->where('name', $roleName)->exists();
     }
 
     /**
      * Check if user has a specific permission.
+     * Supports both module-level and action-level permissions.
      */
     public function hasPermission(string $permissionName): bool
     {
-        return $this->roles()->whereHas('permissions', function ($query) use ($permissionName) {
-            $query->where('name', $permissionName);
-        })->exists();
+        // Admin has all permissions
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Check if user has the permission through roles
+        $hasPermission = $this->roles()
+            ->whereHas('permissions', function ($query) use ($permissionName) {
+                $query->where('name', $permissionName);
+            })
+            ->exists();
+
+        if ($hasPermission) {
+            return true;
+        }
+
+        // Check for module-level permission (e.g., if checking "orders.create", also check "orders")
+        $parts = explode('.', $permissionName);
+        if (count($parts) === 2) {
+            $module = $parts[0];
+            return $this->roles()
+                ->whereHas('permissions', function ($query) use ($module) {
+                    $query->where('name', $module);
+                })
+                ->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user is admin (using enum role).
+     */
+    public function isAdmin(): bool
+    {
+        return strtolower($this->role) === 'admin';
+    }
+
+    /**
+     * Check if user is manager (using enum role).
+     */
+    public function isManager(): bool
+    {
+        return strtolower($this->role) === 'manager';
+    }
+
+    /**
+     * Check if user is staff (using enum role).
+     */
+    public function isStaff(): bool
+    {
+        return strtolower($this->role) === 'staff';
+    }
+
+    /**
+     * Sync enum role with Role model.
+     * Ensures user has the corresponding Role model role assigned.
+     */
+    public function syncRoleModel(): void
+    {
+        if (!$this->tenant_id) {
+            return;
+        }
+
+        $roleModel = Role::where('tenant_id', $this->tenant_id)
+            ->where('name', $this->role)
+            ->first();
+
+        if ($roleModel && !$this->hasRole($this->role)) {
+            $this->roles()->syncWithoutDetaching([$roleModel->id]);
+        }
     }
 }

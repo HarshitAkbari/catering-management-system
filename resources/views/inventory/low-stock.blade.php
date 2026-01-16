@@ -3,13 +3,6 @@
 @section('title', 'Low Stock Alerts')
 
 @section('page_content')
-<div class="row page-titles">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ route('inventory.index') }}">Inventory</a></li>
-        <li class="breadcrumb-item active"><a href="javascript:void(0)">Low Stock Alerts</a></li>
-    </ol>
-</div>
-
 <div class="row">
     <div class="col-12">
         <div class="card">

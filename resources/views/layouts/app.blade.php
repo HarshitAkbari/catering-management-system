@@ -18,20 +18,6 @@
         </div>
     @endif
 
-    @if(isset($breadcrumbs) && count($breadcrumbs) > 0)
-        <div class="row page-titles">
-            <ol class="breadcrumb">
-                @foreach($breadcrumbs as $breadcrumb)
-                    @if($loop->last)
-                        <li class="breadcrumb-item active"><a href="javascript:void(0)">{{ $breadcrumb['label'] }}</a></li>
-                    @else
-                        <li class="breadcrumb-item"><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['label'] }}</a></li>
-                    @endif
-                @endforeach
-            </ol>
-        </div>
-    @endif
-
     @yield('page_content')
 </div>
 @endsection
