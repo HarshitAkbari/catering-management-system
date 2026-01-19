@@ -1,88 +1,483 @@
-@extends('layouts.app')
-
-@section('title', 'Edit Order')
+@extends('layout.default')
 
 @section('content')
-<div class="space-y-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Order</h1>
+	<div class="container-fluid">
+        <!-- row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">{{ $page_title ?? 'Edit Order' }}</h4>
+                    </div>
+                    <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-alt alert-danger solid alert-dismissible fade show" role="alert">
+                                <strong>There were errors with your submission:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <form action="{{ route('orders.update', $order) }}" method="POST">
-            @csrf
-            @method('PUT')
+                        <div class="form-validation">
+                            <form class="needs-validation" action="{{ route('orders.update', $order) }}" method="POST" novalidate>
+                                @csrf
+                                @method('PUT')
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="customer_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer Name</label>
-                    <input type="text" name="customer_name" id="customer_name" required value="{{ old('customer_name', $order->customer->name) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
+                                <div class="row">
+                                        <div class="row">
+                                            <!-- First Row: 3 Columns -->
+                                            <div class="col-md-4 mb-4">
+                                                <label class="form-label" for="customer_name">Customer Name
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                                    placeholder="Enter customer name.." value="{{ old('customer_name', $order->customer->name) }}" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a customer name.
+                                                </div>
+                                                @error('customer_name')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <label class="form-label" for="customer_email">Customer Email
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="email" class="form-control" id="customer_email" name="customer_email" 
+                                                    placeholder="Enter customer email.." value="{{ old('customer_email', $order->customer->email ?? '') }}" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a valid email.
+                                                </div>
+                                                @error('customer_email')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <label class="form-label" for="customer_mobile">Contact Number
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" 
+                                                    placeholder="Enter contact number.." value="{{ old('customer_mobile', $order->customer->mobile) }}" required>
+                                                <div class="invalid-feedback">
+                                                    Please enter a contact number.
+                                                </div>
+                                                @error('customer_mobile')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Second Row: Full Width Address -->
+                                        <div class="row">
+                                            <div class="col-12 mb-4">
+                                                <label class="form-label" for="address">Address
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <textarea class="form-control" id="address" name="address" rows="3" 
+                                                    placeholder="Enter address.." required>{{ old('address', $order->address) }}</textarea>
+                                                <div class="invalid-feedback">
+                                                    Please enter an address.
+                                                </div>
+                                                @error('address')
+                                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Add Event Button -->
+                                        <div class="mb-4">
+                                            <button type="button" id="add-event-btn" class="btn btn-success">
+                                                <i class="bi bi-plus-circle me-2"></i>Add Event
+                                            </button>
+                                        </div>
+                                </div>
 
-                <div>
-                    <label for="customer_mobile" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contact Number</label>
-                    <input type="text" name="customer_mobile" id="customer_mobile" required value="{{ old('customer_mobile', $order->customer->mobile) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
+                                <!-- Events Table -->
+                                <div class="row">
+                                        <div id="events-container" class="mt-4 d-none">
+                                            <h5 class="mb-3">Events</h5>
+                                            @error('events')
+                                                <div class="alert alert-alt alert-danger solid">{{ $message }}</div>
+                                            @enderror
+                                            @error('events.*')
+                                                <div class="alert alert-alt alert-danger solid">{{ $message }}</div>
+                                            @enderror
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-striped verticle-middle table-responsive-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Event Date</th>
+                                                            <th>Event Time</th>
+                                                            <th>Event Menu</th>
+                                                            <th>Guest Count</th>
+                                                            <th>Order Type</th>
+                                                            <th>Dish Price</th>
+                                                            <th>Cost</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="events-table-body">
+                                                        <!-- Events will be added here dynamically -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                </div>
 
-                <div>
-                    <label for="event_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Event Date</label>
-                    <input type="date" name="event_date" id="event_date" required value="{{ old('event_date', $order->event_date->format('Y-m-d')) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
+                                <!-- Hidden input for events data -->
+                                <input type="hidden" name="events" id="events-data" value="">
 
-                <div>
-                    <label for="event_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Event Time</label>
-                    <select name="event_time" id="event_time" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="morning" {{ old('event_time', $order->event_time) === 'morning' ? 'selected' : '' }}>Morning</option>
-                        <option value="afternoon" {{ old('event_time', $order->event_time) === 'afternoon' ? 'selected' : '' }}>Afternoon</option>
-                        <option value="evening" {{ old('event_time', $order->event_time) === 'evening' ? 'selected' : '' }}>Evening</option>
-                        <option value="night_snack" {{ old('event_time', $order->event_time) === 'night_snack' ? 'selected' : '' }}>Night Snack</option>
-                    </select>
-                </div>
-
-                <div class="md:col-span-2">
-                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
-                    <textarea name="address" id="address" rows="3" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ old('address', $order->address) }}</textarea>
-                </div>
-
-                <div>
-                    <label for="order_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Order Type</label>
-                    <input type="text" name="order_type" id="order_type" value="{{ old('order_type', $order->order_type) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
-
-                <div>
-                    <label for="guest_count" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Guest Count</label>
-                    <input type="number" name="guest_count" id="guest_count" required min="1" value="{{ old('guest_count', $order->guest_count) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
-
-                <div>
-                    <label for="estimated_cost" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estimated Cost</label>
-                    <input type="number" name="estimated_cost" id="estimated_cost" required step="0.01" min="0" value="{{ old('estimated_cost', $order->estimated_cost) }}" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
-
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-                    <select name="status" id="status" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="pending" {{ old('status', $order->status) === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="confirmed" {{ old('status', $order->status) === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                        <option value="completed" {{ old('status', $order->status) === 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="cancelled" {{ old('status', $order->status) === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label for="payment_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Status</label>
-                    <select name="payment_status" id="payment_status" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <option value="pending" {{ old('payment_status', $order->payment_status) === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="partial" {{ old('payment_status', $order->payment_status) === 'partial' ? 'selected' : '' }}>Partial</option>
-                        <option value="paid" {{ old('payment_status', $order->payment_status) === 'paid' ? 'selected' : '' }}>Paid</option>
-                    </select>
+                                <div class="row mt-4">
+                                    <div class="col-xl-8 col-lg-10 mx-auto">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="{{ route('orders.index') }}" class="btn btn-secondary">Cancel</a>
+                                            <button type="submit" id="submit-btn" class="btn btn-primary">Update Order</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="mt-6 flex justify-end space-x-3">
-                <a href="{{ route('orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">Cancel</a>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update Order</button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
 @endsection
 
+<!-- Event Modal -->
+<div class="modal fade" id="event-modal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Add Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="event-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-event-date" class="form-label">Event Date <span class="text-danger">*</span></label>
+                            <x-datepicker 
+                                id="modal-event-date" 
+                                name="modal-event-date" 
+                                required 
+                                minDate="today"
+                                placeholder="Select event date"
+                            />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-event-time" class="form-label">Event Time <span class="text-danger">*</span></label>
+                            <select id="modal-event-time" required class="form-control default-select">
+                                <option value="">Select Time</option>
+                                <option value="morning">Morning</option>
+                                <option value="afternoon">Afternoon</option>
+                                <option value="evening">Evening</option>
+                                <option value="night_snack">Snack</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="modal-event-menu" class="form-label">Event Menu <span class="text-danger">*</span></label>
+                            <input type="text" id="modal-event-menu" required class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-guest-count" class="form-label">Guest Count <span class="text-danger">*</span></label>
+                            <input type="number" id="modal-guest-count" min="1" required class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-order-type" class="form-label">Order Type</label>
+                            <select id="modal-order-type" class="form-control default-select">
+                                <option value="">Select Order Type</option>
+                                <option value="full_service">Full Service</option>
+                                <option value="preparation_only">Preparation Only</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-dish-price" class="form-label">Dish Price <span class="text-danger">*</span></label>
+                            <input type="number" id="modal-dish-price" step="0.01" min="0" required class="form-control">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-cost" class="form-label">Cost</label>
+                            <input type="text" id="modal-cost" readonly class="form-control" value="0.00">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="save-event-btn" class="btn btn-primary">Add Event</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section('scripts')
+    <script>
+        (function () {
+          'use strict'
+
+          // Fetch all the forms we want to apply custom Bootstrap validation styles to
+          var forms = document.querySelectorAll('.needs-validation')
+
+          // Loop over them and prevent submission
+          Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+              form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+              }, false)
+            })
+        })()
+
+        // Initialize events array with existing orders data
+        @php
+            $eventsData = $relatedOrders->map(function($order) {
+                $dishPrice = $order->guest_count > 0 ? ($order->estimated_cost / $order->guest_count) : 0;
+                return [
+                    'event_date' => $order->event_date ? $order->event_date->format('Y-m-d') : '',
+                    'event_time' => $order->event_time ?? '',
+                    'event_menu' => $order->event_menu ?? '',
+                    'guest_count' => (int)($order->guest_count ?? 0),
+                    'order_type' => $order->order_type ?? null,
+                    'dish_price' => (float)number_format($dishPrice, 2, '.', ''),
+                    'cost' => (float)number_format($order->estimated_cost ?? 0, 2, '.', ''),
+                ];
+            })->values();
+        @endphp
+        let events = @json($eventsData);
+        let editingIndex = -1;
+        let eventModal;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            eventModal = new bootstrap.Modal(document.getElementById('event-modal'));
+
+            // Initialize events table if events exist
+            if (events.length > 0) {
+                updateEventsTable();
+                updateEventsData();
+            }
+
+            // Open modal when Add Event button is clicked
+            document.getElementById('add-event-btn').addEventListener('click', function() {
+                editingIndex = -1;
+                resetEventForm();
+                eventModal.show();
+            });
+
+            // Calculate cost when guest count or dish price changes
+            document.getElementById('modal-guest-count').addEventListener('input', calculateCost);
+            document.getElementById('modal-dish-price').addEventListener('input', calculateCost);
+
+            // Save event
+            document.getElementById('save-event-btn').addEventListener('click', function() {
+                const form = document.getElementById('event-form');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                // Get date value from Pickadate picker (submit format)
+                let eventDate = document.getElementById('modal-event-date').value;
+                if (typeof jQuery !== 'undefined' && jQuery.fn.pickadate) {
+                    const $dateInput = jQuery('#modal-event-date');
+                    const picker = $dateInput.pickadate('picker');
+                    if (picker) {
+                        // Get the selected date and format it as yyyy-mm-dd
+                        const selectedDate = picker.get('select');
+                        if (selectedDate) {
+                            // Format date as yyyy-mm-dd
+                            const year = selectedDate.getFullYear();
+                            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(selectedDate.getDate()).padStart(2, '0');
+                            eventDate = year + '-' + month + '-' + day;
+                        }
+                    }
+                }
+
+                const eventData = {
+                    event_date: eventDate,
+                    event_time: document.getElementById('modal-event-time').value,
+                    event_menu: document.getElementById('modal-event-menu').value,
+                    guest_count: parseInt(document.getElementById('modal-guest-count').value),
+                    order_type: document.getElementById('modal-order-type').value || null,
+                    dish_price: parseFloat(document.getElementById('modal-dish-price').value),
+                    cost: parseFloat(document.getElementById('modal-cost').value)
+                };
+
+                if (editingIndex >= 0) {
+                    events[editingIndex] = eventData;
+                } else {
+                    events.push(eventData);
+                }
+
+                updateEventsTable();
+                updateEventsData();
+                eventModal.hide();
+                resetEventForm();
+            });
+
+            // Validate events before form submission
+            document.querySelector('form[action="{{ route('orders.update', $order) }}"]').addEventListener('submit', function(e) {
+                updateEventsData();
+                
+                if (events.length === 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    alert('Please add at least one event before submitting.');
+                    return false;
+                }
+            });
+
+            // Handle delete modal for events
+            const deleteEventModal = document.getElementById('deleteEventModal');
+            if (deleteEventModal) {
+                deleteEventModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const eventIndex = parseInt(button.getAttribute('data-event-index'));
+                    eventIndexToDelete = eventIndex;
+                });
+
+                // Handle delete confirmation
+                const deleteEventForm = document.getElementById('deleteEventModal-form');
+                if (deleteEventForm) {
+                    deleteEventForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        if (eventIndexToDelete >= 0) {
+                            deleteEvent(eventIndexToDelete);
+                            const modal = bootstrap.Modal.getInstance(deleteEventModal);
+                            if (modal) {
+                                modal.hide();
+                            }
+                            eventIndexToDelete = -1;
+                        }
+                    });
+                }
+            }
+        });
+
+        function calculateCost() {
+            const guestCount = parseFloat(document.getElementById('modal-guest-count').value) || 0;
+            const dishPrice = parseFloat(document.getElementById('modal-dish-price').value) || 0;
+            const cost = guestCount * dishPrice;
+            document.getElementById('modal-cost').value = cost.toFixed(2);
+        }
+
+        function resetEventForm() {
+            document.getElementById('event-form').reset();
+            document.getElementById('modal-cost').value = '0.00';
+            document.getElementById('save-event-btn').textContent = 'Add Event';
+            // Clear date picker
+            const dateInput = document.getElementById('modal-event-date');
+            const picker = dateInput.pickadate ? dateInput.pickadate('picker') : null;
+            if (picker) {
+                picker.clear();
+            }
+        }
+
+        function updateEventsTable() {
+            const tbody = document.getElementById('events-table-body');
+            const container = document.getElementById('events-container');
+            
+            if (events.length === 0) {
+                container.classList.add('d-none');
+                tbody.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('d-none');
+            tbody.innerHTML = events.map((event, index) => {
+                const eventTimeLabels = {
+                    'morning': 'Morning',
+                    'afternoon': 'Afternoon',
+                    'evening': 'Evening',
+                    'night_snack': 'Snack'
+                };
+
+                const orderTypeLabels = {
+                    'full_service': 'Full Service',
+                    'preparation_only': 'Preparation Only'
+                };
+
+                return `
+                    <tr>
+                        <td>${event.event_date}</td>
+                        <td>${eventTimeLabels[event.event_time] || event.event_time}</td>
+                        <td>${event.event_menu}</td>
+                        <td>${event.guest_count}</td>
+                        <td>${orderTypeLabels[event.order_type] || event.order_type || '-'}</td>
+                        <td>₹${event.dish_price.toFixed(2)}</td>
+                        <td><strong>₹${event.cost.toFixed(2)}</strong></td>
+                        <td>
+                            <button type="button" onclick="editEvent(${index})" class="btn btn-sm btn-primary me-1">Edit</button>
+                            <button type="button" class="btn btn-sm btn-danger" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteEventModal"
+                                data-event-index="${index}"
+                                data-event-name="${event.event_menu} - ${event.event_date}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function editEvent(index) {
+            editingIndex = index;
+            const event = events[index];
+            
+            // Set date picker value using Pickadate API
+            const dateInput = document.getElementById('modal-event-date');
+            const picker = dateInput.pickadate ? dateInput.pickadate('picker') : null;
+            if (picker) {
+                picker.set('select', event.event_date);
+            } else {
+                dateInput.value = event.event_date;
+            }
+            
+            document.getElementById('modal-event-time').value = event.event_time;
+            document.getElementById('modal-event-menu').value = event.event_menu;
+            document.getElementById('modal-guest-count').value = event.guest_count;
+            document.getElementById('modal-order-type').value = event.order_type || '';
+            document.getElementById('modal-dish-price').value = event.dish_price;
+            document.getElementById('modal-cost').value = event.cost.toFixed(2);
+            document.getElementById('save-event-btn').textContent = 'Update Event';
+            
+            eventModal.show();
+        }
+
+        let eventIndexToDelete = -1;
+
+        function deleteEvent(index) {
+            events.splice(index, 1);
+            updateEventsTable();
+            updateEventsData();
+        }
+
+        function updateEventsData() {
+            document.getElementById('events-data').value = JSON.stringify(events);
+        }
+    </script>
+
+    <!-- Delete Event Modal -->
+    <x-delete-modal 
+        id="deleteEventModal" 
+        title="Delete Event"
+        message="Are you sure you want to delete this event?"
+        delete-button-text="Delete Event"
+    />
+    @stack('datepicker-init')
+@endsection

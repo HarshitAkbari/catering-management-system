@@ -1,20 +1,39 @@
 @extends('layouts.app')
 
-@section('title', 'Order Details')
+@section('title', $page_title ?? 'Order Details')
 
 @section('page_content')
 @php
     $totalAmount = $relatedOrders->sum('estimated_cost');
     $eventCount = $relatedOrders->count();
     $firstOrder = $relatedOrders->first();
+    // Get current status - if all orders have same status, use it; otherwise use first order's status
+    $statuses = $relatedOrders->pluck('status')->unique();
+    $currentStatus = $statuses->count() === 1 ? $statuses->first() : $firstOrder->status;
 @endphp
+<!-- Action Buttons -->
+<div class="row mb-3">
+    <div class="col-lg-12">
+        <div class="d-flex gap-2 align-items-center justify-content-end" style="position: relative; z-index: 10;">
+            <a href="{{ route('orders.edit', $firstOrder) }}" class="btn btn-info btn-sm" style="pointer-events: auto; cursor: pointer;">
+                <i class="bi bi-pencil me-1"></i>Edit Orders
+            </a>
+            <button type="button" onclick="openStatusModal('{{ $firstOrder->id }}', '{{ $currentStatus }}')" class="btn btn-primary btn-sm" style="pointer-events: auto; cursor: pointer;">
+                <i class="bi bi-arrow-repeat me-1"></i>Change Status
+            </button>
+            <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm" style="pointer-events: auto; cursor: pointer;">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-lg-12">
         <!-- Summary Section -->
         <div class="card">
             <div class="card-header">
-                <h4 class="card-title">Order Summary</h4>
+                <h4 class="card-title">{{ $page_title ?? 'Order Details' }}</h4>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -48,7 +67,6 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title">All Orders</h4>
-                <a href="{{ route('orders.index') }}" class="btn btn-primary btn-sm">Back to Orders</a>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -154,4 +172,132 @@
         </div>
     </div>
 </div>
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="status-modal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Update Order Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="status-update-form" class="needs-validation" action="" method="POST" novalidate>
+                @csrf
+                <div class="modal-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>There were errors with your submission:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <div class="mb-3">
+                        <label for="modal-order-status" class="form-label">Order Status <span class="text-danger">*</span></label>
+                        <select name="status" id="modal-order-status" required class="form-control default-select">
+                            <option value="">Select Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select an order status.
+                        </div>
+                        @error('status')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+
+    let statusModal;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize modal
+        const modalElement = document.getElementById('status-modal');
+        if (modalElement) {
+            statusModal = new bootstrap.Modal(modalElement);
+        }
+        
+        // Ensure buttons are clickable
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(function(btn) {
+            btn.style.pointerEvents = 'auto';
+            btn.style.cursor = 'pointer';
+        });
+    });
+
+    // Make function globally accessible
+    window.openStatusModal = function(orderId, currentStatus) {
+        try {
+            // Set form action URL
+            const form = document.getElementById('status-update-form');
+            if (!form) {
+                console.error('Status update form not found');
+                return;
+            }
+            
+            const routeUrl = '{{ route("orders.update-status", ":id") }}'.replace(':id', orderId);
+            form.action = routeUrl;
+            
+            // Set current status in dropdown
+            const selectElement = document.getElementById('modal-order-status');
+            if (selectElement) {
+                selectElement.value = currentStatus || '';
+            }
+            
+            // Reset validation state
+            form.classList.remove('was-validated');
+            
+            // Show modal
+            if (statusModal) {
+                statusModal.show();
+            } else {
+                // Reinitialize if needed
+                const modalElement = document.getElementById('status-modal');
+                if (modalElement) {
+                    statusModal = new bootstrap.Modal(modalElement);
+                    statusModal.show();
+                }
+            }
+        } catch (error) {
+            console.error('Error opening status modal:', error);
+            alert('An error occurred while opening the status modal. Please try again.');
+        }
+    };
+</script>
 @endsection

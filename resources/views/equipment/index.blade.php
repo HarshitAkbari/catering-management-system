@@ -1,6 +1,6 @@
 @extends('layout.default')
 
-@section('title', 'Equipment')
+@section('title', $page_title ?? 'Equipment')
 
 @section('content')
 <div class="container-fluid">
@@ -8,21 +8,83 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title">Equipment</h4>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2">
+                            <h4 class="card-title mb-0">{{ $page_title ?? 'Equipment' }}</h4>
+                        </div>
+                        @if(isset($subtitle))
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                            </div>
+                        @endif
+                    </div>
                     <a href="{{ route('equipment.create') }}" class="btn btn-primary btn-sm">
                         <i class="bi bi-plus-circle me-1"></i>Add Equipment
                     </a>
                 </div>
                 <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="GET" action="{{ route('equipment.index') }}" class="mb-4">
+                        <!-- Preserve sort parameters -->
+                        @if(request('sort_by'))
+                            <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
+                        @endif
+                        @if(request('sort_order'))
+                            <input type="hidden" name="sort_order" value="{{ request('sort_order') }}">
+                        @endif
+                        
+                        <div class="row g-2 align-items-end mb-3">
+                            <!-- Name Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="name_filter" class="form-label">Name</label>
+                                <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                            </div>
+
+                            <!-- Category Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="category_filter" class="form-label">Category</label>
+                                <select name="category" id="category_filter" class="form-control form-control-sm">
+                                    <option value="">All Categories</option>
+                                    @foreach($categories ?? [] as $category)
+                                        <option value="{{ $category }}" {{ ($filterValues['category'] ?? '') == $category ? 'selected' : '' }}>{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="status_filter" class="form-label">Status</label>
+                                <select name="status" id="status_filter" class="form-control form-control-sm">
+                                    <option value="">All Status</option>
+                                    <option value="available" {{ ($filterValues['status'] ?? '') == 'available' ? 'selected' : '' }}>Available</option>
+                                    <option value="damaged" {{ ($filterValues['status'] ?? '') == 'damaged' ? 'selected' : '' }}>Damaged</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Filter Buttons -->
+                        <x-filter-buttons resetRoute="{{ route('equipment.index') }}" />
+                    </form>
+                    <hr>
                     <div class="table-responsive">
                         <table class="datatable table table-sm mb-0 table-striped">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Category</th>
-                                    <th>Quantity</th>
-                                    <th>Available</th>
-                                    <th>Status</th>
+                                    <th>
+                                        <x-table.sort-link field="name" label="Name" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="category" label="Category" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="quantity" label="Quantity" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="available_quantity" label="Available" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="status" label="Status" />
+                                    </th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -55,33 +117,10 @@
                                             <a href="{{ route('equipment.edit', $item) }}" class="btn btn-secondary btn-sm me-1" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger btn-sm" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $item->id }}">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                            
-                                            <!-- Delete Confirmation Modal -->
-                                            <div class="modal fade" id="deleteModal{{ $item->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $item->id }}" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="deleteModalLabel{{ $item->id }}">Confirm Delete</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p>Are you sure you want to delete <strong>{{ $item->name }}</strong>?</p>
-                                                            <p class="text-muted small mb-0">This action cannot be undone.</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                            <form action="{{ route('equipment.destroy', $item) }}" method="POST" class="d-inline">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <x-delete-button 
+                                                item-name="{{ $item->name }}"
+                                                delete-url="{{ route('equipment.destroy', $item) }}"
+                                            />
                                         </td>
                                     </tr>
                                 @empty
@@ -100,9 +139,16 @@
                             </tbody>
                         </table>
                     </div>
+                    @if(method_exists($equipment, 'links'))
+                        <div class="mt-3">
+                            {{ $equipment->appends(request()->query())->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<x-delete-modal id="deleteModal" />
 @endsection

@@ -58,6 +58,17 @@ return [
 				'OrderController_calendar' => [
 					'vendor/fullcalendar/lib/main.min.css',
 				],
+				'OrderController_create' => [
+					'vendor/pickadate/themes/default.css',
+					'vendor/pickadate/themes/default.date.css',
+				],
+				'OrderController_edit' => [
+					'vendor/pickadate/themes/default.css',
+					'vendor/pickadate/themes/default.date.css',
+				],
+				'OrderController_index' => [
+					'vendor/select2/css/select2.min.css',
+				],
 			],
 			'js' => [
 				'ReportController_profitLoss' => [
@@ -82,6 +93,19 @@ return [
 				],
 				'OrderController_calendar' => [
 					'vendor/fullcalendar/lib/main.min.js',
+				],
+				'OrderController_create' => [
+					'vendor/pickadate/picker.js',
+					'vendor/pickadate/picker.date.js',
+					'js/plugins-init/pickadate-init.js',
+				],
+				'OrderController_edit' => [
+					'vendor/pickadate/picker.js',
+					'vendor/pickadate/picker.date.js',
+					'js/plugins-init/pickadate-init.js',
+				],
+				'OrderController_index' => [
+					'vendor/select2/js/select2.full.min.js',
 				],
 			]
 		],

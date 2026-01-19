@@ -24,11 +24,47 @@ class OrderService extends BaseService
     /**
      * Get orders grouped by order number for tenant
      */
-    public function getGroupedOrders(int $tenantId): SupportCollection
+    public function getGroupedOrders(int $tenantId, array $filters = []): SupportCollection
     {
-        $allOrders = $this->repository->getByTenant($tenantId, ['customer']);
+        // Build base query with tenant filter
+        $baseFilters = ['tenant_id' => $tenantId];
         
-        return $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) {
+        // Handle customer search separately as it needs special handling
+        $customerSearch = null;
+        if (isset($filters['customer']) && isset($filters['customer']['_or_where'])) {
+            $customerSearch = $filters['customer']['_or_where'][0]['search_term'] ?? null;
+            unset($filters['customer']);
+        }
+        
+        // Extract sorting parameters for group-level sorting
+        $sortBy = $filters['sort_by'] ?? null;
+        $sortOrder = $filters['sort_order'] ?? 'asc';
+        
+        // Keep sort parameters in filters for repository (it will handle relationship sorting)
+        // But we'll also apply group-level sorting after grouping
+        $mergedFilters = array_merge($baseFilters, $filters);
+        
+        // Get filtered orders (return Query Builder, not Collection)
+        $query = $this->repository->filter($mergedFilters, ['customer'], [], true);
+        
+        // Apply customer search if provided
+        if ($customerSearch) {
+            $query->whereHas('customer', function ($q) use ($customerSearch) {
+                $q->where('name', 'like', "%{$customerSearch}%")
+                  ->orWhere('mobile', 'like', "%{$customerSearch}%")
+                  ->orWhere('email', 'like', "%{$customerSearch}%");
+            });
+        }
+        
+        // Default sorting if no sort_by specified
+        if (!$sortBy) {
+            $query->orderBy('created_at', 'desc');
+        }
+        
+        $allOrders = $query->get();
+        
+        // Group orders by order_number
+        $grouped = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) {
             $firstOrder = $orderGroup->first();
             return [
                 'order_number' => $orderNumber,
@@ -39,14 +75,71 @@ class OrderService extends BaseService
                 'orders' => $orderGroup,
                 'created_at' => $firstOrder->created_at,
             ];
-        })->values()->sortByDesc('created_at')->values();
+        })->values();
+        
+        // Apply group-level sorting if needed
+        if ($sortBy) {
+            $grouped = $this->applyGroupSorting($grouped, $sortBy, $sortOrder);
+        } else {
+            $grouped = $grouped->sortByDesc('created_at')->values();
+        }
+        
+        return $grouped;
+    }
+    
+    /**
+     * Apply sorting to grouped orders collection
+     */
+    private function applyGroupSorting(SupportCollection $grouped, string $sortBy, string $sortOrder): SupportCollection
+    {
+        // Handle relationship sorting (customer.name, customer.mobile, customer.email)
+        if (str_starts_with($sortBy, 'customer.')) {
+            $field = str_replace('customer.', '', $sortBy);
+            if ($sortOrder === 'asc') {
+                return $grouped->sortBy(function ($group) use ($field) {
+                    return $group['customer']->{$field} ?? '';
+                })->values();
+            } else {
+                return $grouped->sortByDesc(function ($group) use ($field) {
+                    return $group['customer']->{$field} ?? '';
+                })->values();
+            }
+        }
+        
+        // Handle group-level fields (total_amount, payment_status)
+        if (in_array($sortBy, ['total_amount', 'payment_status', 'status', 'created_at'])) {
+            if ($sortOrder === 'asc') {
+                return $grouped->sortBy($sortBy)->values();
+            } else {
+                return $grouped->sortByDesc($sortBy)->values();
+            }
+        }
+        
+        // Default: sort by created_at desc
+        return $grouped->sortByDesc('created_at')->values();
     }
 
     /**
      * Get orders by order number
      */
-    public function getByOrderNumber(string $orderNumber, int $tenantId): Collection
+    public function getByOrderNumber(string $orderNumber, int $tenantId, array $filters = []): Collection
     {
+        $baseFilters = [
+            'tenant_id' => $tenantId,
+            'order_number' => $orderNumber,
+        ];
+
+        // Merge additional filters
+        $mergedFilters = array_merge($baseFilters, $filters);
+
+        // Use repository filter method if filters are provided, otherwise use direct method
+        if (!empty($filters)) {
+            return $this->repository->filter($mergedFilters, [], [], false)
+                ->orderBy('event_date', 'asc')
+                ->orderBy('event_time', 'asc')
+                ->get();
+        }
+
         return $this->repository->getByOrderNumber($orderNumber, $tenantId);
     }
 
@@ -147,6 +240,99 @@ class OrderService extends BaseService
     }
 
     /**
+     * Update orders for events (handles multiple orders with same order_number)
+     */
+    public function updateOrders(string $orderNumber, array $eventsData, array $customerData, string $address, int $tenantId): array
+    {
+        try {
+            return DB::transaction(function () use ($orderNumber, $eventsData, $customerData, $address, $tenantId) {
+                // Verify that the order number belongs to this tenant
+                $existingOrders = $this->repository->getByOrderNumber($orderNumber, $tenantId);
+                if ($existingOrders->isEmpty()) {
+                    return ['status' => false, 'message' => 'Order not found or unauthorized'];
+                }
+
+                // Find or create customer
+                $customerService = app(CustomerService::class);
+                $customer = $customerService->findOrCreateByMobile(
+                    $customerData['customer_mobile'],
+                    $tenantId,
+                    [
+                        'name' => $customerData['customer_name'],
+                        'email' => $customerData['customer_email'] ?? null,
+                    ]
+                );
+
+                // Get existing order IDs to track which ones to keep
+                $existingOrderIds = $existingOrders->pluck('id')->toArray();
+                $updatedOrderIds = [];
+
+                // Update or create orders for each event
+                foreach ($eventsData as $event) {
+                    // Check if this event matches an existing order (by date, time, menu)
+                    $existingOrder = $existingOrders->first(function ($order) use ($event) {
+                        return $order->event_date->format('Y-m-d') === $event['event_date'] &&
+                               $order->event_time === $event['event_time'] &&
+                               $order->event_menu === $event['event_menu'];
+                    });
+
+                    if ($existingOrder) {
+                        // Update existing order
+                        $this->repository->update($existingOrder, [
+                            'customer_id' => $customer->id,
+                            'address' => $address,
+                            'event_date' => $event['event_date'],
+                            'event_time' => $event['event_time'],
+                            'event_menu' => $event['event_menu'],
+                            'order_type' => $event['order_type'] ?? null,
+                            'guest_count' => $event['guest_count'],
+                            'estimated_cost' => $event['cost'],
+                        ]);
+                        $updatedOrderIds[] = $existingOrder->id;
+                    } else {
+                        // Create new order for this event
+                        $newOrder = $this->repository->create([
+                            'tenant_id' => $tenantId,
+                            'customer_id' => $customer->id,
+                            'order_number' => $orderNumber,
+                            'address' => $address,
+                            'event_date' => $event['event_date'],
+                            'event_time' => $event['event_time'],
+                            'event_menu' => $event['event_menu'],
+                            'order_type' => $event['order_type'] ?? null,
+                            'guest_count' => $event['guest_count'],
+                            'estimated_cost' => $event['cost'],
+                            'status' => 'pending',
+                            'payment_status' => 'pending',
+                        ]);
+                        $updatedOrderIds[] = $newOrder->id;
+                    }
+                }
+
+                // Delete orders that are no longer in the events array
+                $ordersToDelete = array_diff($existingOrderIds, $updatedOrderIds);
+                if (!empty($ordersToDelete)) {
+                    $this->repository->filter([
+                        'id' => $ordersToDelete,
+                        'tenant_id' => $tenantId,
+                    ], [], [], true)->delete();
+                }
+
+                return [
+                    'status' => true,
+                    'order_number' => $orderNumber,
+                    'count' => count($eventsData),
+                ];
+            });
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'Failed to update orders: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Update payment status for all orders with same order number
      */
     public function updateGroupPaymentStatus(string $orderNumber, string $paymentStatus, int $tenantId): array
@@ -164,6 +350,27 @@ class OrderService extends BaseService
             ];
         } catch (\Exception $e) {
             return ['status' => false, 'message' => 'Failed to update payment status: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Update status for all orders with same order number
+     */
+    public function updateGroupStatus(string $orderNumber, string $status, int $tenantId): array
+    {
+        try {
+            $updatedCount = $this->repository->filter([
+                'tenant_id' => $tenantId,
+                'order_number' => $orderNumber,
+            ], [], [], true)->update(['status' => $status]);
+
+            return [
+                'status' => true,
+                'count' => $updatedCount,
+                'message' => "Order status updated to '{$status}' for {$updatedCount} order(s).",
+            ];
+        } catch (\Exception $e) {
+            return ['status' => false, 'message' => 'Failed to update order status: ' . $e->getMessage()];
         }
     }
 

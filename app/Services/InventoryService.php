@@ -28,14 +28,36 @@ class InventoryService extends BaseService
     /**
      * Get inventory items by tenant
      */
-    public function getByTenant(int $tenantId, int $perPage = 15): LengthAwarePaginator
+    public function getByTenant(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
+        // Merge tenant_id filter if not already present
+        if (!isset($filters['tenant_id'])) {
+            $filters['tenant_id'] = $tenantId;
+        }
+        
+        // Handle low stock filter
+        if (isset($filters['stock_status']) && $filters['stock_status'] === 'low') {
+            unset($filters['stock_status']);
+            // Use a custom query for low stock
+            $query = $this->repository->filter($filters, [], [], true);
+            $query->whereRaw('current_stock <= minimum_stock');
+            return $this->repository->applyPagination($query, $filters, $perPage);
+        }
+        
         return $this->repository->filterAndPaginate(
-            ['tenant_id' => $tenantId],
+            $filters,
             [],
             [],
             $perPage
         );
+    }
+    
+    /**
+     * Get all inventory items (for dropdowns, etc.)
+     */
+    public function getAll(): Collection
+    {
+        return $this->repository->all();
     }
 
     /**

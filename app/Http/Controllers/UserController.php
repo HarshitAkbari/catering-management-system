@@ -19,12 +19,55 @@ class UserController extends Controller
     /**
      * Display a listing of users for the current tenant.
      */
-    public function index()
+    public function index(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $users = $this->userService->getByTenant($tenantId);
-
-        return view('users.index', compact('users'));
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Email filter
+        if ($request->has('email_like') && !empty($request->email_like)) {
+            $filters['email_like'] = $request->email_like;
+        }
+        
+        // Role filter
+        if ($request->has('role') && !empty($request->role)) {
+            $filters['role'] = $request->role;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['status'] = $request->status;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $users = $this->userService->getByTenant($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'email_like' => $request->input('email_like', ''),
+            'role' => $request->input('role', ''),
+            'status' => $request->input('status', ''),
+        ];
+        
+        $page_title = 'Users';
+        $subtitle = 'Manage system users and permissions';
+        
+        return view('users.index', compact('users', 'filterValues', 'page_title', 'subtitle'));
     }
 
     /**
