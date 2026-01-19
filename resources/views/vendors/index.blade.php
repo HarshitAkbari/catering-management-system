@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Vendors')
+@section('title', $page_title ?? 'Vendors')
 
 @section('content')
 <div class="container-fluid">
@@ -8,18 +8,69 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Vendors</h4>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2">
+                            <h4 class="card-title mb-0">{{ $page_title ?? 'Vendors' }}</h4>
+                        </div>
+                        @if(isset($subtitle))
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                            </div>
+                        @endif
+                    </div>
                 </div>
                 <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="GET" action="{{ route('vendors.index') }}" class="mb-4">
+                        <!-- Preserve sort parameters -->
+                        @if(request('sort_by'))
+                            <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
+                        @endif
+                        @if(request('sort_order'))
+                            <input type="hidden" name="sort_order" value="{{ request('sort_order') }}">
+                        @endif
+                        
+                        <div class="row g-2 align-items-end mb-3">
+                            <!-- Name Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="name_filter" class="form-label">Name</label>
+                                <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                            </div>
+
+                            <!-- Contact Person Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="contact_person_filter" class="form-label">Contact Person</label>
+                                <input type="text" name="contact_person_like" id="contact_person_filter" value="{{ $filterValues['contact_person_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by contact person">
+                            </div>
+
+                            <!-- Email Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="email_filter" class="form-label">Email</label>
+                                <input type="text" name="email_like" id="email_filter" value="{{ $filterValues['email_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by email">
+                            </div>
+                        </div>
+
+                        <!-- Filter Buttons -->
+                        <x-filter-buttons resetRoute="{{ route('vendors.index') }}" />
+                    </form>
+                    <hr>
                     <div class="table-responsive">
                         <table class="datatable table table-sm mb-0 table-striped">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Contact Person</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                    <th></th>
+                                    <th>
+                                        <x-table.sort-link field="name" label="Name" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="contact_person" label="Contact Person" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="phone" label="Phone" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="email" label="Email" />
+                                    </th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="vendors">
@@ -59,14 +110,12 @@
                                             <a href="{{ route('vendors.edit', $vendor) }}" class="btn btn-info btn-sm me-1" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger btn-sm" title="Delete" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#deleteVendorModal"
-                                                data-vendor-id="{{ $vendor->id }}"
-                                                data-vendor-name="{{ $vendor->name }}"
-                                                data-vendor-url="{{ route('vendors.destroy', $vendor) }}">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            <x-delete-button 
+                                                item-name="{{ $vendor->name }}"
+                                                delete-url="{{ route('vendors.destroy', $vendor) }}"
+                                                modal-id="deleteVendorModal"
+                                                delete-button-text="Delete Vendor"
+                                            />
                                         </td>
                                     </tr>
                                 @empty
@@ -85,64 +134,20 @@
                             </tbody>
                         </table>
                     </div>
+                    @if(method_exists($vendors, 'links'))
+                        <div class="mt-3">
+                            {{ $vendors->appends(request()->query())->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteVendorModal" tabindex="-1" aria-labelledby="deleteVendorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteVendorModalLabel">
-                    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
-                    Confirm Deletion
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete <strong id="vendorNameToDelete"></strong>?</p>
-                <p class="text-muted small mb-0">This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteVendorForm" method="POST" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete Vendor</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const deleteModal = document.getElementById('deleteVendorModal');
-        const deleteForm = document.getElementById('deleteVendorForm');
-        const vendorNameElement = document.getElementById('vendorNameToDelete');
-        
-        if (deleteModal) {
-            deleteModal.addEventListener('show.bs.modal', function(event) {
-                // Button that triggered the modal
-                const button = event.relatedTarget;
-                
-                // Extract info from data-* attributes
-                const vendorId = button.getAttribute('data-vendor-id');
-                const vendorName = button.getAttribute('data-vendor-name');
-                const vendorUrl = button.getAttribute('data-vendor-url');
-                
-                // Update modal content
-                vendorNameElement.textContent = vendorName;
-                
-                // Update form action
-                deleteForm.action = vendorUrl;
-            });
-        }
-    });
-</script>
+<x-delete-modal 
+    id="deleteVendorModal" 
+    title="Confirm Deletion"
+    delete-button-text="Delete Vendor"
+/>
 @endsection

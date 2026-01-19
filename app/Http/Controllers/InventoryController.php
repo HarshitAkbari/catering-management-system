@@ -16,12 +16,60 @@ class InventoryController extends Controller
         private readonly VendorService $vendorService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $inventoryItems = $this->inventoryService->getByTenant($tenantId);
-
-        return view('inventory.index', compact('inventoryItems'));
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Unit filter
+        if ($request->has('unit') && !empty($request->unit)) {
+            $filters['unit'] = $request->unit;
+        }
+        
+        // Stock status filter (low stock)
+        if ($request->has('stock_status') && !empty($request->stock_status)) {
+            if ($request->stock_status === 'low') {
+                // This will be handled in the service/repository
+                $filters['stock_status'] = 'low';
+            }
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $inventoryItems = $this->inventoryService->getByTenant($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'unit' => $request->input('unit', ''),
+            'stock_status' => $request->input('stock_status', ''),
+        ];
+        
+        // Get unique units for filter dropdown
+        $units = $this->inventoryService->getAll()
+            ->where('tenant_id', $tenantId)
+            ->pluck('unit')
+            ->unique()
+            ->sort()
+            ->values();
+        
+        $page_title = 'Inventory';
+        $subtitle = 'Manage your inventory items';
+        
+        return view('inventory.index', compact('inventoryItems', 'filterValues', 'units', 'page_title', 'subtitle'));
     }
 
     public function create()

@@ -20,9 +20,19 @@ class VendorService extends BaseService
     /**
      * Get vendors by tenant
      */
-    public function getByTenant(int $tenantId): Collection
+    public function getByTenant(int $tenantId, int $perPage = 15, array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
     {
-        return $this->repository->getByTenant($tenantId);
+        // Merge tenant_id filter if not already present
+        if (!isset($filters['tenant_id'])) {
+            $filters['tenant_id'] = $tenantId;
+        }
+        
+        return $this->repository->filterAndPaginate(
+            $filters,
+            [],
+            [],
+            $perPage
+        );
     }
 }
 

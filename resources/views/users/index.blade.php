@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Users')
+@section('title', $page_title ?? 'Users')
 
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,16 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="card-title">Users</h4>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2">
+                            <h4 class="card-title mb-0">{{ $page_title ?? 'Users' }}</h4>
+                        </div>
+                        @if(isset($subtitle))
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                            </div>
+                        @endif
+                    </div>
                     @hasPermission('users.create')
                     <a href="{{ route('users.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Create New User
@@ -30,14 +39,71 @@
                         </div>
                     @endif
 
+                    <!-- Filter Form -->
+                    <form method="GET" action="{{ route('users.index') }}" class="mb-4">
+                        <!-- Preserve sort parameters -->
+                        @if(request('sort_by'))
+                            <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
+                        @endif
+                        @if(request('sort_order'))
+                            <input type="hidden" name="sort_order" value="{{ request('sort_order') }}">
+                        @endif
+                        
+                        <div class="row g-2 align-items-end mb-3">
+                            <!-- Name Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="name_filter" class="form-label">Name</label>
+                                <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                            </div>
+
+                            <!-- Email Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="email_filter" class="form-label">Email</label>
+                                <input type="text" name="email_like" id="email_filter" value="{{ $filterValues['email_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by email">
+                            </div>
+
+                            <!-- Role Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="role_filter" class="form-label">Role</label>
+                                <select name="role" id="role_filter" class="form-control form-control-sm">
+                                    <option value="">All Roles</option>
+                                    <option value="admin" {{ ($filterValues['role'] ?? '') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="manager" {{ ($filterValues['role'] ?? '') == 'manager' ? 'selected' : '' }}>Manager</option>
+                                    <option value="staff" {{ ($filterValues['role'] ?? '') == 'staff' ? 'selected' : '' }}>Staff</option>
+                                </select>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <label for="status_filter" class="form-label">Status</label>
+                                <select name="status" id="status_filter" class="form-control form-control-sm">
+                                    <option value="">All Status</option>
+                                    <option value="active" {{ ($filterValues['status'] ?? '') == 'active' ? 'selected' : '' }}>Active</option>
+                                    <option value="inactive" {{ ($filterValues['status'] ?? '') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Filter Buttons -->
+                        <x-filter-buttons resetRoute="{{ route('users.index') }}" />
+                    </form>
+                    <hr>
                     <div class="table-responsive">
                         <table class="datatable table table-sm mb-0 table-striped">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
+                                    <th>
+                                        <x-table.sort-link field="name" label="Name" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="email" label="Email" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="role" label="Role" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="status" label="Status" />
+                                    </th>
                                     <th>Roles</th>
                                     <th>Actions</th>
                                 </tr>
@@ -87,13 +153,10 @@
                                             @endhasPermission
                                             @hasPermission('users.delete')
                                             @if($user->id !== auth()->id())
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" title="Delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
+                                            <x-delete-button 
+                                                item-name="{{ $user->name }}"
+                                                delete-url="{{ route('users.destroy', $user) }}"
+                                            />
                                             @endif
                                             @endhasPermission
                                         </td>
@@ -116,12 +179,14 @@
                     </div>
 
                     <div class="mt-3">
-                        {{ $users->links() }}
+                        {{ $users->appends(request()->query())->links() }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<x-delete-modal id="deleteModal" />
 @endsection
 

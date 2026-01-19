@@ -1,24 +1,85 @@
 @extends('layouts.app')
 
-@section('title', 'Inventory')
+@section('title', $page_title ?? 'Inventory')
 
 @section('page_content')
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h4 class="card-title">Inventory</h4>
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="card-title mb-0">{{ $page_title ?? 'Inventory' }}</h4>
+                    </div>
+                    @if(isset($subtitle))
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                        </div>
+                    @endif
+                </div>
             </div>
             <div class="card-body">
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('inventory.index') }}" class="mb-4">
+                    <!-- Preserve sort parameters -->
+                    @if(request('sort_by'))
+                        <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
+                    @endif
+                    @if(request('sort_order'))
+                        <input type="hidden" name="sort_order" value="{{ request('sort_order') }}">
+                    @endif
+                    
+                    <div class="row g-2 align-items-end mb-3">
+                        <!-- Name Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="name_filter" class="form-label">Name</label>
+                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                        </div>
+
+                        <!-- Unit Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="unit_filter" class="form-label">Unit</label>
+                            <select name="unit" id="unit_filter" class="form-control form-control-sm">
+                                <option value="">All Units</option>
+                                @foreach($units ?? [] as $unit)
+                                    <option value="{{ $unit }}" {{ ($filterValues['unit'] ?? '') == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Stock Status Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="stock_status_filter" class="form-label">Stock Status</label>
+                            <select name="stock_status" id="stock_status_filter" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="low" {{ ($filterValues['stock_status'] ?? '') == 'low' ? 'selected' : '' }}>Low Stock</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <x-filter-buttons resetRoute="{{ route('inventory.index') }}" />
+                </form>
+                <hr>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Unit</th>
-                                <th>Current Stock</th>
-                                <th>Minimum Stock</th>
-                                <th>Price/Unit</th>
+                                <th>
+                                    <x-table.sort-link field="name" label="Name" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="unit" label="Unit" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="current_stock" label="Current Stock" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="minimum_stock" label="Minimum Stock" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="price_per_unit" label="Price/Unit" />
+                                </th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -45,13 +106,10 @@
                                         <a href="{{ route('inventory.edit', $item) }}" class="btn btn-info btn-sm" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <form action="{{ route('inventory.destroy', $item) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <x-delete-button 
+                                            item-name="{{ $item->name }}"
+                                            delete-url="{{ route('inventory.destroy', $item) }}"
+                                        />
                                     </td>
                                 </tr>
                             @empty
@@ -66,11 +124,13 @@
                 </div>
                 @if(method_exists($inventoryItems, 'links'))
                     <div class="mt-3">
-                        {{ $inventoryItems->links() }}
+                        {{ $inventoryItems->appends(request()->query())->links() }}
                     </div>
                 @endif
             </div>
         </div>
     </div>
 </div>
+
+<x-delete-modal id="deleteModal" />
 @endsection

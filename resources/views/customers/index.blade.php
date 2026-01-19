@@ -1,24 +1,75 @@
 @extends('layouts.app')
 
-@section('title', 'Customers')
+@section('title', $page_title ?? 'Customers')
 
-@section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="datatable table table-sm mb-0 table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Customer</th>
-                                    <th>Mobile</th>
-                                    <th>Email</th>
-                                    <th>Total Orders</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
+@section('page_content')
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="card-title mb-0">{{ $page_title ?? 'Customers' }}</h4>
+                    </div>
+                    @if(isset($subtitle))
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                        </div>
+                    @endif
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('customers.index') }}" class="mb-4">
+                    <!-- Preserve sort parameters -->
+                    @if(request('sort_by'))
+                        <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
+                    @endif
+                    @if(request('sort_order'))
+                        <input type="hidden" name="sort_order" value="{{ request('sort_order') }}">
+                    @endif
+                    
+                    <div class="row g-2 align-items-end mb-3">
+                        <!-- Name Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="name_filter" class="form-label">Name</label>
+                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                        </div>
+
+                        <!-- Email Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="email_filter" class="form-label">Email</label>
+                            <input type="text" name="email_like" id="email_filter" value="{{ $filterValues['email_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by email">
+                        </div>
+
+                        <!-- Mobile Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="mobile_filter" class="form-label">Mobile</label>
+                            <input type="text" name="mobile_like" id="mobile_filter" value="{{ $filterValues['mobile_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by mobile">
+                        </div>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <x-filter-buttons resetRoute="{{ route('customers.index') }}" />
+                </form>
+                <hr>
+                <div class="table-responsive">
+                    <table class="datatable table table-sm mb-0 table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <x-table.sort-link field="name" label="Customer" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="mobile" label="Mobile" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="email" label="Email" />
+                                </th>
+                                <th>Total Orders</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                             <tbody id="customers">
                                 @forelse($customers as $customer)
                                     <tr class="btn-reveal-trigger">

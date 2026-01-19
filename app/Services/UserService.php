@@ -27,10 +27,15 @@ class UserService extends BaseService
     /**
      * Get users by tenant
      */
-    public function getByTenant(int $tenantId, int $perPage = 15): LengthAwarePaginator
+    public function getByTenant(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
+        // Merge tenant_id filter if not already present
+        if (!isset($filters['tenant_id'])) {
+            $filters['tenant_id'] = $tenantId;
+        }
+        
         return $this->repository->filterAndPaginate(
-            ['tenant_id' => $tenantId],
+            $filters,
             ['roles'],
             [],
             $perPage
