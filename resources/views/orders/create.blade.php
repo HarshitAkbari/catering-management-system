@@ -7,7 +7,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Create New Order</h4>
+                        <h4 class="card-title">{{ $page_title ?? 'Create New Order' }}</h4>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -106,7 +106,7 @@
                                                 <div class="alert alert-alt alert-danger solid">{{ $message }}</div>
                                             @enderror
                                             <div class="table-responsive">
-                                                <table class="datatable-simple table table-striped table-bordered">
+                                                <table class="table table-bordered table-striped verticle-middle table-responsive-sm">
                                                     <thead>
                                                         <tr>
                                                             <th>Event Date</th>
@@ -160,7 +160,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="modal-event-date" class="form-label">Event Date <span class="text-danger">*</span></label>
-                            <input type="date" id="modal-event-date" required class="form-control">
+                            <x-datepicker 
+                                id="modal-event-date" 
+                                name="modal-event-date" 
+                                required 
+                                minDate="today"
+                                placeholder="Select event date"
+                            />
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -261,8 +267,26 @@
                     return;
                 }
 
+                // Get date value from Pickadate picker (submit format)
+                let eventDate = document.getElementById('modal-event-date').value;
+                if (typeof jQuery !== 'undefined' && jQuery.fn.pickadate) {
+                    const $dateInput = jQuery('#modal-event-date');
+                    const picker = $dateInput.pickadate('picker');
+                    if (picker) {
+                        // Get the selected date and format it as yyyy-mm-dd
+                        const selectedDate = picker.get('select');
+                        if (selectedDate) {
+                            // Format date as yyyy-mm-dd
+                            const year = selectedDate.getFullYear();
+                            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(selectedDate.getDate()).padStart(2, '0');
+                            eventDate = year + '-' + month + '-' + day;
+                        }
+                    }
+                }
+
                 const eventData = {
-                    event_date: document.getElementById('modal-event-date').value,
+                    event_date: eventDate,
                     event_time: document.getElementById('modal-event-time').value,
                     event_menu: document.getElementById('modal-event-menu').value,
                     guest_count: parseInt(document.getElementById('modal-guest-count').value),
@@ -293,6 +317,32 @@
                     return false;
                 }
             });
+
+            // Handle delete modal for events
+            const deleteEventModal = document.getElementById('deleteEventModal');
+            if (deleteEventModal) {
+                deleteEventModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const eventIndex = parseInt(button.getAttribute('data-event-index'));
+                    eventIndexToDelete = eventIndex;
+                });
+
+                // Handle delete confirmation
+                const deleteEventForm = document.getElementById('deleteEventModal-form');
+                if (deleteEventForm) {
+                    deleteEventForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        if (eventIndexToDelete >= 0) {
+                            deleteEvent(eventIndexToDelete);
+                            const modal = bootstrap.Modal.getInstance(deleteEventModal);
+                            if (modal) {
+                                modal.hide();
+                            }
+                            eventIndexToDelete = -1;
+                        }
+                    });
+                }
+            }
         });
 
         function calculateCost() {
@@ -306,6 +356,12 @@
             document.getElementById('event-form').reset();
             document.getElementById('modal-cost').value = '0.00';
             document.getElementById('save-event-btn').textContent = 'Add Event';
+            // Clear date picker
+            const dateInput = document.getElementById('modal-event-date');
+            const picker = dateInput.pickadate ? dateInput.pickadate('picker') : null;
+            if (picker) {
+                picker.clear();
+            }
         }
 
         function updateEventsTable() {
@@ -343,7 +399,13 @@
                         <td><strong>₹${event.cost.toFixed(2)}</strong></td>
                         <td>
                             <button type="button" onclick="editEvent(${index})" class="btn btn-sm btn-primary me-1">Edit</button>
-                            <button type="button" onclick="deleteEvent(${index})" class="btn btn-sm btn-danger">Delete</button>
+                            <button type="button" class="btn btn-sm btn-danger" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteEventModal"
+                                data-event-index="${index}"
+                                data-event-name="${event.event_menu} - ${event.event_date}">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                 `;
@@ -354,7 +416,15 @@
             editingIndex = index;
             const event = events[index];
             
-            document.getElementById('modal-event-date').value = event.event_date;
+            // Set date picker value using Pickadate API
+            const dateInput = document.getElementById('modal-event-date');
+            const picker = dateInput.pickadate ? dateInput.pickadate('picker') : null;
+            if (picker) {
+                picker.set('select', event.event_date);
+            } else {
+                dateInput.value = event.event_date;
+            }
+            
             document.getElementById('modal-event-time').value = event.event_time;
             document.getElementById('modal-event-menu').value = event.event_menu;
             document.getElementById('modal-guest-count').value = event.guest_count;
@@ -366,16 +436,25 @@
             eventModal.show();
         }
 
+        let eventIndexToDelete = -1;
+
         function deleteEvent(index) {
-            if (confirm('Are you sure you want to delete this event?')) {
-                events.splice(index, 1);
-                updateEventsTable();
-                updateEventsData();
-            }
+            events.splice(index, 1);
+            updateEventsTable();
+            updateEventsData();
         }
 
         function updateEventsData() {
             document.getElementById('events-data').value = JSON.stringify(events);
         }
     </script>
+
+    <!-- Delete Event Modal -->
+    <x-delete-modal 
+        id="deleteEventModal" 
+        title="Delete Event"
+        message="Are you sure you want to delete this event?"
+        delete-button-text="Delete Event"
+    />
+    @stack('datepicker-init')
 @endsection

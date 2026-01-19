@@ -15,26 +15,58 @@ class EquipmentController extends Controller
         private readonly EquipmentService $equipmentService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $equipment = $this->equipmentService->getByTenant($tenantId);
-
-        // Manual pagination
-        $currentPage = request()->get('page', 1);
-        $perPage = 15;
-        $items = $equipment->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        $total = $equipment->count();
         
-        $equipment = new \Illuminate\Pagination\LengthAwarePaginator(
-            $items,
-            $total,
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return view('equipment.index', compact('equipment'));
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Category filter
+        if ($request->has('category') && !empty($request->category)) {
+            $filters['category'] = $request->category;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['status'] = $request->status;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $equipment = $this->equipmentService->getByTenant($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'category' => $request->input('category', ''),
+            'status' => $request->input('status', ''),
+        ];
+        
+        // Get unique categories for filter dropdown
+        $categories = $this->equipmentService->getAll()
+            ->where('tenant_id', $tenantId)
+            ->pluck('category')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+        
+        $page_title = 'Equipment';
+        $subtitle = 'Manage your equipment inventory';
+        
+        return view('equipment.index', compact('equipment', 'filterValues', 'categories', 'page_title', 'subtitle'));
     }
 
     public function create()

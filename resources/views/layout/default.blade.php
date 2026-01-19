@@ -241,5 +241,6 @@
     @endif
 
     @yield('scripts')
+    @stack('datepicker-init')
 </body>
 </html>

@@ -183,7 +183,7 @@ abstract class BaseRepository
                 $query->whereNull($key);
             } else {
                 if (str_ends_with($key, '_date')) {
-                    $value = Carbon::createFromFormat('m/d/Y', $value)->toDateString();
+                    $value = Carbon::parse($value)->toDateString();
                 }
 
                 if (str_ends_with($key, '_like')) {

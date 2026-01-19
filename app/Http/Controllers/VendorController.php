@@ -14,26 +14,49 @@ class VendorController extends Controller
         private readonly VendorService $vendorService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $vendors = $this->vendorService->getByTenant($tenantId);
-
-        // Manual pagination since getByTenant returns Collection
-        $currentPage = request()->get('page', 1);
-        $perPage = 15;
-        $items = $vendors->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        $total = $vendors->count();
         
-        $vendors = new \Illuminate\Pagination\LengthAwarePaginator(
-            $items,
-            $total,
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return view('vendors.index', compact('vendors'));
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Contact person filter
+        if ($request->has('contact_person_like') && !empty($request->contact_person_like)) {
+            $filters['contact_person_like'] = $request->contact_person_like;
+        }
+        
+        // Email filter
+        if ($request->has('email_like') && !empty($request->email_like)) {
+            $filters['email_like'] = $request->email_like;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $vendors = $this->vendorService->getByTenant($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'contact_person_like' => $request->input('contact_person_like', ''),
+            'email_like' => $request->input('email_like', ''),
+        ];
+        
+        $page_title = 'Vendors';
+        $subtitle = 'Manage your vendor database';
+        
+        return view('vendors.index', compact('vendors', 'filterValues', 'page_title', 'subtitle'));
     }
 
     public function create()

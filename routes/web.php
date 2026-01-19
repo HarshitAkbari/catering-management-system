@@ -54,6 +54,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::middleware(['permission:orders.edit'])->group(function () {
         Route::get('orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
         Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+        Route::post('orders/{order}/update-status', [OrderController::class, 'updateGroupStatus'])->name('orders.update-status');
     });
     Route::middleware(['permission:orders.delete'])->group(function () {
         Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');

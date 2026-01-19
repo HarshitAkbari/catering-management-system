@@ -26,7 +26,7 @@
                 <thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Role</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Display Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Permissions</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th></tr></thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($roles as $role)
-                        <tr><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $role->name }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $role->display_name ?? '-' }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $role->permissions->count() }} permissions</td><td class="px-6 py-4 text-sm font-medium"><a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a><form action="{{ route('roles.destroy', $role) }}" method="POST" class="inline">@csrf @method('DELETE')<button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure?')">Delete</button></form></td></tr>
+                        <tr><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $role->name }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $role->display_name ?? '-' }}</td><td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ $role->permissions->count() }} permissions</td><td class="px-6 py-4 text-sm font-medium"><a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a><x-delete-button item-name="{{ $role->display_name ?? $role->name }}" delete-url="{{ route('roles.destroy', $role) }}" button-class="text-red-600 hover:text-red-900 bg-transparent border-0 p-0" icon-only="false" button-text="Delete" /></td></tr>
                     @empty
                         <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No roles found</td></tr>
                     @endforelse
@@ -35,5 +35,7 @@
         </div>
     </div>
 </div>
+
+<x-delete-modal id="deleteModal" />
 @endsection
 
