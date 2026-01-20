@@ -9,14 +9,15 @@
             <div class="card-header">
                 <h4 class="card-title">Payments</h4>
             </div>
-            <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
+            <div class="card-body">Now, I have this project. In the side navigation, I want to add a menu named Settings.
+                Under this menu, I want to provide configuration options that can be managed by the user.
+                
+                For example, we have Order Status, where the user should be able to create and update order statuses.
+                Similarly, in Inventory, we have Units. Since we do not know in advance which units may be required, I want to allow users to create and manage units themselves.
+                
+                In Equipment, we have Categories and Equipment Statuses. These should also be configurable by the user.
+                
+                Wherever you think such configuration options are required, please include them under the Settings menu.
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>

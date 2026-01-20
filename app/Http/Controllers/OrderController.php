@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\EventTime;
 use App\Models\Order;
+use App\Models\OrderStatus;
+use App\Models\OrderType;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 
@@ -21,9 +24,9 @@ class OrderController extends Controller
         // Build filters from request
         $filters = [];
         
-        // Status filter
-        if ($request->has('status') && is_array($request->status) && !empty($request->status)) {
-            $filters['status'] = $request->status;
+        // Status filter (now using order_status_id)
+        if ($request->has('order_status_id') && is_array($request->order_status_id) && !empty($request->order_status_id)) {
+            $filters['order_status_id'] = $request->order_status_id;
         }
         
         // Payment status filter
@@ -31,14 +34,14 @@ class OrderController extends Controller
             $filters['payment_status'] = $request->payment_status;
         }
         
-        // Event time filter
-        if ($request->has('event_time') && is_array($request->event_time) && !empty($request->event_time)) {
-            $filters['event_time'] = $request->event_time;
+        // Event time filter (now using event_time_id)
+        if ($request->has('event_time_id') && is_array($request->event_time_id) && !empty($request->event_time_id)) {
+            $filters['event_time_id'] = $request->event_time_id;
         }
         
-        // Order type filter
-        if ($request->has('order_type') && is_array($request->order_type) && !empty($request->order_type)) {
-            $filters['order_type'] = $request->order_type;
+        // Order type filter (now using order_type_id)
+        if ($request->has('order_type_id') && is_array($request->order_type_id) && !empty($request->order_type_id)) {
+            $filters['order_type_id'] = $request->order_type_id;
         }
         
         // Event date range filter
@@ -79,10 +82,10 @@ class OrderController extends Controller
         
         // Pass filter values to view for form preservation
         $filterValues = [
-            'status' => $request->input('status', []),
+            'order_status_id' => $request->input('order_status_id', []),
             'payment_status' => $request->input('payment_status', []),
-            'event_time' => $request->input('event_time', []),
-            'order_type' => $request->input('order_type', []),
+            'event_time_id' => $request->input('event_time_id', []),
+            'order_type_id' => $request->input('order_type_id', []),
             'event_date_between' => $request->input('event_date_between', []),
             'customer_search' => $request->input('customer_search', ''),
         ];
@@ -95,8 +98,12 @@ class OrderController extends Controller
 
     public function create()
     {
+        $tenantId = auth()->user()->tenant_id;
+        $eventTimes = EventTime::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        
         $page_title = 'Create New Order';
-        return view('orders.create', compact('page_title'));
+        return view('orders.create', compact('page_title', 'eventTimes', 'orderTypes'));
     }
 
     public function store(Request $request)
@@ -135,8 +142,6 @@ class OrderController extends Controller
             'events.*.dish_price' => 'required|numeric|min:0',
             'events.*.cost' => 'required|numeric|min:0',
         ]);
-
-        $tenantId = auth()->user()->tenant_id;
 
         $result = $this->orderService->createOrders(
             $validated['events'],
@@ -177,9 +182,9 @@ class OrderController extends Controller
         // Build filters from request
         $filters = [];
         
-        // Status filter
-        if ($request->has('status') && is_array($request->status) && !empty($request->status)) {
-            $filters['status'] = $request->status;
+        // Status filter (now using order_status_id)
+        if ($request->has('order_status_id') && is_array($request->order_status_id) && !empty($request->order_status_id)) {
+            $filters['order_status_id'] = $request->order_status_id;
         }
         
         // Payment status filter
@@ -187,14 +192,14 @@ class OrderController extends Controller
             $filters['payment_status'] = $request->payment_status;
         }
         
-        // Event time filter
-        if ($request->has('event_time') && is_array($request->event_time) && !empty($request->event_time)) {
-            $filters['event_time'] = $request->event_time;
+        // Event time filter (now using event_time_id)
+        if ($request->has('event_time_id') && is_array($request->event_time_id) && !empty($request->event_time_id)) {
+            $filters['event_time_id'] = $request->event_time_id;
         }
         
-        // Order type filter
-        if ($request->has('order_type') && is_array($request->order_type) && !empty($request->order_type)) {
-            $filters['order_type'] = $request->order_type;
+        // Order type filter (now using order_type_id)
+        if ($request->has('order_type_id') && is_array($request->order_type_id) && !empty($request->order_type_id)) {
+            $filters['order_type_id'] = $request->order_type_id;
         }
         
         // Event date range filter
@@ -212,17 +217,22 @@ class OrderController extends Controller
         // Load all orders with same order_number, with filters applied
         $relatedOrders = $this->orderService->getByOrderNumber($order->order_number, $tenantId, $filters);
         
+        // Get settings for filters and display
+        $orderStatuses = OrderStatus::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $eventTimes = EventTime::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        
         // Pass filter values to view for form preservation
         $filterValues = [
-            'status' => $request->input('status', []),
+            'order_status_id' => $request->input('order_status_id', []),
             'payment_status' => $request->input('payment_status', []),
-            'event_time' => $request->input('event_time', []),
-            'order_type' => $request->input('order_type', []),
+            'event_time_id' => $request->input('event_time_id', []),
+            'order_type_id' => $request->input('order_type_id', []),
             'event_date_between' => $request->input('event_date_between', []),
         ];
         
         $page_title = 'Order Details';
-        return view('orders.show', compact('order', 'relatedOrders', 'filterValues', 'page_title'));
+        return view('orders.show', compact('order', 'relatedOrders', 'filterValues', 'page_title', 'orderStatuses', 'eventTimes', 'orderTypes'));
     }
 
     public function edit(Order $order)
@@ -238,8 +248,11 @@ class OrderController extends Controller
         // Load all orders with same order_number
         $relatedOrders = $this->orderService->getByOrderNumber($order->order_number, $tenantId);
         
+        $eventTimes = EventTime::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        
         $page_title = 'Edit Order';
-        return view('orders.edit', compact('order', 'relatedOrders', 'page_title'));
+        return view('orders.edit', compact('order', 'relatedOrders', 'page_title', 'eventTimes', 'orderTypes'));
     }
 
     public function update(Request $request, Order $order)
@@ -270,6 +283,8 @@ class OrderController extends Controller
                 ->withErrors(['events' => 'Please add at least one event before submitting.']);
         }
 
+        $tenantId = auth()->user()->tenant_id;
+        
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
@@ -277,10 +292,18 @@ class OrderController extends Controller
             'address' => 'required|string',
             'events' => 'required|array|min:1',
             'events.*.event_date' => 'required|date',
-            'events.*.event_time' => 'required|in:morning,afternoon,evening,night_snack',
+            'events.*.event_time_id' => ['required', 'integer', function ($attribute, $value, $fail) use ($tenantId) {
+                if (!EventTime::where('id', $value)->where('tenant_id', $tenantId)->where('is_active', true)->exists()) {
+                    $fail('The selected event time is invalid.');
+                }
+            }],
             'events.*.event_menu' => 'required|string|max:255',
             'events.*.guest_count' => 'required|integer|min:1',
-            'events.*.order_type' => 'nullable|in:full_service,preparation_only',
+            'events.*.order_type_id' => ['nullable', 'integer', function ($attribute, $value, $fail) use ($tenantId) {
+                if ($value && !OrderType::where('id', $value)->where('tenant_id', $tenantId)->where('is_active', true)->exists()) {
+                    $fail('The selected order type is invalid.');
+                }
+            }],
             'events.*.dish_price' => 'required|numeric|min:0',
             'events.*.cost' => 'required|numeric|min:0',
         ]);
@@ -333,19 +356,23 @@ class OrderController extends Controller
 
     public function updateGroupStatus(Request $request, Order $order)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:pending,completed,cancelled',
-        ]);
-
         $tenantId = auth()->user()->tenant_id;
 
         if ($order->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
 
+        $validated = $request->validate([
+            'order_status_id' => ['required', 'integer', function ($attribute, $value, $fail) use ($tenantId) {
+                if (!OrderStatus::where('id', $value)->where('tenant_id', $tenantId)->where('is_active', true)->exists()) {
+                    $fail('The selected order status is invalid.');
+                }
+            }],
+        ]);
+
         $result = $this->orderService->updateGroupStatus(
             $order->order_number,
-            $validated['status'],
+            $validated['order_status_id'],
             $tenantId
         );
 
