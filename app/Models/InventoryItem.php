@@ -16,7 +16,7 @@ class InventoryItem extends Model
     protected $fillable = [
         'tenant_id',
         'name',
-        'unit',
+        'inventory_unit_id',
         'current_stock',
         'minimum_stock',
         'price_per_unit',
@@ -38,6 +38,14 @@ class InventoryItem extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * Get the inventory unit for this item.
+     */
+    public function inventoryUnit(): BelongsTo
+    {
+        return $this->belongsTo(InventoryUnit::class);
     }
 
     /**

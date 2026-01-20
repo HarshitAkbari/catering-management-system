@@ -16,18 +16,11 @@ class Equipment extends Model
     protected $fillable = [
         'tenant_id',
         'name',
-        'category',
+        'equipment_category_id',
         'quantity',
         'available_quantity',
-        'status',
+        'equipment_status_id',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'status' => 'string',
-        ];
-    }
 
     /**
      * Get the tenant that owns the equipment.
@@ -35,6 +28,22 @@ class Equipment extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * Get the equipment category for this equipment.
+     */
+    public function equipmentCategory(): BelongsTo
+    {
+        return $this->belongsTo(EquipmentCategory::class);
+    }
+
+    /**
+     * Get the equipment status for this equipment.
+     */
+    public function equipmentStatus(): BelongsTo
+    {
+        return $this->belongsTo(EquipmentStatus::class);
     }
 
     /**

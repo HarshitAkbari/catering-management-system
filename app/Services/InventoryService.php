@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\InventoryItem;
+use App\Models\InventoryUnit;
 use App\Repositories\InventoryItemRepository;
 use App\Repositories\StockTransactionRepository;
 use Illuminate\Database\Eloquent\Collection;
@@ -182,6 +183,17 @@ class InventoryService extends BaseService
         } catch (\Exception $e) {
             return ['status' => false, 'message' => 'Failed to reduce stock: ' . $e->getMessage()];
         }
+    }
+
+    /**
+     * Get inventory units for a tenant
+     */
+    public function getInventoryUnits(int $tenantId): Collection
+    {
+        return InventoryUnit::where('tenant_id', $tenantId)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
     }
 }
 

@@ -23,10 +23,10 @@ class ReportController extends Controller
         $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', now()->format('Y-m-d'));
 
-        // Get all orders with customer relationship
+        // Get all orders with relationships
         $allOrders = Order::where('tenant_id', auth()->user()->tenant_id)
             ->whereBetween('event_date', [$startDate, $endDate])
-            ->with('customer')
+            ->with('customer', 'orderStatus', 'orderType')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -54,9 +54,9 @@ class ReportController extends Controller
         $summary = [
             'total_orders' => $orders->count(),
             'total_amount' => $orders->sum('total_amount'),
-            'confirmed' => $orders->where('status', 'confirmed')->count(),
-            'completed' => $orders->where('status', 'completed')->count(),
-            'pending' => $orders->where('status', 'pending')->count(),
+            'confirmed' => $allOrders->where('orderStatus.name', 'confirmed')->count(),
+            'completed' => $allOrders->where('orderStatus.name', 'completed')->count(),
+            'pending' => $allOrders->where('orderStatus.name', 'pending')->count(),
         ];
 
         // Chart data for orders
@@ -248,7 +248,7 @@ class ReportController extends Controller
      */
     private function getGroupStatus($orderGroup): string
     {
-        $statuses = $orderGroup->pluck('status')->unique()->filter();
+        $statuses = $orderGroup->pluck('orderStatus.name')->unique()->filter();
         return $statuses->count() === 1 ? $statuses->first() : 'mixed';
     }
 
@@ -443,7 +443,9 @@ class ReportController extends Controller
         }
 
         // Order status distribution
-        $statusData = $allOrders->groupBy('status')->map(function ($group) {
+        $statusData = $allOrders->groupBy(function ($order) {
+            return $order->orderStatus ? $order->orderStatus->name : 'unknown';
+        })->map(function ($group) {
             return $group->count();
         });
 
@@ -455,7 +457,9 @@ class ReportController extends Controller
         }
 
         // Orders by event type
-        $eventTypeData = $allOrders->groupBy('order_type')->map(function ($group) {
+        $eventTypeData = $allOrders->groupBy(function ($order) {
+            return $order->orderType ? $order->orderType->name : 'unknown';
+        })->map(function ($group) {
             return $group->count();
         })->sortDesc()->take(10);
 

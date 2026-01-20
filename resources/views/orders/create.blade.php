@@ -173,10 +173,9 @@
                             <label for="modal-event-time" class="form-label">Event Time <span class="text-danger">*</span></label>
                             <select id="modal-event-time" required class="form-control default-select">
                                 <option value="">Select Time</option>
-                                <option value="morning">Morning</option>
-                                <option value="afternoon">Afternoon</option>
-                                <option value="evening">Evening</option>
-                                <option value="night_snack">Snack</option>
+                                @foreach($eventTimes as $eventTime)
+                                    <option value="{{ $eventTime->id }}">{{ $eventTime->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -194,8 +193,9 @@
                             <label for="modal-order-type" class="form-label">Order Type</label>
                             <select id="modal-order-type" class="form-control default-select">
                                 <option value="">Select Order Type</option>
-                                <option value="full_service">Full Service</option>
-                                <option value="preparation_only">Preparation Only</option>
+                                @foreach($orderTypes as $orderType)
+                                    <option value="{{ $orderType->id }}">{{ $orderType->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -221,6 +221,10 @@
 
 @section('scripts')
     <script>
+        // Pass PHP data to JavaScript
+        const eventTimes = @json($eventTimes->keyBy('id'));
+        const orderTypes = @json($orderTypes->keyBy('id'));
+        
         (function () {
           'use strict'
 
@@ -287,10 +291,10 @@
 
                 const eventData = {
                     event_date: eventDate,
-                    event_time: document.getElementById('modal-event-time').value,
+                    event_time_id: parseInt(document.getElementById('modal-event-time').value),
                     event_menu: document.getElementById('modal-event-menu').value,
                     guest_count: parseInt(document.getElementById('modal-guest-count').value),
-                    order_type: document.getElementById('modal-order-type').value || null,
+                    order_type_id: document.getElementById('modal-order-type').value ? parseInt(document.getElementById('modal-order-type').value) : null,
                     dish_price: parseFloat(document.getElementById('modal-dish-price').value),
                     cost: parseFloat(document.getElementById('modal-cost').value)
                 };
@@ -376,25 +380,13 @@
 
             container.classList.remove('d-none');
             tbody.innerHTML = events.map((event, index) => {
-                const eventTimeLabels = {
-                    'morning': 'Morning',
-                    'afternoon': 'Afternoon',
-                    'evening': 'Evening',
-                    'night_snack': 'Snack'
-                };
-
-                const orderTypeLabels = {
-                    'full_service': 'Full Service',
-                    'preparation_only': 'Preparation Only'
-                };
-
                 return `
                     <tr>
                         <td>${event.event_date}</td>
-                        <td>${eventTimeLabels[event.event_time] || event.event_time}</td>
+                        <td>${eventTimes[event.event_time_id]?.name || '-'}</td>
                         <td>${event.event_menu}</td>
                         <td>${event.guest_count}</td>
-                        <td>${orderTypeLabels[event.order_type] || event.order_type || '-'}</td>
+                        <td>${event.order_type_id ? (orderTypes[event.order_type_id]?.name || '-') : '-'}</td>
                         <td>₹${event.dish_price.toFixed(2)}</td>
                         <td><strong>₹${event.cost.toFixed(2)}</strong></td>
                         <td>
@@ -425,10 +417,10 @@
                 dateInput.value = event.event_date;
             }
             
-            document.getElementById('modal-event-time').value = event.event_time;
+            document.getElementById('modal-event-time').value = event.event_time_id;
             document.getElementById('modal-event-menu').value = event.event_menu;
             document.getElementById('modal-guest-count').value = event.guest_count;
-            document.getElementById('modal-order-type').value = event.order_type || '';
+            document.getElementById('modal-order-type').value = event.order_type_id || '';
             document.getElementById('modal-dish-price').value = event.dish_price;
             document.getElementById('modal-cost').value = event.cost.toFixed(2);
             document.getElementById('save-event-btn').textContent = 'Update Event';

@@ -85,6 +85,19 @@
                 </ul>
             </li>
             @endhasPermission
+            <li><a class="has-arrow {{ request()->routeIs('settings.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('settings.*') ? 'true' : 'false' }}">
+                    <i class="bi bi-gear"></i>
+                    <span class="nav-text">Settings</span>
+                </a>
+                <ul aria-expanded="{{ request()->routeIs('settings.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('settings.order-statuses') }}" class="{{ request()->routeIs('settings.order-statuses*') ? 'mm-active' : '' }}">Order Statuses</a></li>
+                    <li><a href="{{ route('settings.event-times') }}" class="{{ request()->routeIs('settings.event-times*') ? 'mm-active' : '' }}">Order Event Times</a></li>
+                    <li><a href="{{ route('settings.order-types') }}" class="{{ request()->routeIs('settings.order-types*') ? 'mm-active' : '' }}">Order Types</a></li>
+                    <li><a href="{{ route('settings.inventory-units') }}" class="{{ request()->routeIs('settings.inventory-units*') ? 'mm-active' : '' }}">Inventory Units</a></li>
+                    <li><a href="{{ route('settings.equipment-categories') }}" class="{{ request()->routeIs('settings.equipment-categories*') ? 'mm-active' : '' }}">Equipment Categories</a></li>
+                    <li><a href="{{ route('settings.equipment-statuses') }}" class="{{ request()->routeIs('settings.equipment-statuses*') ? 'mm-active' : '' }}">Equipment Statuses</a></li>
+                </ul>
+            </li>
         </ul>
         <div class="copyright">
             <p><strong>Catering Management System</strong> © {{ date('Y') }} All Rights Reserved</p>

@@ -30,15 +30,21 @@
                             </div>
 
                             <div class="col-md-6 mb-4">
-                                <label class="form-label" for="unit">Unit
+                                <label class="form-label" for="inventory_unit_id">Unit
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" class="form-control" id="unit" name="unit" 
-                                    placeholder="kg, liter, piece" value="{{ old('unit') }}" required>
+                                <select class="form-control" id="inventory_unit_id" name="inventory_unit_id" required>
+                                    <option value="">Select Unit</option>
+                                    @foreach($inventoryUnits as $unit)
+                                        <option value="{{ $unit->id }}" {{ old('inventory_unit_id') == $unit->id ? 'selected' : '' }}>
+                                            {{ $unit->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <div class="invalid-feedback">
-                                    Please enter a unit.
+                                    Please select a unit.
                                 </div>
-                                @error('unit')
+                                @error('inventory_unit_id')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>

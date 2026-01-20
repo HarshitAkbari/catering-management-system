@@ -43,10 +43,10 @@
                             <!-- Category Filter -->
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                                 <label for="category_filter" class="form-label">Category</label>
-                                <select name="category" id="category_filter" class="form-control form-control-sm">
+                                <select name="equipment_category_id" id="category_filter" class="form-control form-control-sm">
                                     <option value="">All Categories</option>
                                     @foreach($categories ?? [] as $category)
-                                        <option value="{{ $category }}" {{ ($filterValues['category'] ?? '') == $category ? 'selected' : '' }}>{{ $category }}</option>
+                                        <option value="{{ $category->id }}" {{ ($filterValues['equipment_category_id'] ?? '') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -54,10 +54,11 @@
                             <!-- Status Filter -->
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                                 <label for="status_filter" class="form-label">Status</label>
-                                <select name="status" id="status_filter" class="form-control form-control-sm">
+                                <select name="equipment_status_id" id="status_filter" class="form-control form-control-sm">
                                     <option value="">All Status</option>
-                                    <option value="available" {{ ($filterValues['status'] ?? '') == 'available' ? 'selected' : '' }}>Available</option>
-                                    <option value="damaged" {{ ($filterValues['status'] ?? '') == 'damaged' ? 'selected' : '' }}>Damaged</option>
+                                    @foreach($statuses ?? [] as $status)
+                                        <option value="{{ $status->id }}" {{ ($filterValues['equipment_status_id'] ?? '') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -95,7 +96,7 @@
                                             <strong>{{ $item->name }}</strong>
                                         </td>
                                         <td class="py-2">
-                                            {{ $item->category ?? '-' }}
+                                            {{ $item->equipmentCategory->name ?? '-' }}
                                         </td>
                                         <td class="py-2">
                                             {{ $item->quantity }}
@@ -104,10 +105,10 @@
                                             {{ $item->available_quantity }}
                                         </td>
                                         <td class="py-2">
-                                            @if($item->status === 'available')
-                                                <span class="badge light badge-success">{{ ucfirst($item->status) }}</span>
+                                            @if($item->equipmentStatus)
+                                                <span class="badge light badge-success">{{ $item->equipmentStatus->name }}</span>
                                             @else
-                                                <span class="badge light badge-danger">{{ ucfirst($item->status) }}</span>
+                                                <span class="badge light badge-secondary">-</span>
                                             @endif
                                         </td>
                                         <td class="py-2 text-end">

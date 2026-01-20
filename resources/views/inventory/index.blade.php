@@ -39,10 +39,10 @@
                         <!-- Unit Filter -->
                         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                             <label for="unit_filter" class="form-label">Unit</label>
-                            <select name="unit" id="unit_filter" class="form-control form-control-sm">
+                            <select name="inventory_unit_id" id="unit_filter" class="form-control form-control-sm">
                                 <option value="">All Units</option>
-                                @foreach($units ?? [] as $unit)
-                                    <option value="{{ $unit }}" {{ ($filterValues['unit'] ?? '') == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                                @foreach($inventoryUnits ?? [] as $unit)
+                                    <option value="{{ $unit->id }}" {{ ($filterValues['inventory_unit_id'] ?? '') == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -88,7 +88,7 @@
                             @forelse($inventoryItems as $item)
                                 <tr>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->unit }}</td>
+                                    <td>{{ $item->inventoryUnit->name ?? '-' }}</td>
                                     <td>{{ number_format($item->current_stock, 2) }}</td>
                                     <td>{{ number_format($item->minimum_stock, 2) }}</td>
                                     <td>₹{{ number_format($item->price_per_unit, 2) }}</td>

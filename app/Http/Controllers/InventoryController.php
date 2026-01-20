@@ -29,8 +29,8 @@ class InventoryController extends Controller
         }
         
         // Unit filter
-        if ($request->has('unit') && !empty($request->unit)) {
-            $filters['unit'] = $request->unit;
+        if ($request->has('inventory_unit_id') && !empty($request->inventory_unit_id)) {
+            $filters['inventory_unit_id'] = $request->inventory_unit_id;
         }
         
         // Stock status filter (low stock)
@@ -50,31 +50,30 @@ class InventoryController extends Controller
         }
         
         $inventoryItems = $this->inventoryService->getByTenant($tenantId, 15, $filters);
+        $inventoryItems->load('inventoryUnit');
         
         // Pass filter values to view for form preservation
         $filterValues = [
             'name_like' => $request->input('name_like', ''),
-            'unit' => $request->input('unit', ''),
+            'inventory_unit_id' => $request->input('inventory_unit_id', ''),
             'stock_status' => $request->input('stock_status', ''),
         ];
         
-        // Get unique units for filter dropdown
-        $units = $this->inventoryService->getAll()
-            ->where('tenant_id', $tenantId)
-            ->pluck('unit')
-            ->unique()
-            ->sort()
-            ->values();
+        // Get inventory units for filter dropdown
+        $inventoryUnits = $this->inventoryService->getInventoryUnits($tenantId);
         
         $page_title = 'Inventory';
         $subtitle = 'Manage your inventory items';
         
-        return view('inventory.index', compact('inventoryItems', 'filterValues', 'units', 'page_title', 'subtitle'));
+        return view('inventory.index', compact('inventoryItems', 'filterValues', 'inventoryUnits', 'page_title', 'subtitle'));
     }
 
     public function create()
     {
-        return view('inventory.create');
+        $tenantId = auth()->user()->tenant_id;
+        $inventoryUnits = $this->inventoryService->getInventoryUnits($tenantId);
+        
+        return view('inventory.create', compact('inventoryUnits'));
     }
 
     public function store(Request $request)
@@ -121,14 +120,16 @@ class InventoryController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        return view('inventory.edit', compact('inventoryItem'));
+        $inventoryUnits = $this->inventoryService->getInventoryUnits($tenantId);
+
+        return view('inventory.edit', compact('inventoryItem', 'inventoryUnits'));
     }
 
     public function update(Request $request, InventoryItem $inventoryItem)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'unit' => 'required|string|max:50',
+            'inventory_unit_id' => 'required|exists:inventory_units,id',
             'current_stock' => 'required|numeric|min:0',
             'minimum_stock' => 'required|numeric|min:0',
             'price_per_unit' => 'required|numeric|min:0',

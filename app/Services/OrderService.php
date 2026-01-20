@@ -180,12 +180,11 @@ class OrderService extends BaseService
                         'order_number' => $orderNumber,
                         'address' => $address,
                         'event_date' => $event['event_date'],
-                        'event_time' => $event['event_time'],
+                        'event_time_id' => $event['event_time_id'],
                         'event_menu' => $event['event_menu'],
-                        'order_type' => $event['order_type'] ?? null,
+                        'order_type_id' => $event['order_type_id'] ?? null,
                         'guest_count' => $event['guest_count'],
                         'estimated_cost' => $event['cost'],
-                        'status' => 'pending',
                         'payment_status' => 'pending',
                     ]);
 
@@ -272,7 +271,7 @@ class OrderService extends BaseService
                     // Check if this event matches an existing order (by date, time, menu)
                     $existingOrder = $existingOrders->first(function ($order) use ($event) {
                         return $order->event_date->format('Y-m-d') === $event['event_date'] &&
-                               $order->event_time === $event['event_time'] &&
+                               $order->event_time_id == $event['event_time_id'] &&
                                $order->event_menu === $event['event_menu'];
                     });
 
@@ -282,9 +281,9 @@ class OrderService extends BaseService
                             'customer_id' => $customer->id,
                             'address' => $address,
                             'event_date' => $event['event_date'],
-                            'event_time' => $event['event_time'],
+                            'event_time_id' => $event['event_time_id'],
                             'event_menu' => $event['event_menu'],
-                            'order_type' => $event['order_type'] ?? null,
+                            'order_type_id' => $event['order_type_id'] ?? null,
                             'guest_count' => $event['guest_count'],
                             'estimated_cost' => $event['cost'],
                         ]);
@@ -297,12 +296,11 @@ class OrderService extends BaseService
                             'order_number' => $orderNumber,
                             'address' => $address,
                             'event_date' => $event['event_date'],
-                            'event_time' => $event['event_time'],
+                            'event_time_id' => $event['event_time_id'],
                             'event_menu' => $event['event_menu'],
-                            'order_type' => $event['order_type'] ?? null,
+                            'order_type_id' => $event['order_type_id'] ?? null,
                             'guest_count' => $event['guest_count'],
                             'estimated_cost' => $event['cost'],
-                            'status' => 'pending',
                             'payment_status' => 'pending',
                         ]);
                         $updatedOrderIds[] = $newOrder->id;
@@ -356,18 +354,19 @@ class OrderService extends BaseService
     /**
      * Update status for all orders with same order number
      */
-    public function updateGroupStatus(string $orderNumber, string $status, int $tenantId): array
+    public function updateGroupStatus(string $orderNumber, int $orderStatusId, int $tenantId): array
     {
         try {
             $updatedCount = $this->repository->filter([
                 'tenant_id' => $tenantId,
                 'order_number' => $orderNumber,
-            ], [], [], true)->update(['status' => $status]);
+            ], [], [], true)->update(['order_status_id' => $orderStatusId]);
 
+            $statusName = \App\Models\OrderStatus::find($orderStatusId)?->name ?? 'Unknown';
             return [
                 'status' => true,
                 'count' => $updatedCount,
-                'message' => "Order status updated to '{$status}' for {$updatedCount} order(s).",
+                'message' => "Order status updated to '{$statusName}' for {$updatedCount} order(s).",
             ];
         } catch (\Exception $e) {
             return ['status' => false, 'message' => 'Failed to update order status: ' . $e->getMessage()];
@@ -406,7 +405,7 @@ class OrderService extends BaseService
      */
     private function getGroupStatus($orderGroup): string
     {
-        $statuses = $orderGroup->pluck('status')->unique()->filter();
+        $statuses = $orderGroup->pluck('order_status_id')->unique()->filter();
         return $statuses->count() === 1 ? $statuses->first() : 'mixed';
     }
 

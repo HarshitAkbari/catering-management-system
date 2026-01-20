@@ -20,13 +20,13 @@ class Order extends Model
         'customer_id',
         'order_number',
         'event_date',
-        'event_time',
+        'event_time_id',
         'event_menu',
         'address',
-        'order_type',
+        'order_type_id',
         'guest_count',
         'estimated_cost',
-        'status',
+        'order_status_id',
         'payment_status',
     ];
 
@@ -70,5 +70,29 @@ class Order extends Model
         return $this->belongsToMany(Equipment::class, 'event_equipment')
             ->withPivot('quantity')
             ->withTimestamps();
+    }
+
+    /**
+     * Get the order status.
+     */
+    public function orderStatus(): BelongsTo
+    {
+        return $this->belongsTo(OrderStatus::class);
+    }
+
+    /**
+     * Get the event time.
+     */
+    public function eventTime(): BelongsTo
+    {
+        return $this->belongsTo(EventTime::class);
+    }
+
+    /**
+     * Get the order type.
+     */
+    public function orderType(): BelongsTo
+    {
+        return $this->belongsTo(OrderType::class);
     }
 }
