@@ -67,7 +67,7 @@ class UserController extends Controller
         $page_title = 'Users';
         $subtitle = 'Manage system users and permissions';
         
-        return view('users.index', compact('users', 'filterValues', 'page_title', 'subtitle'));
+        return view('settings.users.index', compact('users', 'filterValues', 'page_title', 'subtitle'));
     }
 
     /**
@@ -78,7 +78,7 @@ class UserController extends Controller
         $tenantId = auth()->user()->tenant_id;
         $roles = $this->userService->getRolesForTenant($tenantId);
 
-        return view('users.create', compact('roles'));
+        return view('settings.users.create', compact('roles'));
     }
 
     /**
@@ -101,7 +101,6 @@ class UserController extends Controller
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:admin,manager,staff'],
-            'status' => ['required', 'in:active,inactive'],
             'role_ids' => ['nullable', 'array'],
             'role_ids.*' => ['exists:roles,id'],
         ]);
@@ -131,7 +130,7 @@ class UserController extends Controller
 
         $roles = $this->userService->getRolesForTenant($tenantId);
 
-        return view('users.edit', compact('user', 'roles'));
+        return view('settings.users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -158,7 +157,6 @@ class UserController extends Controller
             ],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:admin,manager,staff'],
-            'status' => ['required', 'in:active,inactive'],
             'role_ids' => ['nullable', 'array'],
             'role_ids.*' => ['exists:roles,id'],
         ]);
@@ -195,5 +193,59 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * Toggle user status between active and inactive.
+     */
+    public function toggleStatus(User $user)
+    {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($user->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Prevent self-deactivation
+        if ($user->id === auth()->id()) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You cannot deactivate your own account.',
+                ], 403);
+            }
+
+            return redirect()->route('users.index')
+                ->with('error', 'You cannot deactivate your own account.');
+        }
+
+        $result = $this->userService->toggleUserStatus($user);
+
+        if (!$result['status']) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message'],
+                ], 400);
+            }
+
+            return redirect()->route('users.index')
+                ->with('error', $result['message']);
+        }
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'status' => $result['status'],
+                'message' => $result['status'] === 'active' 
+                    ? 'User activated successfully!' 
+                    : 'User deactivated successfully!',
+            ]);
+        }
+
+        return redirect()->route('users.index')
+            ->with('success', $result['status'] === 'active' 
+                ? 'User activated successfully!' 
+                : 'User deactivated successfully!');
     }
 }

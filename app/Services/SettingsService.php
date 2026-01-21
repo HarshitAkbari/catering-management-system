@@ -11,16 +11,35 @@ use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\OrderType;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class SettingsService
 {
     // Order Statuses Methods
-    public function getOrderStatuses(int $tenantId): Collection
+    public function getOrderStatuses(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        return OrderStatus::where('tenant_id', $tenantId)
-            ->orderBy('name')
-            ->get();
+        $query = OrderStatus::where('tenant_id', $tenantId);
+        
+        // Apply name filter
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+        }
+        
+        // Apply status filter
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
+        // Apply sorting
+        if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
+            $sortOrder = $filters['sort_order'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+        
+        return $query->paginate($perPage)->appends($filters);
     }
 
     public function createOrderStatus(array $data, int $tenantId): array
@@ -96,11 +115,29 @@ class SettingsService
     }
 
     // Event Times Methods
-    public function getEventTimes(int $tenantId): Collection
+    public function getEventTimes(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        return EventTime::where('tenant_id', $tenantId)
-            ->orderBy('name')
-            ->get();
+        $query = EventTime::where('tenant_id', $tenantId);
+        
+        // Apply name filter
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+        }
+        
+        // Apply status filter
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
+        // Apply sorting
+        if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
+            $sortOrder = $filters['sort_order'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+        
+        return $query->paginate($perPage)->appends($filters);
     }
 
     public function createEventTime(array $data, int $tenantId): array
@@ -176,11 +213,29 @@ class SettingsService
     }
 
     // Order Types Methods
-    public function getOrderTypes(int $tenantId): Collection
+    public function getOrderTypes(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        return OrderType::where('tenant_id', $tenantId)
-            ->orderBy('name')
-            ->get();
+        $query = OrderType::where('tenant_id', $tenantId);
+        
+        // Apply name filter
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+        }
+        
+        // Apply status filter
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
+        // Apply sorting
+        if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
+            $sortOrder = $filters['sort_order'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+        
+        return $query->paginate($perPage)->appends($filters);
     }
 
     public function createOrderType(array $data, int $tenantId): array
@@ -256,11 +311,29 @@ class SettingsService
     }
 
     // Inventory Units Methods
-    public function getInventoryUnits(int $tenantId): Collection
+    public function getInventoryUnits(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        return InventoryUnit::where('tenant_id', $tenantId)
-            ->orderBy('name')
-            ->get();
+        $query = InventoryUnit::where('tenant_id', $tenantId);
+        
+        // Apply name filter
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+        }
+        
+        // Apply status filter
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
+        // Apply sorting
+        if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
+            $sortOrder = $filters['sort_order'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+        
+        return $query->paginate($perPage)->appends($filters);
     }
 
     public function createInventoryUnit(array $data, int $tenantId): array

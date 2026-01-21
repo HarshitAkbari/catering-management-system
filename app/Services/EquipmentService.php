@@ -9,6 +9,7 @@ use App\Models\EquipmentCategory;
 use App\Models\EquipmentStatus;
 use App\Repositories\EquipmentRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EquipmentService extends BaseService
 {
@@ -63,11 +64,29 @@ class EquipmentService extends BaseService
     }
 
     // Equipment Categories Methods
-    public function getEquipmentCategories(int $tenantId): Collection
+    public function getEquipmentCategories(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        return EquipmentCategory::where('tenant_id', $tenantId)
-            ->orderBy('name')
-            ->get();
+        $query = EquipmentCategory::where('tenant_id', $tenantId);
+        
+        // Apply name filter
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+        }
+        
+        // Apply status filter
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
+        // Apply sorting
+        if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
+            $sortOrder = $filters['sort_order'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+        
+        return $query->paginate($perPage)->appends($filters);
     }
 
     public function createEquipmentCategory(array $data, int $tenantId): array
@@ -143,11 +162,29 @@ class EquipmentService extends BaseService
     }
 
     // Equipment Statuses Methods
-    public function getEquipmentStatuses(int $tenantId): Collection
+    public function getEquipmentStatuses(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        return EquipmentStatus::where('tenant_id', $tenantId)
-            ->orderBy('name')
-            ->get();
+        $query = EquipmentStatus::where('tenant_id', $tenantId);
+        
+        // Apply name filter
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+        }
+        
+        // Apply status filter
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
+        // Apply sorting
+        if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
+            $sortOrder = $filters['sort_order'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+        
+        return $query->paginate($perPage)->appends($filters);
     }
 
     public function createEquipmentStatus(array $data, int $tenantId): array

@@ -88,23 +88,6 @@
         @enderror
     </div>
 
-    <div class="col-md-6 mb-4">
-        <label class="form-label" for="status">Status
-            <span class="text-danger">*</span>
-        </label>
-        <select class="form-select" id="status" name="status" required>
-            <option value="">Select status</option>
-            <option value="active" {{ old('status', $user->status ?? 'active') === 'active' ? 'selected' : '' }}>Active</option>
-            <option value="inactive" {{ old('status', $user->status ?? '') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-        </select>
-        <div class="invalid-feedback">
-            Please select a status.
-        </div>
-        @error('status')
-            <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-    </div>
-
     @if(isset($roles) && $roles->count() > 0)
     <div class="col-12 mb-4">
         <label class="form-label">Additional Roles</label>

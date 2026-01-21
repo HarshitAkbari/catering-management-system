@@ -49,13 +49,17 @@ class UserService extends BaseService
     {
         try {
             return DB::transaction(function () use ($data, $tenantId) {
+                $status = $data['status'] ?? 'active';
+                $isActive = $status === 'active';
+                
                 $user = $this->repository->create([
                     'name' => $data['name'],
                     'email' => $data['email'],
                     'password' => Hash::make($data['password']),
                     'tenant_id' => $tenantId,
                     'role' => $data['role'],
-                    'status' => $data['status'],
+                    'status' => $status,
+                    'is_active' => $isActive,
                 ]);
 
                 // Sync roles if provided
@@ -95,7 +99,6 @@ class UserService extends BaseService
                     'name' => $data['name'],
                     'email' => $data['email'],
                     'role' => $data['role'],
-                    'status' => $data['status'],
                 ];
 
                 if (!empty($data['password'])) {
@@ -148,6 +151,35 @@ class UserService extends BaseService
     public function getRolesForTenant(int $tenantId): \Illuminate\Database\Eloquent\Collection
     {
         return $this->roleRepository->filter(['tenant_id' => $tenantId], [], [], true)->orderBy('name')->get();
+    }
+
+    /**
+     * Toggle user status between active and inactive
+     */
+    public function toggleUserStatus(User $user): array
+    {
+        try {
+            $newIsActive = !$user->is_active;
+            $newStatus = $newIsActive ? 'active' : 'inactive';
+            
+            $this->repository->update($user, [
+                'is_active' => $newIsActive,
+                'status' => $newStatus, // Keep status enum in sync for backward compatibility
+            ]);
+
+            return [
+                'status' => $newStatus,
+                'is_active' => $newIsActive,
+                'message' => $newIsActive 
+                    ? 'User activated successfully.' 
+                    : 'User deactivated successfully.',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'Failed to toggle user status: ' . $e->getMessage(),
+            ];
+        }
     }
 }
 

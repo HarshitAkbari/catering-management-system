@@ -74,22 +74,14 @@
                     <li><a href="{{ route('reports.profit-loss') }}" class="{{ request()->routeIs('reports.profit-loss') ? 'mm-active' : '' }}">Profit & Loss</a></li>
                 </ul>
             </li>
-            @hasPermission('users.view')
-            <li><a class="has-arrow {{ request()->routeIs('users.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('users.*') ? 'true' : 'false' }}">
-                    <i class="bi bi-people-fill"></i>
-                    <span class="nav-text">Users</span>
-                </a>
-                <ul aria-expanded="{{ request()->routeIs('users.*') ? 'true' : 'false' }}">
-                    <li><a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.index') ? 'mm-active' : '' }}">Users List</a></li>
-                    <li><a href="{{ route('users.create') }}" class="{{ request()->routeIs('users.create') ? 'mm-active' : '' }}">Add User</a></li>
-                </ul>
-            </li>
-            @endhasPermission
-            <li><a class="has-arrow {{ request()->routeIs('settings.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('settings.*') ? 'true' : 'false' }}">
+            <li><a class="has-arrow {{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'true' : 'false' }}">
                     <i class="bi bi-gear"></i>
                     <span class="nav-text">Settings</span>
                 </a>
-                <ul aria-expanded="{{ request()->routeIs('settings.*') ? 'true' : 'false' }}">
+                <ul aria-expanded="{{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'true' : 'false' }}">
+                    @hasPermission('users.view')
+                    <li><a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'mm-active' : '' }}">User Management</a></li>
+                    @endhasPermission
                     <li><a href="{{ route('settings.order-statuses') }}" class="{{ request()->routeIs('settings.order-statuses*') ? 'mm-active' : '' }}">Order Statuses</a></li>
                     <li><a href="{{ route('settings.event-times') }}" class="{{ request()->routeIs('settings.event-times*') ? 'mm-active' : '' }}">Order Event Times</a></li>
                     <li><a href="{{ route('settings.order-types') }}" class="{{ request()->routeIs('settings.order-types*') ? 'mm-active' : '' }}">Order Types</a></li>
