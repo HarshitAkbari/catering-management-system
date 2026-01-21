@@ -114,7 +114,6 @@
                                                 item-name="{{ $vendor->name }}"
                                                 delete-url="{{ route('vendors.destroy', $vendor) }}"
                                                 modal-id="deleteVendorModal"
-                                                delete-button-text="Delete Vendor"
                                             />
                                         </td>
                                     </tr>

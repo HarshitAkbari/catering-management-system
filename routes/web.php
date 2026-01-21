@@ -242,6 +242,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::middleware(['permission:users.edit'])->group(function () {
         Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::patch('users/{user}/toggle', [UserController::class, 'toggleStatus'])->name('users.toggle');
     });
     // Users - Delete
     Route::middleware(['permission:users.delete'])->group(function () {

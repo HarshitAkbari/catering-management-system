@@ -39,13 +39,41 @@ class SettingsController extends Controller
     }
 
     // Order Statuses Methods
-    public function orderStatuses()
+    public function orderStatuses(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $orderStatuses = $this->settingsService->getOrderStatuses($tenantId);
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['is_active'] = $request->status === 'active' ? 1 : 0;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $orderStatuses = $this->settingsService->getOrderStatuses($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'status' => $request->input('status', ''),
+        ];
         
         $page_title = 'Order Statuses';
-        return view('settings.order_statuses.index', compact('orderStatuses', 'page_title'));
+        return view('settings.order_statuses.index', compact('orderStatuses', 'filterValues', 'page_title'));
     }
 
     public function createOrderStatus()
@@ -167,13 +195,41 @@ class SettingsController extends Controller
     }
 
     // Event Times Methods
-    public function eventTimes()
+    public function eventTimes(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $eventTimes = $this->settingsService->getEventTimes($tenantId);
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['is_active'] = $request->status === 'active' ? 1 : 0;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $eventTimes = $this->settingsService->getEventTimes($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'status' => $request->input('status', ''),
+        ];
         
         $page_title = 'Event Times';
-        return view('settings.event_times.index', compact('eventTimes', 'page_title'));
+        return view('settings.event_times.index', compact('eventTimes', 'filterValues', 'page_title'));
     }
 
     public function createEventTime()
@@ -295,13 +351,41 @@ class SettingsController extends Controller
     }
 
     // Order Types Methods
-    public function orderTypes()
+    public function orderTypes(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $orderTypes = $this->settingsService->getOrderTypes($tenantId);
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['is_active'] = $request->status === 'active' ? 1 : 0;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $orderTypes = $this->settingsService->getOrderTypes($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'status' => $request->input('status', ''),
+        ];
         
         $page_title = 'Order Types';
-        return view('settings.order_types.index', compact('orderTypes', 'page_title'));
+        return view('settings.order_types.index', compact('orderTypes', 'filterValues', 'page_title'));
     }
 
     public function createOrderType()
@@ -423,13 +507,41 @@ class SettingsController extends Controller
     }
 
     // Inventory Units Methods
-    public function inventoryUnits()
+    public function inventoryUnits(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $inventoryUnits = $this->settingsService->getInventoryUnits($tenantId);
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['is_active'] = $request->status === 'active' ? 1 : 0;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $inventoryUnits = $this->settingsService->getInventoryUnits($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'status' => $request->input('status', ''),
+        ];
         
         $page_title = 'Inventory Units';
-        return view('settings.inventory_units.index', compact('inventoryUnits', 'page_title'));
+        return view('settings.inventory_units.index', compact('inventoryUnits', 'filterValues', 'page_title'));
     }
 
     public function createInventoryUnit()
@@ -551,13 +663,41 @@ class SettingsController extends Controller
     }
 
     // Equipment Categories Methods
-    public function equipmentCategories()
+    public function equipmentCategories(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $equipmentCategories = $this->equipmentService->getEquipmentCategories($tenantId);
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['is_active'] = $request->status === 'active' ? 1 : 0;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $equipmentCategories = $this->equipmentService->getEquipmentCategories($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'status' => $request->input('status', ''),
+        ];
         
         $page_title = 'Equipment Categories';
-        return view('settings.equipment_categories.index', compact('equipmentCategories', 'page_title'));
+        return view('settings.equipment_categories.index', compact('equipmentCategories', 'filterValues', 'page_title'));
     }
 
     public function createEquipmentCategory()
@@ -679,13 +819,41 @@ class SettingsController extends Controller
     }
 
     // Equipment Statuses Methods
-    public function equipmentStatuses()
+    public function equipmentStatuses(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $equipmentStatuses = $this->equipmentService->getEquipmentStatuses($tenantId);
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $filters['is_active'] = $request->status === 'active' ? 1 : 0;
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $equipmentStatuses = $this->equipmentService->getEquipmentStatuses($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'status' => $request->input('status', ''),
+        ];
         
         $page_title = 'Equipment Statuses';
-        return view('settings.equipment_statuses.index', compact('equipmentStatuses', 'page_title'));
+        return view('settings.equipment_statuses.index', compact('equipmentStatuses', 'filterValues', 'page_title'));
     }
 
     public function createEquipmentStatus()

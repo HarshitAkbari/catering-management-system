@@ -9,6 +9,11 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Edit Order Type</h4>
+                    <div class="card-tools">
+                        <a href="{{ route('settings.order-types') }}" class="btn btn-default btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     @include('error.alerts')
