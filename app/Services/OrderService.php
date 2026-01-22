@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\OrderStatus;
 use App\Repositories\OrderRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -45,7 +46,7 @@ class OrderService extends BaseService
         $mergedFilters = array_merge($baseFilters, $filters);
         
         // Get filtered orders (return Query Builder, not Collection)
-        $query = $this->repository->filter($mergedFilters, ['customer'], [], true);
+        $query = $this->repository->filter($mergedFilters, ['customer', 'eventTime', 'orderType', 'orderStatus'], [], true);
         
         // Apply customer search if provided
         if ($customerSearch) {
@@ -134,9 +135,9 @@ class OrderService extends BaseService
 
         // Use repository filter method if filters are provided, otherwise use direct method
         if (!empty($filters)) {
-            return $this->repository->filter($mergedFilters, [], [], false)
+            return $this->repository->filter($mergedFilters, ['eventTime', 'orderType', 'orderStatus'], [], false)
                 ->orderBy('event_date', 'asc')
-                ->orderBy('event_time', 'asc')
+                ->orderBy('event_time_id', 'asc')
                 ->get();
         }
 
@@ -171,6 +172,12 @@ class OrderService extends BaseService
 
                 $orderNumber = $existingOrder?->order_number ?? $this->generateOrderNumber($tenantId);
 
+                // Get default system order status (ID 1)
+                $defaultStatus = OrderStatus::where('id', 1)
+                    ->whereNull('tenant_id')
+                    ->where('is_system', true)
+                    ->first();
+
                 // Create orders for each event
                 $createdOrders = [];
                 foreach ($eventsData as $event) {
@@ -185,6 +192,7 @@ class OrderService extends BaseService
                         'order_type_id' => $event['order_type_id'] ?? null,
                         'guest_count' => $event['guest_count'],
                         'estimated_cost' => $event['cost'],
+                        'order_status_id' => $defaultStatus?->id,
                         'payment_status' => 'pending',
                     ]);
 
@@ -406,7 +414,7 @@ class OrderService extends BaseService
     private function getGroupStatus($orderGroup): string
     {
         $statuses = $orderGroup->pluck('order_status_id')->unique()->filter();
-        return $statuses->count() === 1 ? $statuses->first() : 'mixed';
+        return $statuses->count() === 1 ? (string) $statuses->first() : 'mixed';
     }
 
     /**

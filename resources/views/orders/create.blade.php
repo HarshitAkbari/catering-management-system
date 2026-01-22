@@ -280,12 +280,71 @@
                         // Get the selected date and format it as yyyy-mm-dd
                         const selectedDate = picker.get('select');
                         if (selectedDate) {
-                            // Format date as yyyy-mm-dd
-                            const year = selectedDate.getFullYear();
-                            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-                            const day = String(selectedDate.getDate()).padStart(2, '0');
-                            eventDate = year + '-' + month + '-' + day;
+                            // Check if selectedDate is a Date object
+                            if (selectedDate instanceof Date) {
+                                // Format date as yyyy-mm-dd
+                                const year = selectedDate.getFullYear();
+                                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                                const day = String(selectedDate.getDate()).padStart(2, '0');
+                                eventDate = year + '-' + month + '-' + day;
+                            } else {
+                                // If not a Date object, try to parse it or get formatted value
+                                try {
+                                    // Try to parse as Date if it's a date-like object
+                                    const dateObj = new Date(selectedDate);
+                                    if (!isNaN(dateObj.getTime())) {
+                                        const year = dateObj.getFullYear();
+                                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                                        const day = String(dateObj.getDate()).padStart(2, '0');
+                                        eventDate = year + '-' + month + '-' + day;
+                                    } else {
+                                        // Try to get submit format from picker
+                                        const submitValue = picker.get('value', 'yyyy-mm-dd');
+                                        if (submitValue) {
+                                            eventDate = submitValue;
+                                        } else {
+                                            // Fallback to input value and try to parse
+                                            const inputValue = document.getElementById('modal-event-date').value;
+                                            const parsedDate = new Date(inputValue);
+                                            if (!isNaN(parsedDate.getTime())) {
+                                                const year = parsedDate.getFullYear();
+                                                const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                                                const day = String(parsedDate.getDate()).padStart(2, '0');
+                                                eventDate = year + '-' + month + '-' + day;
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    // If all else fails, use input value
+                                    eventDate = document.getElementById('modal-event-date').value;
+                                }
+                            }
+                        } else {
+                            // No date selected, try to get from input
+                            const inputValue = document.getElementById('modal-event-date').value;
+                            if (inputValue) {
+                                // Try to parse and format the input value
+                                const parsedDate = new Date(inputValue);
+                                if (!isNaN(parsedDate.getTime())) {
+                                    const year = parsedDate.getFullYear();
+                                    const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                                    const day = String(parsedDate.getDate()).padStart(2, '0');
+                                    eventDate = year + '-' + month + '-' + day;
+                                }
+                            }
                         }
+                    }
+                }
+                
+                // Final validation: ensure eventDate is in yyyy-mm-dd format
+                if (eventDate && !/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) {
+                    // Try to parse and reformat
+                    const parsedDate = new Date(eventDate);
+                    if (!isNaN(parsedDate.getTime())) {
+                        const year = parsedDate.getFullYear();
+                        const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(parsedDate.getDate()).padStart(2, '0');
+                        eventDate = year + '-' + month + '-' + day;
                     }
                 }
 
@@ -368,6 +427,16 @@
             }
         }
 
+        function formatDateForDisplay(dateString) {
+            // Format yyyy-mm-dd to readable format
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString; // Return as-is if invalid
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
         function updateEventsTable() {
             const tbody = document.getElementById('events-table-body');
             const container = document.getElementById('events-container');
@@ -382,7 +451,7 @@
             tbody.innerHTML = events.map((event, index) => {
                 return `
                     <tr>
-                        <td>${event.event_date}</td>
+                        <td>${formatDateForDisplay(event.event_date)}</td>
                         <td>${eventTimes[event.event_time_id]?.name || '-'}</td>
                         <td>${event.event_menu}</td>
                         <td>${event.guest_count}</td>
@@ -395,7 +464,7 @@
                                 data-bs-toggle="modal" 
                                 data-bs-target="#deleteEventModal"
                                 data-event-index="${index}"
-                                data-event-name="${event.event_menu} - ${event.event_date}">
+                                data-event-name="${event.event_menu} - ${formatDateForDisplay(event.event_date)}">
                                 Delete
                             </button>
                         </td>

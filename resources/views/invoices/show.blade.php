@@ -404,7 +404,7 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $order->event_date ? $order->event_date->format('M d, Y') : 'N/A' }}</td>
-                    <td>{{ ucfirst(str_replace('_', ' ', $order->event_time ?? 'N/A')) }}</td>
+                    <td>{{ $order->eventTime ? $order->eventTime->name : 'N/A' }}</td>
                     <td>{{ $order->event_menu ?? 'N/A' }}</td>
                     <td>{{ $order->guest_count ?? 'N/A' }}</td>
                     <td class="text-right">₹{{ number_format($order->estimated_cost ?? 0, 2) }}</td>

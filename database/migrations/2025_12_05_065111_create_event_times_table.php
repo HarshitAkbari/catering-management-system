@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('event_times', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
+            $table->foreignId('tenant_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_system')->default(false)->comment('0 = Tenant, 1 = System');
             $table->timestamps();
             $table->softDeletes();
             

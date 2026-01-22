@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreOrderRequest;
 use App\Models\EventTime;
 use App\Models\Order;
 use App\Models\OrderStatus;
@@ -99,49 +100,20 @@ class OrderController extends Controller
     public function create()
     {
         $tenantId = auth()->user()->tenant_id;
-        $eventTimes = EventTime::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $eventTimes = EventTime::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        })->where('is_active', true)->orderBy('is_system', 'desc')->orderBy('name')->get();
         $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
         
         $page_title = 'Create New Order';
         return view('orders.create', compact('page_title', 'eventTimes', 'orderTypes'));
     }
 
-    public function store(Request $request)
+    public function store(StoreOrderRequest $request)
     {
-        // Decode events JSON if it's a string and merge back into request
-        $eventsData = $request->input('events');
-        if (is_string($eventsData)) {
-            $decodedEvents = json_decode($eventsData, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decodedEvents)) {
-                $request->merge(['events' => $decodedEvents]);
-            } else {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['events' => 'Invalid events data. Please add at least one event.']);
-            }
-        }
-        
-        // Check if events data is valid
-        if (empty($eventsData) || (is_array($eventsData) && count($eventsData) === 0)) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['events' => 'Please add at least one event before submitting.']);
-        }
-
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
-            'customer_mobile' => 'required|string|max:20',
-            'address' => 'required|string',
-            'events' => 'required|array|min:1',
-            'events.*.event_date' => 'required|date',
-            'events.*.event_time' => 'required|in:morning,afternoon,evening,night_snack',
-            'events.*.event_menu' => 'required|string|max:255',
-            'events.*.guest_count' => 'required|integer|min:1',
-            'events.*.order_type' => 'nullable|in:full_service,preparation_only',
-            'events.*.dish_price' => 'required|numeric|min:0',
-            'events.*.cost' => 'required|numeric|min:0',
-        ]);
+        $tenantId = auth()->user()->tenant_id;
+        $validated = $request->validated();
 
         $result = $this->orderService->createOrders(
             $validated['events'],
@@ -177,7 +149,7 @@ class OrderController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $order->load('customer', 'invoice.payments');
+        $order->load('customer', 'invoice.payments', 'eventTime', 'orderType', 'orderStatus');
         
         // Build filters from request
         $filters = [];
@@ -218,8 +190,14 @@ class OrderController extends Controller
         $relatedOrders = $this->orderService->getByOrderNumber($order->order_number, $tenantId, $filters);
         
         // Get settings for filters and display
-        $orderStatuses = OrderStatus::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
-        $eventTimes = EventTime::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $orderStatuses = OrderStatus::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        })->where('is_active', true)->orderBy('is_system', 'desc')->orderBy('name')->get();
+        $eventTimes = EventTime::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        })->where('is_active', true)->orderBy('is_system', 'desc')->orderBy('name')->get();
         $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
         
         // Pass filter values to view for form preservation
@@ -248,7 +226,10 @@ class OrderController extends Controller
         // Load all orders with same order_number
         $relatedOrders = $this->orderService->getByOrderNumber($order->order_number, $tenantId);
         
-        $eventTimes = EventTime::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $eventTimes = EventTime::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        })->where('is_active', true)->orderBy('is_system', 'desc')->orderBy('name')->get();
         $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
         
         $page_title = 'Edit Order';
@@ -293,7 +274,13 @@ class OrderController extends Controller
             'events' => 'required|array|min:1',
             'events.*.event_date' => 'required|date',
             'events.*.event_time_id' => ['required', 'integer', function ($attribute, $value, $fail) use ($tenantId) {
-                if (!EventTime::where('id', $value)->where('tenant_id', $tenantId)->where('is_active', true)->exists()) {
+                if (!EventTime::where('id', $value)
+                    ->where(function ($q) use ($tenantId) {
+                        $q->whereNull('tenant_id')
+                          ->orWhere('tenant_id', $tenantId);
+                    })
+                    ->where('is_active', true)
+                    ->exists()) {
                     $fail('The selected event time is invalid.');
                 }
             }],
@@ -364,7 +351,13 @@ class OrderController extends Controller
 
         $validated = $request->validate([
             'order_status_id' => ['required', 'integer', function ($attribute, $value, $fail) use ($tenantId) {
-                if (!OrderStatus::where('id', $value)->where('tenant_id', $tenantId)->where('is_active', true)->exists()) {
+                if (!OrderStatus::where('id', $value)
+                    ->where(function ($q) use ($tenantId) {
+                        $q->whereNull('tenant_id')
+                          ->orWhere('tenant_id', $tenantId);
+                    })
+                    ->where('is_active', true)
+                    ->exists()) {
                     $fail('The selected order status is invalid.');
                 }
             }],
@@ -372,7 +365,7 @@ class OrderController extends Controller
 
         $result = $this->orderService->updateGroupStatus(
             $order->order_number,
-            $validated['order_status_id'],
+            (int) $validated['order_status_id'],
             $tenantId
         );
 

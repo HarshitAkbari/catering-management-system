@@ -19,7 +19,10 @@ class SettingsService
     // Order Statuses Methods
     public function getOrderStatuses(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = OrderStatus::where('tenant_id', $tenantId);
+        $query = OrderStatus::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        });
         
         // Apply name filter
         if (isset($filters['name_like']) && !empty($filters['name_like'])) {
@@ -31,12 +34,13 @@ class SettingsService
             $query->where('is_active', $filters['is_active']);
         }
         
-        // Apply sorting
+        // Apply sorting - system statuses first, then by name
         if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
             $sortOrder = $filters['sort_order'] ?? 'asc';
             $query->orderBy($filters['sort_by'], $sortOrder);
         } else {
-            $query->orderBy('name', 'asc');
+            $query->orderBy('is_system', 'desc')
+                  ->orderBy('name', 'asc');
         }
         
         return $query->paginate($perPage)->appends($filters);
@@ -62,6 +66,13 @@ class SettingsService
     public function updateOrderStatus(OrderStatus $orderStatus, array $data): array
     {
         try {
+            if ($orderStatus->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System order statuses cannot be modified.',
+                ];
+            }
+
             $orderStatus->update($data);
 
             return ['status' => true];
@@ -76,6 +87,13 @@ class SettingsService
     public function deleteOrderStatus(OrderStatus $orderStatus): array
     {
         try {
+            if ($orderStatus->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System order statuses cannot be deleted.',
+                ];
+            }
+
             // Check if status is used in orders
             $orderCount = Order::where('order_status_id', $orderStatus->id)->count();
 
@@ -100,6 +118,13 @@ class SettingsService
     public function toggleOrderStatus(OrderStatus $orderStatus): array
     {
         try {
+            if ($orderStatus->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System order statuses cannot be toggled.',
+                ];
+            }
+
             $orderStatus->update(['is_active' => !$orderStatus->is_active]);
 
             return [
@@ -117,7 +142,10 @@ class SettingsService
     // Event Times Methods
     public function getEventTimes(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = EventTime::where('tenant_id', $tenantId);
+        $query = EventTime::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        });
         
         // Apply name filter
         if (isset($filters['name_like']) && !empty($filters['name_like'])) {
@@ -129,12 +157,13 @@ class SettingsService
             $query->where('is_active', $filters['is_active']);
         }
         
-        // Apply sorting
+        // Apply sorting - system event times first, then by name
         if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
             $sortOrder = $filters['sort_order'] ?? 'asc';
             $query->orderBy($filters['sort_by'], $sortOrder);
         } else {
-            $query->orderBy('name', 'asc');
+            $query->orderBy('is_system', 'desc')
+                  ->orderBy('name', 'asc');
         }
         
         return $query->paginate($perPage)->appends($filters);
@@ -160,6 +189,13 @@ class SettingsService
     public function updateEventTime(EventTime $eventTime, array $data): array
     {
         try {
+            if ($eventTime->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System event times cannot be modified.',
+                ];
+            }
+
             $eventTime->update($data);
 
             return ['status' => true];
@@ -174,6 +210,13 @@ class SettingsService
     public function deleteEventTime(EventTime $eventTime): array
     {
         try {
+            if ($eventTime->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System event times cannot be deleted.',
+                ];
+            }
+
             // Check if event time is used in orders
             $orderCount = Order::where('event_time_id', $eventTime->id)->count();
 
@@ -198,6 +241,13 @@ class SettingsService
     public function toggleEventTime(EventTime $eventTime): array
     {
         try {
+            if ($eventTime->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System event times cannot be toggled.',
+                ];
+            }
+
             $eventTime->update(['is_active' => !$eventTime->is_active]);
 
             return [
@@ -313,7 +363,10 @@ class SettingsService
     // Inventory Units Methods
     public function getInventoryUnits(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = InventoryUnit::where('tenant_id', $tenantId);
+        $query = InventoryUnit::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        });
         
         // Apply name filter
         if (isset($filters['name_like']) && !empty($filters['name_like'])) {
@@ -325,12 +378,13 @@ class SettingsService
             $query->where('is_active', $filters['is_active']);
         }
         
-        // Apply sorting
+        // Apply sorting - system inventory units first, then by name
         if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
             $sortOrder = $filters['sort_order'] ?? 'asc';
             $query->orderBy($filters['sort_by'], $sortOrder);
         } else {
-            $query->orderBy('name', 'asc');
+            $query->orderBy('is_system', 'desc')
+                  ->orderBy('name', 'asc');
         }
         
         return $query->paginate($perPage)->appends($filters);
@@ -356,6 +410,13 @@ class SettingsService
     public function updateInventoryUnit(InventoryUnit $inventoryUnit, array $data): array
     {
         try {
+            if ($inventoryUnit->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System inventory units cannot be modified.',
+                ];
+            }
+
             $inventoryUnit->update($data);
 
             return ['status' => true];
@@ -370,6 +431,13 @@ class SettingsService
     public function deleteInventoryUnit(InventoryUnit $inventoryUnit): array
     {
         try {
+            if ($inventoryUnit->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System inventory units cannot be deleted.',
+                ];
+            }
+
             // Check if unit is used in inventory items
             $itemCount = InventoryItem::where('inventory_unit_id', $inventoryUnit->id)->count();
 
@@ -394,6 +462,13 @@ class SettingsService
     public function toggleInventoryUnit(InventoryUnit $inventoryUnit): array
     {
         try {
+            if ($inventoryUnit->is_system) {
+                return [
+                    'status' => false,
+                    'message' => 'System inventory units cannot be toggled.',
+                ];
+            }
+
             $inventoryUnit->update(['is_active' => !$inventoryUnit->is_active]);
 
             return [
