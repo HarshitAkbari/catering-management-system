@@ -190,8 +190,11 @@ class InventoryService extends BaseService
      */
     public function getInventoryUnits(int $tenantId): Collection
     {
-        return InventoryUnit::where('tenant_id', $tenantId)
-            ->where('is_active', true)
+        return InventoryUnit::where(function ($q) use ($tenantId) {
+            $q->whereNull('tenant_id')
+              ->orWhere('tenant_id', $tenantId);
+        })->where('is_active', true)
+            ->orderBy('is_system', 'desc')
             ->orderBy('name')
             ->get();
     }

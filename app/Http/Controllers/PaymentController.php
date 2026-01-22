@@ -15,12 +15,38 @@ class PaymentController extends Controller
         private readonly OrderService $orderService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
         $tenantId = auth()->user()->tenant_id;
-        $orders = $this->paymentService->getGroupedOrders($tenantId);
+        
+        // Build filters from request
+        $filters = [];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Mobile filter
+        if ($request->has('mobile_like') && !empty($request->mobile_like)) {
+            $filters['mobile_like'] = $request->mobile_like;
+        }
+        
+        // Payment status filter
+        if ($request->has('payment_status') && !empty($request->payment_status)) {
+            $filters['payment_status'] = $request->payment_status;
+        }
+        
+        $orders = $this->paymentService->getGroupedOrders($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'mobile_like' => $request->input('mobile_like', ''),
+            'payment_status' => $request->input('payment_status', ''),
+        ];
 
-        return view('payments.index', compact('orders'));
+        return view('payments.index', compact('orders', 'filterValues'));
     }
     
     public function updateGroupPaymentStatus(Request $request)

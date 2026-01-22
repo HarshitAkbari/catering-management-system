@@ -88,19 +88,21 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('settings.inventory-units.edit', $unit) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
-                                            @if($unit->is_active)
-                                                <button type="button" 
-                                                    class="btn btn-danger btn-xs" 
-                                                    onclick="showSettingsDeactivationModal('inventory-unit-deactivation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
-                                                    Deactivate
-                                                </button>
-                                            @else
-                                                <button type="button" 
-                                                    class="btn btn-success btn-xs" 
-                                                    onclick="showSettingsActivationModal('inventory-unit-activation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
-                                                    Activate
-                                                </button>
+                                            @if(!$unit->is_system)
+                                                <a href="{{ route('settings.inventory-units.edit', $unit) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                                @if($unit->is_active)
+                                                    <button type="button" 
+                                                        class="btn btn-danger btn-xs" 
+                                                        onclick="showSettingsDeactivationModal('inventory-unit-deactivation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
+                                                        Deactivate
+                                                    </button>
+                                                @else
+                                                    <button type="button" 
+                                                        class="btn btn-success btn-xs" 
+                                                        onclick="showSettingsActivationModal('inventory-unit-activation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
+                                                        Activate
+                                                    </button>
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>

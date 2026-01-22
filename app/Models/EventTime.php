@@ -18,12 +18,14 @@ class EventTime extends Model
         'tenant_id',
         'name',
         'is_active',
+        'is_system',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'is_system' => 'boolean',
         ];
     }
 

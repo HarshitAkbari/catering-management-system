@@ -88,19 +88,21 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('settings.order-statuses.edit', $status) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
-                                            @if($status->is_active)
-                                                <button type="button" 
-                                                    class="btn btn-danger btn-xs" 
-                                                    onclick="showSettingsDeactivationModal('order-status-deactivation-modal', '{{ $status->name }}', 'order status', '{{ route('settings.order-statuses.toggle', $status) }}', 'PATCH')">
-                                                    Deactivate
-                                                </button>
-                                            @else
-                                                <button type="button" 
-                                                    class="btn btn-success btn-xs" 
-                                                    onclick="showSettingsActivationModal('order-status-activation-modal', '{{ $status->name }}', 'order status', '{{ route('settings.order-statuses.toggle', $status) }}', 'PATCH')">
-                                                    Activate
-                                                </button>
+                                            @if(!$status->is_system)
+                                                <a href="{{ route('settings.order-statuses.edit', $status) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                                @if($status->is_active)
+                                                    <button type="button" 
+                                                        class="btn btn-danger btn-xs" 
+                                                        onclick="showSettingsDeactivationModal('order-status-deactivation-modal', '{{ $status->name }}', 'order status', '{{ route('settings.order-statuses.toggle', $status) }}', 'PATCH')">
+                                                        Deactivate
+                                                    </button>
+                                                @else
+                                                    <button type="button" 
+                                                        class="btn btn-success btn-xs" 
+                                                        onclick="showSettingsActivationModal('order-status-activation-modal', '{{ $status->name }}', 'order status', '{{ route('settings.order-statuses.toggle', $status) }}', 'PATCH')">
+                                                        Activate
+                                                    </button>
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>

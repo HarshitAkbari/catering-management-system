@@ -174,10 +174,9 @@
                             <label for="modal-event-time" class="form-label">Event Time <span class="text-danger">*</span></label>
                             <select id="modal-event-time" required class="form-control default-select">
                                 <option value="">Select Time</option>
-                                <option value="morning">Morning</option>
-                                <option value="afternoon">Afternoon</option>
-                                <option value="evening">Evening</option>
-                                <option value="night_snack">Snack</option>
+                                @foreach($eventTimes as $eventTime)
+                                    <option value="{{ $eventTime->id }}">{{ $eventTime->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -195,8 +194,9 @@
                             <label for="modal-order-type" class="form-label">Order Type</label>
                             <select id="modal-order-type" class="form-control default-select">
                                 <option value="">Select Order Type</option>
-                                <option value="full_service">Full Service</option>
-                                <option value="preparation_only">Preparation Only</option>
+                                @foreach($orderTypes as $orderType)
+                                    <option value="{{ $orderType->id }}">{{ $orderType->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -222,6 +222,10 @@
 
 @section('scripts')
     <script>
+        // Pass PHP data to JavaScript
+        const eventTimes = @json($eventTimes->keyBy('id'));
+        const orderTypes = @json($orderTypes->keyBy('id'));
+        
         (function () {
           'use strict'
 
@@ -248,10 +252,10 @@
                 $dishPrice = $order->guest_count > 0 ? ($order->estimated_cost / $order->guest_count) : 0;
                 return [
                     'event_date' => $order->event_date ? $order->event_date->format('Y-m-d') : '',
-                    'event_time' => $order->event_time ?? '',
+                    'event_time_id' => $order->event_time_id ?? '',
                     'event_menu' => $order->event_menu ?? '',
                     'guest_count' => (int)($order->guest_count ?? 0),
-                    'order_type' => $order->order_type ?? null,
+                    'order_type_id' => $order->order_type_id ?? null,
                     'dish_price' => (float)number_format($dishPrice, 2, '.', ''),
                     'cost' => (float)number_format($order->estimated_cost ?? 0, 2, '.', ''),
                 ];
@@ -298,21 +302,80 @@
                         // Get the selected date and format it as yyyy-mm-dd
                         const selectedDate = picker.get('select');
                         if (selectedDate) {
-                            // Format date as yyyy-mm-dd
-                            const year = selectedDate.getFullYear();
-                            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-                            const day = String(selectedDate.getDate()).padStart(2, '0');
-                            eventDate = year + '-' + month + '-' + day;
+                            // Check if selectedDate is a Date object
+                            if (selectedDate instanceof Date) {
+                                // Format date as yyyy-mm-dd
+                                const year = selectedDate.getFullYear();
+                                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                                const day = String(selectedDate.getDate()).padStart(2, '0');
+                                eventDate = year + '-' + month + '-' + day;
+                            } else {
+                                // If not a Date object, try to parse it or get formatted value
+                                try {
+                                    // Try to parse as Date if it's a date-like object
+                                    const dateObj = new Date(selectedDate);
+                                    if (!isNaN(dateObj.getTime())) {
+                                        const year = dateObj.getFullYear();
+                                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                                        const day = String(dateObj.getDate()).padStart(2, '0');
+                                        eventDate = year + '-' + month + '-' + day;
+                                    } else {
+                                        // Try to get submit format from picker
+                                        const submitValue = picker.get('value', 'yyyy-mm-dd');
+                                        if (submitValue) {
+                                            eventDate = submitValue;
+                                        } else {
+                                            // Fallback to input value and try to parse
+                                            const inputValue = document.getElementById('modal-event-date').value;
+                                            const parsedDate = new Date(inputValue);
+                                            if (!isNaN(parsedDate.getTime())) {
+                                                const year = parsedDate.getFullYear();
+                                                const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                                                const day = String(parsedDate.getDate()).padStart(2, '0');
+                                                eventDate = year + '-' + month + '-' + day;
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    // If all else fails, use input value
+                                    eventDate = document.getElementById('modal-event-date').value;
+                                }
+                            }
+                        } else {
+                            // No date selected, try to get from input
+                            const inputValue = document.getElementById('modal-event-date').value;
+                            if (inputValue) {
+                                // Try to parse and format the input value
+                                const parsedDate = new Date(inputValue);
+                                if (!isNaN(parsedDate.getTime())) {
+                                    const year = parsedDate.getFullYear();
+                                    const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                                    const day = String(parsedDate.getDate()).padStart(2, '0');
+                                    eventDate = year + '-' + month + '-' + day;
+                                }
+                            }
                         }
+                    }
+                }
+                
+                // Final validation: ensure eventDate is in yyyy-mm-dd format
+                if (eventDate && !/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) {
+                    // Try to parse and reformat
+                    const parsedDate = new Date(eventDate);
+                    if (!isNaN(parsedDate.getTime())) {
+                        const year = parsedDate.getFullYear();
+                        const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(parsedDate.getDate()).padStart(2, '0');
+                        eventDate = year + '-' + month + '-' + day;
                     }
                 }
 
                 const eventData = {
                     event_date: eventDate,
-                    event_time: document.getElementById('modal-event-time').value,
+                    event_time_id: parseInt(document.getElementById('modal-event-time').value),
                     event_menu: document.getElementById('modal-event-menu').value,
                     guest_count: parseInt(document.getElementById('modal-guest-count').value),
-                    order_type: document.getElementById('modal-order-type').value || null,
+                    order_type_id: document.getElementById('modal-order-type').value ? parseInt(document.getElementById('modal-order-type').value) : null,
                     dish_price: parseFloat(document.getElementById('modal-dish-price').value),
                     cost: parseFloat(document.getElementById('modal-cost').value)
                 };
@@ -387,6 +450,16 @@
             }
         }
 
+        function formatDateForDisplay(dateString) {
+            // Format yyyy-mm-dd to readable format
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString; // Return as-is if invalid
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
         function updateEventsTable() {
             const tbody = document.getElementById('events-table-body');
             const container = document.getElementById('events-container');
@@ -399,25 +472,13 @@
 
             container.classList.remove('d-none');
             tbody.innerHTML = events.map((event, index) => {
-                const eventTimeLabels = {
-                    'morning': 'Morning',
-                    'afternoon': 'Afternoon',
-                    'evening': 'Evening',
-                    'night_snack': 'Snack'
-                };
-
-                const orderTypeLabels = {
-                    'full_service': 'Full Service',
-                    'preparation_only': 'Preparation Only'
-                };
-
                 return `
                     <tr>
-                        <td>${event.event_date}</td>
-                        <td>${eventTimeLabels[event.event_time] || event.event_time}</td>
+                        <td>${formatDateForDisplay(event.event_date)}</td>
+                        <td>${eventTimes[event.event_time_id]?.name || '-'}</td>
                         <td>${event.event_menu}</td>
                         <td>${event.guest_count}</td>
-                        <td>${orderTypeLabels[event.order_type] || event.order_type || '-'}</td>
+                        <td>${event.order_type_id ? (orderTypes[event.order_type_id]?.name || '-') : '-'}</td>
                         <td>₹${event.dish_price.toFixed(2)}</td>
                         <td><strong>₹${event.cost.toFixed(2)}</strong></td>
                         <td>
@@ -426,7 +487,7 @@
                                 data-bs-toggle="modal" 
                                 data-bs-target="#deleteEventModal"
                                 data-event-index="${index}"
-                                data-event-name="${event.event_menu} - ${event.event_date}">
+                                data-event-name="${event.event_menu} - ${formatDateForDisplay(event.event_date)}">
                                 Delete
                             </button>
                         </td>
@@ -448,10 +509,10 @@
                 dateInput.value = event.event_date;
             }
             
-            document.getElementById('modal-event-time').value = event.event_time;
+            document.getElementById('modal-event-time').value = event.event_time_id;
             document.getElementById('modal-event-menu').value = event.event_menu;
             document.getElementById('modal-guest-count').value = event.guest_count;
-            document.getElementById('modal-order-type').value = event.order_type || '';
+            document.getElementById('modal-order-type').value = event.order_type_id || '';
             document.getElementById('modal-dish-price').value = event.dish_price;
             document.getElementById('modal-cost').value = event.cost.toFixed(2);
             document.getElementById('save-event-btn').textContent = 'Update Event';

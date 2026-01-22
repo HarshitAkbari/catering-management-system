@@ -9,15 +9,53 @@
             <div class="card-header">
                 <h4 class="card-title">Payments</h4>
             </div>
-            <div class="card-body">Now, I have this project. In the side navigation, I want to add a menu named Settings.
-                Under this menu, I want to provide configuration options that can be managed by the user.
-                
-                For example, we have Order Status, where the user should be able to create and update order statuses.
-                Similarly, in Inventory, we have Units. Since we do not know in advance which units may be required, I want to allow users to create and manage units themselves.
-                
-                In Equipment, we have Categories and Equipment Statuses. These should also be configurable by the user.
-                
-                Wherever you think such configuration options are required, please include them under the Settings menu.
+            <div class="card-body">
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('payments.index') }}" class="mb-4">
+                    <div class="row g-2 align-items-end mb-3">
+                        <!-- Name Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="name_filter" class="form-label">Name</label>
+                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm">
+                        </div>
+
+                        <!-- Contact Number Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="mobile_filter" class="form-label">Contact Number</label>
+                            <input type="text" name="mobile_like" id="mobile_filter" value="{{ $filterValues['mobile_like'] ?? '' }}" class="form-control form-control-sm">
+                        </div>
+
+                        <!-- Payment Status Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="payment_status_filter" class="form-label">Payment Status</label>
+                            <select name="payment_status" id="payment_status_filter" class="form-control form-control-sm">
+                                <option value="">All Status</option>
+                                <option value="pending" {{ ($filterValues['payment_status'] ?? '') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="partial" {{ ($filterValues['payment_status'] ?? '') == 'partial' ? 'selected' : '' }}>Partial</option>
+                                <option value="paid" {{ ($filterValues['payment_status'] ?? '') == 'paid' ? 'selected' : '' }}>Paid</option>
+                                <option value="mixed" {{ ($filterValues['payment_status'] ?? '') == 'mixed' ? 'selected' : '' }}>Mixed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <x-filter-buttons resetRoute="{{ route('payments.index') }}" />
+                </form>
+                <hr>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
@@ -92,7 +130,7 @@
                 </div>
                 @if(method_exists($orders, 'links'))
                     <div class="mt-3">
-                        {{ $orders->links() }}
+                        {{ $orders->appends(request()->query())->links() }}
                     </div>
                 @endif
             </div>

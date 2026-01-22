@@ -105,6 +105,10 @@ class SettingsController extends Controller
     {
         $tenantId = auth()->user()->tenant_id;
         
+        if ($orderStatus->is_system) {
+            abort(403, 'System order statuses cannot be modified.');
+        }
+        
         if ($orderStatus->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
@@ -116,6 +120,10 @@ class SettingsController extends Controller
     public function updateOrderStatus(Request $request, OrderStatus $orderStatus)
     {
         $tenantId = auth()->user()->tenant_id;
+        
+        if ($orderStatus->is_system) {
+            abort(403, 'System order statuses cannot be modified.');
+        }
         
         if ($orderStatus->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
@@ -141,6 +149,10 @@ class SettingsController extends Controller
     {
         $tenantId = auth()->user()->tenant_id;
         
+        if ($orderStatus->is_system) {
+            abort(403, 'System order statuses cannot be deleted.');
+        }
+        
         if ($orderStatus->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
@@ -159,6 +171,16 @@ class SettingsController extends Controller
     public function toggleOrderStatus(OrderStatus $orderStatus)
     {
         $tenantId = auth()->user()->tenant_id;
+        
+        if ($orderStatus->is_system) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'System order statuses cannot be toggled.',
+                ], 403);
+            }
+            abort(403, 'System order statuses cannot be toggled.');
+        }
         
         if ($orderStatus->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
@@ -261,6 +283,10 @@ class SettingsController extends Controller
     {
         $tenantId = auth()->user()->tenant_id;
         
+        if ($eventTime->is_system) {
+            abort(403, 'System event times cannot be modified.');
+        }
+        
         if ($eventTime->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
@@ -272,6 +298,10 @@ class SettingsController extends Controller
     public function updateEventTime(Request $request, EventTime $eventTime)
     {
         $tenantId = auth()->user()->tenant_id;
+        
+        if ($eventTime->is_system) {
+            abort(403, 'System event times cannot be modified.');
+        }
         
         if ($eventTime->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
@@ -297,6 +327,10 @@ class SettingsController extends Controller
     {
         $tenantId = auth()->user()->tenant_id;
         
+        if ($eventTime->is_system) {
+            abort(403, 'System event times cannot be deleted.');
+        }
+        
         if ($eventTime->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
@@ -315,6 +349,16 @@ class SettingsController extends Controller
     public function toggleEventTime(EventTime $eventTime)
     {
         $tenantId = auth()->user()->tenant_id;
+        
+        if ($eventTime->is_system) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'System event times cannot be toggled.',
+                ], 403);
+            }
+            abort(403, 'System event times cannot be toggled.');
+        }
         
         if ($eventTime->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
@@ -573,6 +617,10 @@ class SettingsController extends Controller
     {
         $tenantId = auth()->user()->tenant_id;
         
+        if ($inventoryUnit->is_system) {
+            abort(403, 'System inventory units cannot be modified.');
+        }
+        
         if ($inventoryUnit->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
@@ -584,6 +632,10 @@ class SettingsController extends Controller
     public function updateInventoryUnit(Request $request, InventoryUnit $inventoryUnit)
     {
         $tenantId = auth()->user()->tenant_id;
+        
+        if ($inventoryUnit->is_system) {
+            abort(403, 'System inventory units cannot be modified.');
+        }
         
         if ($inventoryUnit->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
@@ -609,6 +661,10 @@ class SettingsController extends Controller
     {
         $tenantId = auth()->user()->tenant_id;
         
+        if ($inventoryUnit->is_system) {
+            abort(403, 'System inventory units cannot be deleted.');
+        }
+        
         if ($inventoryUnit->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');
         }
@@ -627,6 +683,16 @@ class SettingsController extends Controller
     public function toggleInventoryUnit(InventoryUnit $inventoryUnit)
     {
         $tenantId = auth()->user()->tenant_id;
+        
+        if ($inventoryUnit->is_system) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'System inventory units cannot be toggled.',
+                ], 403);
+            }
+            abort(403, 'System inventory units cannot be toggled.');
+        }
         
         if ($inventoryUnit->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized');

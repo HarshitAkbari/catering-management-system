@@ -88,19 +88,21 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('settings.event-times.edit', $eventTime) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
-                                            @if($eventTime->is_active)
-                                                <button type="button" 
-                                                    class="btn btn-danger btn-xs" 
-                                                    onclick="showSettingsDeactivationModal('event-time-deactivation-modal', '{{ $eventTime->name }}', 'event time', '{{ route('settings.event-times.toggle', $eventTime) }}', 'PATCH')">
-                                                    Deactivate
-                                                </button>
-                                            @else
-                                                <button type="button" 
-                                                    class="btn btn-success btn-xs" 
-                                                    onclick="showSettingsActivationModal('event-time-activation-modal', '{{ $eventTime->name }}', 'event time', '{{ route('settings.event-times.toggle', $eventTime) }}', 'PATCH')">
-                                                    Activate
-                                                </button>
+                                            @if(!$eventTime->is_system)
+                                                <a href="{{ route('settings.event-times.edit', $eventTime) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                                @if($eventTime->is_active)
+                                                    <button type="button" 
+                                                        class="btn btn-danger btn-xs" 
+                                                        onclick="showSettingsDeactivationModal('event-time-deactivation-modal', '{{ $eventTime->name }}', 'event time', '{{ route('settings.event-times.toggle', $eventTime) }}', 'PATCH')">
+                                                        Deactivate
+                                                    </button>
+                                                @else
+                                                    <button type="button" 
+                                                        class="btn btn-success btn-xs" 
+                                                        onclick="showSettingsActivationModal('event-time-activation-modal', '{{ $eventTime->name }}', 'event time', '{{ route('settings.event-times.toggle', $eventTime) }}', 'PATCH')">
+                                                        Activate
+                                                    </button>
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>
