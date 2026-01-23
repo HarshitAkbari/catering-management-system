@@ -1,142 +1,48 @@
 @extends('layouts.app')
 
-@section('title', 'Add Inventory Item')
+@section('title', $page_title ?? 'Add Inventory Item')
 
-@section('page_content')
-<div class="row">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">Add Inventory Item</h4>
-            </div>
-            <div class="card-body">
-                <div class="form-validation">
-                    <form class="needs-validation" action="{{ route('inventory.store') }}" method="POST" novalidate>
-                        @csrf
-
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label" for="name">Name
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="text" class="form-control" id="name" name="name" 
-                                    placeholder="Enter item name.." value="{{ old('name') }}" required>
-                                <div class="invalid-feedback">
-                                    Please enter an item name.
-                                </div>
-                                @error('name')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Add {{ $page_title ?? 'Inventory Item' }}</h3>
+                </div>
+                <div class="card-body">
+                    @include('error.alerts')
+                    <div class="form-validation">
+                        <form class="needs-validation" method="POST" action="{{ route('inventory.store') }}" novalidate>
+                            @csrf
+                            @include('inventory.form')
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                             </div>
-
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label" for="inventory_unit_id">Unit
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <select class="form-control" id="inventory_unit_id" name="inventory_unit_id" required>
-                                    <option value="">Select Unit</option>
-                                    @foreach($inventoryUnits as $unit)
-                                        <option value="{{ $unit->id }}" {{ old('inventory_unit_id') == $unit->id ? 'selected' : '' }}>
-                                            {{ $unit->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback">
-                                    Please select a unit.
-                                </div>
-                                @error('inventory_unit_id')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label" for="current_stock">Current Stock
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" class="form-control" id="current_stock" name="current_stock" 
-                                    step="0.01" min="0" value="{{ old('current_stock') }}" required>
-                                <div class="invalid-feedback">
-                                    Please enter current stock.
-                                </div>
-                                @error('current_stock')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label" for="minimum_stock">Minimum Stock
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" class="form-control" id="minimum_stock" name="minimum_stock" 
-                                    step="0.01" min="0" value="{{ old('minimum_stock') }}" required>
-                                <div class="invalid-feedback">
-                                    Please enter minimum stock.
-                                </div>
-                                @error('minimum_stock')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label" for="price_per_unit">Price Per Unit
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" class="form-control" id="price_per_unit" name="price_per_unit" 
-                                    step="0.01" min="0" value="{{ old('price_per_unit') }}" required>
-                                <div class="invalid-feedback">
-                                    Please enter price per unit.
-                                </div>
-                                @error('price_per_unit')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-12 mb-4">
-                                <label class="form-label" for="description">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3" 
-                                    placeholder="Enter description..">{{ old('description') }}</textarea>
-                                @error('description')
-                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-xl-8 col-lg-10 mx-auto">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary">Cancel</a>
-                                    <button type="submit" class="btn btn-primary">Create Item</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    {{-- Tips Section --}}
+    <x-tips-section>
+        <x-tip-item>
+            Use clear, descriptive names for inventory items (e.g., "Basmati Rice", "Olive Oil", "Chicken Breast")
+        </x-tip-item>
+        
+        <x-tip-item>
+            Set appropriate minimum stock levels to avoid running out of essential items during operations
+        </x-tip-item>
+        
+        <x-tip-item>
+            Regularly update current stock through stock-in/stock-out operations to maintain accurate inventory levels
+        </x-tip-item>
+        
+        <x-tip-item>
+            Keep price per unit updated for accurate cost calculations and profit margin analysis
+        </x-tip-item>
+    </x-tips-section>
 </div>
-@endsection
-
-@section('scripts')
-<script>
-    (function () {
-      'use strict'
-
-      // Fetch all the forms we want to apply custom Bootstrap validation styles to
-      var forms = document.querySelectorAll('.needs-validation')
-
-      // Loop over them and prevent submission
-      Array.prototype.slice.call(forms)
-        .forEach(function (form) {
-          form.addEventListener('submit', function (event) {
-            if (!form.checkValidity()) {
-              event.preventDefault()
-              event.stopPropagation()
-            }
-
-            form.classList.add('was-validated')
-          }, false)
-        })
-    })()
-</script>
 @endsection

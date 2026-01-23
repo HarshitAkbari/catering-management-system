@@ -11,86 +11,12 @@
                     <h4 class="card-title">Edit Equipment</h4>
                 </div>
                 <div class="card-body">
-                    @if ($errors->any())
-                        <div class="alert alert-alt alert-danger solid alert-dismissible fade show" role="alert">
-                            <strong>There were errors with your submission:</strong>
-                            <ul class="mb-0 mt-2">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
+                    @include('error.alerts')
                     <div class="form-validation">
-                        <form class="needs-validation" action="{{ route('equipment.update', $equipment) }}" method="POST" id="equipmentForm" novalidate>
+                        <form class="needs-validation" action="{{ route('equipment.update', $equipment) }}" method="POST" novalidate>
                             @csrf
                             @method('PUT')
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6 mb-3">
-                                    <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $equipment->name) }}" placeholder="Enter equipment name.." required>
-                                    <div class="invalid-feedback">
-                                        Please enter a equipment name.
-                                    </div>
-                                    @error('name')
-                                        <div class="text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-6 col-md-6 mb-3">
-                                    <label class="form-label" for="equipment_category_id">Category</label>
-                                    <select name="equipment_category_id" id="equipment_category_id" class="form-control default-select @error('equipment_category_id') is-invalid @enderror">
-                                        <option value="">Select Category</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ old('equipment_category_id', $equipment->equipment_category_id) == $category->id ? 'selected' : '' }}>
-                                                {{ $category->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('equipment_category_id')
-                                        <div class="text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-6 col-md-6 mb-3">
-                                    <label class="form-label" for="quantity">Total Quantity <span class="text-danger">*</span></label>
-                                    <input type="number" name="quantity" id="quantity" class="form-control @error('quantity') is-invalid @enderror" value="{{ old('quantity', $equipment->quantity) }}" placeholder="Enter total quantity.." required min="0">
-                                    <div class="invalid-feedback">
-                                        Please enter a valid quantity (minimum 0).
-                                    </div>
-                                    @error('quantity')
-                                        <div class="text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-6 col-md-6 mb-3">
-                                    <label class="form-label" for="available_quantity">Available Quantity <span class="text-danger">*</span></label>
-                                    <input type="number" name="available_quantity" id="available_quantity" class="form-control @error('available_quantity') is-invalid @enderror" value="{{ old('available_quantity', $equipment->available_quantity) }}" placeholder="Enter available quantity.." required min="0">
-                                    <div class="invalid-feedback">
-                                        Please enter a valid available quantity (minimum 0).
-                                    </div>
-                                    <small class="form-text text-muted">Available quantity cannot exceed total quantity</small>
-                                    @error('available_quantity')
-                                        <div class="text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-lg-6 col-md-6 mb-3">
-                                    <label class="form-label" for="equipment_status_id">Status <span class="text-danger">*</span></label>
-                                    <select name="equipment_status_id" id="equipment_status_id" class="form-control default-select @error('equipment_status_id') is-invalid @enderror" required>
-                                        <option value="">Select Status</option>
-                                        @foreach($statuses as $status)
-                                            <option value="{{ $status->id }}" {{ old('equipment_status_id', $equipment->equipment_status_id) == $status->id ? 'selected' : '' }}>
-                                                {{ $status->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Please select a status.
-                                    </div>
-                                    @error('equipment_status_id')
-                                        <div class="text-danger small mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                            @include('equipment.form')
                             <div class="row">
                                 <div class="col-12">
                                     <div class="d-flex justify-content-end gap-2">
@@ -105,53 +31,32 @@
             </div>
         </div>
     </div>
+    
+    {{-- Tips Section --}}
+    <x-tips-section>
+        <x-tip-item>
+            Use clear, descriptive names for equipment items to easily identify them in your inventory
+        </x-tip-item>
+        
+        <x-tip-item>
+            Total quantity represents the complete stock of equipment you own, while available quantity is what's currently ready for use
+        </x-tip-item>
+        
+        <x-tip-item>
+            Available quantity cannot exceed total quantity. The difference represents equipment that is currently assigned or unavailable
+        </x-tip-item>
+        
+        <x-tip-item>
+            Regularly update quantities when equipment is assigned, returned, or when new equipment is purchased
+        </x-tip-item>
+        
+        <x-tip-item>
+            Categorizing equipment helps organize your inventory and makes it easier to find and manage items
+        </x-tip-item>
+        
+        <x-tip-item>
+            Equipment status helps track the condition and availability of each item in your inventory
+        </x-tip-item>
+    </x-tips-section>
 </div>
-
-@section('scripts')
-<script>
-    (function () {
-        'use strict'
-
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        var forms = document.querySelectorAll('.needs-validation')
-
-        // Loop over them and prevent submission
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('equipmentForm');
-        const quantityInput = document.getElementById('quantity');
-        const availableQuantityInput = document.getElementById('available_quantity');
-        
-        function validateQuantities() {
-            const quantity = parseInt(quantityInput.value) || 0;
-            const availableQuantity = parseInt(availableQuantityInput.value) || 0;
-            
-            if (availableQuantity > quantity) {
-                availableQuantityInput.setCustomValidity('Available quantity cannot exceed total quantity');
-                availableQuantityInput.classList.add('is-invalid');
-            } else {
-                availableQuantityInput.setCustomValidity('');
-                if (form.classList.contains('was-validated')) {
-                    availableQuantityInput.classList.remove('is-invalid');
-                }
-            }
-        }
-        
-        quantityInput.addEventListener('input', validateQuantities);
-        availableQuantityInput.addEventListener('input', validateQuantities);
-    });
-</script>
-@endsection
 @endsection

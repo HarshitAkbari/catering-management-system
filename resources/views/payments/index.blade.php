@@ -106,15 +106,9 @@
                                                     <i class="bi bi-file-earmark-plus me-1"></i>Generate Invoice
                                                 </a>
                                             @endif
-                                            @if($group['orders']->count() > 1)
-                                                <button type="button" onclick="openPaymentModal('{{ $group['order_number'] }}', {{ $group['orders']->count() }}, '{{ $paymentStatus }}')" class="btn btn-primary btn-sm" title="Update Payment">
-                                                    <i class="bi bi-pencil me-1"></i>Update Payment
-                                                </button>
-                                            @else
-                                                <a href="{{ route('orders.edit', $group['orders']->first()) }}" class="btn btn-primary btn-sm" title="Update Payment">
-                                                    <i class="bi bi-pencil me-1"></i>Update Payment
-                                                </a>
-                                            @endif
+                                            <button type="button" onclick="openPaymentModal('{{ $group['order_number'] }}', '{{ $paymentStatus }}')" class="btn btn-primary btn-sm" title="Update Payment">
+                                                <i class="bi bi-pencil me-1"></i>Update Payment
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -161,19 +155,7 @@
                         </div>
                     @endif
 
-                    <div class="mb-3">
-                        <label for="modal-order-number" class="form-label">Order Number <span class="text-danger">*</span></label>
-                        <input type="text" id="modal-order-number" readonly class="form-control bg-light">
-                        <input type="hidden" name="order_number" id="hidden-order-number">
-                        <div class="invalid-feedback">
-                            Order number is required.
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="modal-order-count" class="form-label">Number of Orders</label>
-                        <input type="text" id="modal-order-count" readonly class="form-control bg-light">
-                    </div>
+                    <input type="hidden" name="order_number" id="hidden-order-number">
                     
                     <div class="mb-3">
                         <label for="modal-payment-status" class="form-label">Payment Status <span class="text-danger">*</span></label>
@@ -229,11 +211,9 @@
         paymentModal = new bootstrap.Modal(document.getElementById('payment-modal'));
     });
 
-    function openPaymentModal(orderNumber, orderCount, currentStatus) {
-        // Set form values
-        document.getElementById('modal-order-number').value = orderNumber;
+    function openPaymentModal(orderNumber, currentStatus) {
+        // Set hidden order number field
         document.getElementById('hidden-order-number').value = orderNumber;
-        document.getElementById('modal-order-count').value = orderCount + ' order(s)';
         
         // Set payment status, defaulting to 'pending' if 'mixed'
         const selectElement = document.getElementById('modal-payment-status');

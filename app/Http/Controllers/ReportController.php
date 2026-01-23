@@ -178,52 +178,52 @@ class ReportController extends Controller
 
     private function exportOrders(int $tenantId, string $startDate, string $endDate)
     {
-        $allOrders = Order::where('tenant_id', $tenantId)
+        // Get first order ID for each order_number to use for relationships
+        $firstOrderIds = Order::where('tenant_id', $tenantId)
             ->whereBetween('event_date', [$startDate, $endDate])
-            ->with('customer')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->selectRaw('order_number, MIN(id) as first_order_id')
+            ->groupBy('order_number')
+            ->pluck('first_order_id');
 
-        $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) {
-            $firstOrder = $orderGroup->first();
-            return [
-                'order_number' => $orderNumber,
-                'customer' => $firstOrder->customer,
-                'total_amount' => $orderGroup->sum('estimated_cost'),
-                'status' => $this->getGroupStatus($orderGroup),
-                'payment_status' => $this->getGroupPaymentStatus($orderGroup),
-                'orders' => $orderGroup,
-                'created_at' => $firstOrder->created_at,
-                'event_date' => $orderGroup->min('event_date'),
-            ];
-        })->values();
+        // Build subquery for total_amount
+        $totalAmountSubquery = Order::where('tenant_id', $tenantId)
+            ->whereBetween('event_date', [$startDate, $endDate])
+            ->selectRaw('order_number, SUM(estimated_cost) as total_amount')
+            ->groupBy('order_number');
+
+        // Query first orders with relationships and join total_amount
+        $query = Order::whereIn('id', $firstOrderIds)
+            ->with(['customer', 'orderStatus', 'orderType', 'eventTime'])
+            ->leftJoinSub($totalAmountSubquery, 'totals', function ($join) {
+                $join->on('totals.order_number', '=', 'orders.order_number');
+            })
+            ->select('orders.*', 'totals.total_amount')
+            ->orderBy('orders.created_at', 'desc');
 
         $filename = 'orders_' . $startDate . '_to_' . $endDate . '.xlsx';
-        return Excel::download(new OrdersExport($groupedOrders), $filename);
+        return Excel::download(new OrdersExport($query), $filename);
     }
 
     private function exportPayments(int $tenantId, string $startDate, string $endDate)
     {
-        $payments = Payment::where('tenant_id', $tenantId)
+        $query = Payment::where('tenant_id', $tenantId)
             ->whereBetween('payment_date', [$startDate, $endDate])
             ->with('invoice.order')
-            ->orderBy('payment_date', 'desc')
-            ->get();
+            ->orderBy('payment_date', 'desc');
 
         $filename = 'payments_' . $startDate . '_to_' . $endDate . '.xlsx';
-        return Excel::download(new PaymentsExport($payments), $filename);
+        return Excel::download(new PaymentsExport($query), $filename);
     }
 
     private function exportExpenses(int $tenantId, string $startDate, string $endDate)
     {
-        $expenses = StockTransaction::where('tenant_id', $tenantId)
+        $query = StockTransaction::where('tenant_id', $tenantId)
             ->where('type', 'in')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->with('inventoryItem', 'vendor')
-            ->get();
+            ->with('inventoryItem', 'vendor');
 
         $filename = 'expenses_' . $startDate . '_to_' . $endDate . '.xlsx';
-        return Excel::download(new ExpensesExport($expenses), $filename);
+        return Excel::download(new ExpensesExport($query), $filename);
     }
 
     private function exportProfitLoss(int $tenantId, string $startDate, string $endDate)

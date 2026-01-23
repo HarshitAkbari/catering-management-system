@@ -78,7 +78,7 @@ class EquipmentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'equipment_category_id' => 'nullable|exists:equipment_categories,id',
             'quantity' => 'required|integer|min:0',
             'available_quantity' => [
                 'required',
@@ -90,7 +90,7 @@ class EquipmentController extends Controller
                     }
                 },
             ],
-            'status' => 'required|in:available,damaged',
+            'equipment_status_id' => 'required|exists:equipment_statuses,id',
         ]);
 
         $tenantId = auth()->user()->tenant_id;
@@ -113,7 +113,7 @@ class EquipmentController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $equipment->load('orders');
+        $equipment->load(['orders', 'equipmentStatus', 'equipmentCategory']);
         
         return view('equipment.show', compact('equipment'));
     }
