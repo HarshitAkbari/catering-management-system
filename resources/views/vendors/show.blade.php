@@ -9,6 +9,11 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Vendor Information</h4>
+                    <div class="mt-3">
+                        <a href="{{ route('vendors.index') }}">
+                            <i class="bi bi-arrow-left me-1"></i>Back to List
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -34,14 +39,7 @@
                             </div>
                         @endif
                     </div>
-                    <div class="mt-3">
-                        <a href="{{ route('vendors.edit', $vendor) }}" class="btn btn-info btn-sm me-2">
-                            <i class="bi bi-pencil me-1"></i>Edit
-                        </a>
-                        <a href="{{ route('vendors.index') }}" class="btn btn-secondary btn-sm">
-                            <i class="bi bi-arrow-left me-1"></i>Back
-                        </a>
-                    </div>
+                    
                 </div>
             </div>
         </div>

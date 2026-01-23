@@ -112,12 +112,8 @@
                                             @endif
                                         </td>
                                         <td class="py-2 text-end">
-                                            <a href="{{ route('equipment.show', $item) }}" class="btn btn-primary btn-sm me-1" title="View">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="{{ route('equipment.edit', $item) }}" class="btn btn-secondary btn-sm me-1" title="Edit">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
+                                            <a href="{{ route('equipment.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
+                                            <a href="{{ route('equipment.edit', $item) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
                                             <x-delete-button 
                                                 item-name="{{ $item->name }}"
                                                 delete-url="{{ route('equipment.destroy', $item) }}"
