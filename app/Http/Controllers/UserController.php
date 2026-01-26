@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
@@ -99,13 +100,16 @@ class UserController extends Controller
                     return $query->where('tenant_id', $tenantId);
                 }),
             ],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:admin,manager,staff'],
             'role_ids' => ['nullable', 'array'],
             'role_ids.*' => ['exists:roles,id'],
         ]);
 
-        $result = $this->userService->createUser($validated, $tenantId);
+        // Generate a secure random password
+        $temporaryPassword = Str::password(12);
+        $validated['password'] = $temporaryPassword;
+
+        $result = $this->userService->createUser($validated, $tenantId, $temporaryPassword);
 
         if (!$result['status']) {
             return redirect()->back()
@@ -114,7 +118,7 @@ class UserController extends Controller
         }
 
         return redirect()->route('users.index')
-            ->with('success', 'User created successfully.');
+            ->with('success', 'User created successfully. An email with login credentials has been sent to the user.');
     }
 
     /**

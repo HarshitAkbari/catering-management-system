@@ -5,24 +5,12 @@
 @section('page_content')
 <div class="row">
     <div class="col-12">
+        @include('components.flash-messages')
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Payments</h4>
             </div>
             <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
 
                 <!-- Filter Form -->
                 <form method="GET" action="{{ route('payments.index') }}" class="mb-4">
@@ -143,17 +131,7 @@
             <form id="payment-update-form" class="needs-validation" action="{{ route('payments.update-group') }}" method="POST" novalidate>
                 @csrf
                 <div class="modal-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>There were errors with your submission:</strong>
-                            <ul class="mb-0 mt-2">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                    @include('error.alerts')
 
                     <input type="hidden" name="order_number" id="hidden-order-number">
                     

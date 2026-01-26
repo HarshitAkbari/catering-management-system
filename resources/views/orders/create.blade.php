@@ -5,22 +5,12 @@
         <!-- row -->
         <div class="row">
             <div class="col-lg-12">
+                @include('error.alerts')
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">{{ $page_title ?? 'Create New Order' }}</h4>
                     </div>
                     <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-alt alert-danger solid alert-dismissible fade show" role="alert">
-                                <strong>There were errors with your submission:</strong>
-                                <ul class="mb-0 mt-2">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
 
                         <div class="form-validation">
                             <form class="needs-validation" action="{{ route('orders.store') }}" method="POST" novalidate>

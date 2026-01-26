@@ -161,17 +161,7 @@
             <form id="status-update-form" class="needs-validation" action="" method="POST" novalidate>
                 @csrf
                 <div class="modal-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>There were errors with your submission:</strong>
-                            <ul class="mb-0 mt-2">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                    @include('error.alerts')
 
                     <div class="mb-3">
                         <label for="modal-order-status" class="form-label">Order Status <span class="text-danger">*</span></label>

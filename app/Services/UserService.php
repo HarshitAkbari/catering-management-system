@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\User;
+use App\Notifications\UserCreatedNotification;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -45,17 +46,17 @@ class UserService extends BaseService
     /**
      * Create user
      */
-    public function createUser(array $data, int $tenantId): array
+    public function createUser(array $data, int $tenantId, string $temporaryPassword): array
     {
         try {
-            return DB::transaction(function () use ($data, $tenantId) {
+            return DB::transaction(function () use ($data, $tenantId, $temporaryPassword) {
                 $status = $data['status'] ?? 'active';
                 $isActive = $status === 'active';
                 
                 $user = $this->repository->create([
                     'name' => $data['name'],
                     'email' => $data['email'],
-                    'password' => Hash::make($data['password']),
+                    'password' => Hash::make($temporaryPassword),
                     'tenant_id' => $tenantId,
                     'role' => $data['role'],
                     'status' => $status,
@@ -71,6 +72,17 @@ class UserService extends BaseService
                     $user->roles()->sync($validRoleIds);
                 } else {
                     $user->syncRoleModel();
+                }
+
+                // Send notification with temporary password
+                try {
+                    $user->notify(new UserCreatedNotification($temporaryPassword));
+                } catch (\Exception $e) {
+                    // Log the error but don't fail user creation
+                    \Log::error('Failed to send user creation email: ' . $e->getMessage(), [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                    ]);
                 }
 
                 return [

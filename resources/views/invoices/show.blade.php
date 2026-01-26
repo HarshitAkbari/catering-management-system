@@ -318,17 +318,7 @@
         </div>
         @endif
         
-        @if(session('success'))
-        <div style="background: #d1fae5; color: #065f46; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px;">
-            {{ session('success') }}
-        </div>
-        @endif
-        
-        @if(session('info'))
-        <div style="background: #dbeafe; color: #1e40af; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px;">
-            {{ session('info') }}
-        </div>
-        @endif
+        @include('components.flash-messages')
         
         <!-- Header -->
         <div class="invoice-header">

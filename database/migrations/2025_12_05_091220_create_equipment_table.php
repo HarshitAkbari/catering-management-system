@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreignId('equipment_status_id')->nullable()->constrained('equipment_statuses')->onDelete('set null');
             $table->date('last_maintenance_date')->nullable();
             $table->date('next_maintenance_date')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->index('tenant_id');

@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('error.alerts')
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
@@ -37,7 +38,6 @@
                     @endhasPermission
                 </div>
                 <div class="card-body">
-                    @include('error.alerts')
 
                     <div class="form-validation">
                         <form class="needs-validation" action="{{ route('users.update', $user) }}" method="POST" novalidate>

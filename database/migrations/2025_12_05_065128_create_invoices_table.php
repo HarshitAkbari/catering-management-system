@@ -21,6 +21,8 @@ return new class extends Migration
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('final_amount', 10, 2);
             $table->enum('status', ['draft', 'sent', 'paid', 'cancelled'])->default('draft');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->index(['tenant_id', 'invoice_number']);

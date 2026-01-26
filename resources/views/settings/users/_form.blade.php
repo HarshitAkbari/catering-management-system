@@ -33,16 +33,13 @@
         @enderror
     </div>
 
+    @if($isEdit)
     <div class="col-md-6 mb-4">
-        <label class="form-label" for="password">{{ $isEdit ? 'New Password' : 'Password' }}
-            @if(!$isEdit)
-                <span class="text-danger">*</span>
-            @else
-                <span class="text-muted small">(Leave blank to keep current password)</span>
-            @endif
+        <label class="form-label" for="password">New Password
+            <span class="text-muted small">(Leave blank to keep current password)</span>
         </label>
         <input type="password" class="form-control" id="password" name="password" 
-            placeholder="Enter password.." {{ !$isEdit ? 'required' : '' }}>
+            placeholder="Enter password..">
         <div class="invalid-feedback">
             Please enter a password.
         </div>
@@ -51,18 +48,6 @@
         @enderror
     </div>
 
-    @if(!$isEdit)
-    <div class="col-md-6 mb-4">
-        <label class="form-label" for="password_confirmation">Confirm Password
-            <span class="text-danger">*</span>
-        </label>
-        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" 
-            placeholder="Confirm password.." required>
-        <div class="invalid-feedback">
-            Please confirm the password.
-        </div>
-    </div>
-    @else
     <div class="col-md-6 mb-4">
         <label class="form-label" for="password_confirmation">Confirm New Password</label>
         <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" 
@@ -74,7 +59,7 @@
         <label class="form-label" for="role">Role
             <span class="text-danger">*</span>
         </label>
-        <select class="form-select" id="role" name="role" required>
+        <select class="form-control single-select" id="role" name="role" required>
             <option value="">Select a role</option>
             <option value="admin" {{ old('role', $user->role ?? '') === 'admin' ? 'selected' : '' }}>Admin</option>
             <option value="manager" {{ old('role', $user->role ?? '') === 'manager' ? 'selected' : '' }}>Manager</option>

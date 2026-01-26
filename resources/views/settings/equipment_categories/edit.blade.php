@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('error.alerts')
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Edit Equipment Category</h4>
@@ -16,7 +17,6 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    @include('error.alerts')
                     <div class="form-validation">
                         <form class="needs-validation" action="{{ route('settings.equipment-categories.update', $equipmentCategory) }}" method="POST" novalidate>
                             @csrf

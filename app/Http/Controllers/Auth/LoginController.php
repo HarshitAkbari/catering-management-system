@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    public function __construct(
+        private readonly ActivityLogService $activityLogService,
+    ) {}
+
     public function showLoginForm()
     {
         return view('auth.login');
@@ -46,6 +51,10 @@ class LoginController extends Controller
             }
 
             $request->session()->regenerate();
+            
+            // Log login activity
+            $this->activityLogService->logLogin($user, $request);
+            
             return redirect()->intended(route('dashboard'));
         }
 
@@ -56,6 +65,13 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+        
+        // Log logout activity before logging out
+        if ($user) {
+            $this->activityLogService->logLogout($user, $request);
+        }
+        
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

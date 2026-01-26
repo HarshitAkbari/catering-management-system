@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('estimated_cost', 10, 2)->nullable();
             $table->foreignId('order_status_id')->nullable()->constrained('order_statuses')->onDelete('set null');
             $table->enum('payment_status', ['pending', 'partial', 'paid'])->default('pending');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->index(['tenant_id', 'order_number']);

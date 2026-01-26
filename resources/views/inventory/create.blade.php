@@ -6,12 +6,12 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('error.alerts')
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Add {{ $page_title ?? 'Inventory Item' }}</h3>
                 </div>
                 <div class="card-body">
-                    @include('error.alerts')
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('inventory.store') }}" novalidate>
                             @csrf
