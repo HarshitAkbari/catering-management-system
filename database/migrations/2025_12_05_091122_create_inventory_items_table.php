@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('minimum_stock', 10, 2)->default(0);
             $table->decimal('price_per_unit', 10, 2)->default(0);
             $table->text('description')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->index('tenant_id');

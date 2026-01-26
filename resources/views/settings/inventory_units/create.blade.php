@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('error.alerts')
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Add {{ $page_title ?? 'Inventory Unit' }}</h3>
@@ -16,7 +17,6 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    @include('error.alerts')
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('settings.inventory-units.store') }}" novalidate>
                             @csrf

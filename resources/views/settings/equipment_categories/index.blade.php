@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('components.flash-messages')
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
@@ -21,19 +22,6 @@
                     <a href="{{ route('settings.equipment-categories.create') }}" class="btn btn-sm btn-primary btn-add">Add {{ $page_title ?? 'Equipment Category' }}</a>
                 </div>
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
 
                     <!-- Filter Form -->
                     <form method="GET" action="{{ route('settings.equipment-categories') }}" class="mb-4">
