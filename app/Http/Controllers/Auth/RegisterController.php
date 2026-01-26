@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -44,6 +45,13 @@ class RegisterController extends Controller
             'role' => 'admin',
             'status' => 'active',
         ]);
+
+        // Seed roles and permissions for the new tenant
+        $seeder = new RolePermissionSeeder();
+        $seeder->seedRolesAndPermissions($tenant);
+
+        // Sync user with admin role
+        $user->syncRoleModel();
 
         Auth::login($user);
 

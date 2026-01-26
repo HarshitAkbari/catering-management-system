@@ -4,62 +4,21 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\Invoice;
-use App\Models\Order;
-use App\Models\Payment;
+use App\Services\OrderService;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    public function __construct(
+        private readonly PaymentService $paymentService,
+        private readonly OrderService $orderService
+    ) {}
+
     public function index()
     {
         $tenantId = auth()->user()->tenant_id;
-        
-        // Get all orders (not filtered by payment_status)
-        $allOrders = Order::with('customer')
-            ->where('tenant_id', $tenantId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        // Group orders by order_number
-        $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) use ($tenantId) {
-            $firstOrder = $orderGroup->first();
-            
-            // Check if invoice exists for any order in this group
-            $invoice = Invoice::where('tenant_id', $tenantId)
-                ->whereIn('order_id', $orderGroup->pluck('id'))
-                ->first();
-            
-            return [
-                'order_number' => $orderNumber,
-                'customer' => $firstOrder->customer,
-                'total_amount' => $orderGroup->sum('estimated_cost'),
-                'payment_status' => $this->getGroupPaymentStatus($orderGroup),
-                'orders' => $orderGroup,
-                'created_at' => $firstOrder->created_at,
-                'invoice' => $invoice,
-            ];
-        })->values();
-        
-        // Sort by created_at
-        $allGroupedOrders = $groupedOrders
-            ->sortByDesc('created_at')
-            ->values();
-        
-        // Manual pagination
-        $currentPage = request()->get('page', 1);
-        $perPage = 15;
-        $items = $allGroupedOrders->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        $total = $allGroupedOrders->count();
-        
-        // Create paginator manually
-        $orders = new \Illuminate\Pagination\LengthAwarePaginator(
-            $items,
-            $total,
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
+        $orders = $this->paymentService->getGroupedOrders($tenantId);
 
         return view('payments.index', compact('orders'));
     }
@@ -73,21 +32,18 @@ class PaymentController extends Controller
         
         $tenantId = auth()->user()->tenant_id;
         
-        // Update all orders with same order_number
-        $updatedCount = Order::where('tenant_id', $tenantId)
-            ->where('order_number', $validated['order_number'])
-            ->update(['payment_status' => $validated['payment_status']]);
+        $result = $this->orderService->updateGroupPaymentStatus(
+            $validated['order_number'],
+            $validated['payment_status'],
+            $tenantId
+        );
+        
+        if (!$result['status']) {
+            return redirect()->route('payments.index')
+                ->with('error', $result['message']);
+        }
         
         return redirect()->route('payments.index')
-            ->with('success', "Payment status updated to '{$validated['payment_status']}' for {$updatedCount} order(s).");
-    }
-    
-    /**
-     * Get group payment status - returns payment status if all orders have same status, otherwise "mixed"
-     */
-    private function getGroupPaymentStatus($orderGroup): string
-    {
-        $paymentStatuses = $orderGroup->pluck('payment_status')->unique()->filter();
-        return $paymentStatuses->count() === 1 ? $paymentStatuses->first() : 'mixed';
+            ->with('success', $result['message']);
     }
 }

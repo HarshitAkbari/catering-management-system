@@ -3,7 +3,7 @@
 ***********************************-->
   <div class="footer">
       <div class="copyright">
-          <p>Copyright © Designed   by <a href="https://themeforest.net/user/dexignzone" target="_blank">DexignZone</a> 2023</p>
+          <p>Copyright © Designed   by <a href="" target="_blank">Harshit Patel</a> 2026</p>
       </div>
   </div>
 <!--**********************************

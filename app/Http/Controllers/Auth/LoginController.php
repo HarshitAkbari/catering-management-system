@@ -23,7 +23,28 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        $credentials = $request->only('email', 'password');
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+            
+            // Check if user is active
+            if ($user->status !== 'active') {
+                Auth::logout();
+                throw ValidationException::withMessages([
+                    'email' => __('Your account has been deactivated. Please contact your administrator.'),
+                ]);
+            }
+
+            // Ensure user has tenant
+            if (!$user->tenant_id) {
+                Auth::logout();
+                throw ValidationException::withMessages([
+                    'email' => __('Your account is not associated with a tenant. Please contact your administrator.'),
+                ]);
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('dashboard'));
         }

@@ -9,35 +9,58 @@
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
-            <li><a href="{{ route('orders.index') }}" class="{{ request()->routeIs('orders.*') ? 'mm-active' : '' }}" aria-expanded="false">
+            <li><a class="has-arrow {{ request()->routeIs('orders.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('orders.*') ? 'true' : 'false' }}">
                     <i class="bi bi-file-text"></i>
                     <span class="nav-text">Orders</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('orders.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('orders.index') }}" class="{{ request()->routeIs('orders.index') ? 'mm-active' : '' }}">Orders</a></li>
+                    <li><a href="{{ route('orders.create') }}" class="{{ request()->routeIs('orders.create') ? 'mm-active' : '' }}">Create Order</a></li>
+                    <li><a href="{{ route('orders.calendar') }}" class="{{ request()->routeIs('orders.calendar') ? 'mm-active' : '' }}">Order Calendar</a></li>
+                </ul>
             </li>
-            <li><a href="{{ route('customers.index') }}" class="{{ request()->routeIs('customers.*') ? 'mm-active' : '' }}" aria-expanded="false">
+            <li><a class="has-arrow {{ request()->routeIs('customers.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('customers.*') ? 'true' : 'false' }}">
                     <i class="bi bi-people"></i>
                     <span class="nav-text">Customers</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('customers.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('customers.index') }}" class="{{ request()->routeIs('customers.index') ? 'mm-active' : '' }}">Customer List</a></li>
+                </ul>
             </li>
-            <li><a href="{{ route('payments.index') }}" class="{{ request()->routeIs('payments.*') ? 'mm-active' : '' }}" aria-expanded="false">
+            <li><a class="has-arrow {{ request()->routeIs('payments.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('payments.*') ? 'true' : 'false' }}">
                     <i class="bi bi-credit-card"></i>
                     <span class="nav-text">Payments</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('payments.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('payments.index') }}" class="{{ request()->routeIs('payments.index') ? 'mm-active' : '' }}">Payments List</a></li>
+                </ul>
             </li>
-            <li><a href="{{ route('inventory.index') }}" class="{{ request()->routeIs('inventory.*') ? 'mm-active' : '' }}" aria-expanded="false">
+            <li><a class="has-arrow {{ request()->routeIs('inventory.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('inventory.*') ? 'true' : 'false' }}">
                     <i class="bi bi-box-seam"></i>
                     <span class="nav-text">Inventory</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('inventory.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('inventory.index') }}" class="{{ request()->routeIs('inventory.index') ? 'mm-active' : '' }}">Item List</a></li>
+                    <li><a href="{{ route('inventory.create') }}" class="{{ request()->routeIs('inventory.create') ? 'mm-active' : '' }}">Add Item</a></li>
+                </ul>
             </li>
-            <li><a href="{{ route('vendors.index') }}" class="{{ request()->routeIs('vendors.*') ? 'mm-active' : '' }}" aria-expanded="false">
+            <li><a class="has-arrow {{ request()->routeIs('vendors.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('vendors.*') ? 'true' : 'false' }}">
                     <i class="bi bi-building"></i>
                     <span class="nav-text">Vendors</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('vendors.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('vendors.index') }}" class="{{ request()->routeIs('vendors.index') ? 'mm-active' : '' }}">Vendor List</a></li>
+                    <li><a href="{{ route('vendors.create') }}" class="{{ request()->routeIs('vendors.create') ? 'mm-active' : '' }}">Add Vendor</a></li>
+                </ul>
             </li>
-            <li><a href="{{ route('equipment.index') }}" class="{{ request()->routeIs('equipment.*') ? 'mm-active' : '' }}" aria-expanded="false">
+            <li><a class="has-arrow {{ request()->routeIs('equipment.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('equipment.*') ? 'true' : 'false' }}">
                     <i class="bi bi-tools"></i>
                     <span class="nav-text">Equipment</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('equipment.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('equipment.index') }}" class="{{ request()->routeIs('equipment.index') ? 'mm-active' : '' }}">Equipment List</a></li>
+                    <li><a href="{{ route('equipment.create') }}" class="{{ request()->routeIs('equipment.create') ? 'mm-active' : '' }}">Add Equipment</a></li>
+                </ul>
             </li>
             <li><a class="has-arrow {{ request()->routeIs('reports.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('reports.*') ? 'true' : 'false' }}">
                     <i class="bi bi-graph-up"></i>
@@ -51,11 +74,17 @@
                     <li><a href="{{ route('reports.profit-loss') }}" class="{{ request()->routeIs('reports.profit-loss') ? 'mm-active' : '' }}">Profit & Loss</a></li>
                 </ul>
             </li>
-            <li><a href="{{ route('settings.index') }}" class="{{ request()->routeIs('settings.*') ? 'mm-active' : '' }}" aria-expanded="false">
-                    <i class="bi bi-gear"></i>
-                    <span class="nav-text">Settings</span>
+            @hasPermission('users.view')
+            <li><a class="has-arrow {{ request()->routeIs('users.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('users.*') ? 'true' : 'false' }}">
+                    <i class="bi bi-people-fill"></i>
+                    <span class="nav-text">Users</span>
                 </a>
+                <ul aria-expanded="{{ request()->routeIs('users.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.index') ? 'mm-active' : '' }}">Users List</a></li>
+                    <li><a href="{{ route('users.create') }}" class="{{ request()->routeIs('users.create') ? 'mm-active' : '' }}">Add User</a></li>
+                </ul>
             </li>
+            @endhasPermission
         </ul>
         <div class="copyright">
             <p><strong>Catering Management System</strong> © {{ date('Y') }} All Rights Reserved</p>

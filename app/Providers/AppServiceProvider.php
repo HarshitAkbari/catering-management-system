@@ -3,9 +3,8 @@
 namespace App\Providers;
 
 use App\Models\InventoryItem;
-use App\Services\BreadcrumbService;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,11 +28,9 @@ class AppServiceProvider extends ServiceProvider
                 ->findOrFail($value);
         });
 
-        // Share breadcrumbs with all views
-        View::composer('*', function ($view) {
-            $breadcrumbService = new BreadcrumbService();
-            $breadcrumbs = $breadcrumbService->generate();
-            $view->with('breadcrumbs', $breadcrumbs);
+        // Register custom Blade directive for permission checks
+        Blade::if('hasPermission', function ($permission) {
+            return auth()->check() && auth()->user()->hasPermission($permission);
         });
     }
 }

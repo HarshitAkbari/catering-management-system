@@ -388,7 +388,7 @@
         </div>
         
         <!-- Items Table -->
-        <table class="items-table">
+        <table class="datatable-simple items-table">
             <thead>
                 <tr>
                     <th>#</th>

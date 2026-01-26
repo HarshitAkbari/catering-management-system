@@ -4,12 +4,6 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('equipment.index') }}">Equipment</a></li>
-            <li class="breadcrumb-item active"><a href="javascript:void(0)">Edit Equipment</a></li>
-        </ol>
-    </div>
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
@@ -18,7 +12,7 @@
                 </div>
                 <div class="card-body">
                     @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="alert alert-alt alert-danger solid alert-dismissible fade show" role="alert">
                             <strong>There were errors with your submission:</strong>
                             <ul class="mb-0 mt-2">
                                 @foreach ($errors->all() as $error)

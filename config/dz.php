@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Catering Management'),
+    'name' => env('DZ_APP_NAME', 'Catering Pro'),
 
 
     'public' => [
@@ -28,6 +28,7 @@ return [
 		'global' => [
 			'css' => [
 				'vendor/jquery-nice-select/css/nice-select.css',
+				'vendor/datatables/css/jquery.dataTables.min.css',
 				'css/style.css',
 			],
 			'js' => [
@@ -36,7 +37,8 @@ return [
 					'vendor/jquery-nice-select/js/jquery.nice-select.min.js',	
 				],
 				'bottom'=>[
-					'js/custom.min.js',
+					'vendor/datatables/js/jquery.dataTables.min.js',
+					'js/custom.js',
 					'js/dlabnav-init.js',
 				],
 			],
@@ -53,6 +55,20 @@ return [
 				],
 				'ReportController_customers' => [
 				],
+				'OrderController_calendar' => [
+					'vendor/fullcalendar/lib/main.min.css',
+				],
+				'OrderController_create' => [
+					'vendor/pickadate/themes/default.css',
+					'vendor/pickadate/themes/default.date.css',
+				],
+				'OrderController_edit' => [
+					'vendor/pickadate/themes/default.css',
+					'vendor/pickadate/themes/default.date.css',
+				],
+				'OrderController_index' => [
+					'vendor/select2/css/select2.min.css',
+				],
 			],
 			'js' => [
 				'ReportController_profitLoss' => [
@@ -74,6 +90,22 @@ return [
 				'ReportController_customers' => [
 					'vendor/chart.js/Chart.bundle.min.js',
 					'vendor/apexchart/apexchart.js',
+				],
+				'OrderController_calendar' => [
+					'vendor/fullcalendar/lib/main.min.js',
+				],
+				'OrderController_create' => [
+					'vendor/pickadate/picker.js',
+					'vendor/pickadate/picker.date.js',
+					'js/plugins-init/pickadate-init.js',
+				],
+				'OrderController_edit' => [
+					'vendor/pickadate/picker.js',
+					'vendor/pickadate/picker.date.js',
+					'js/plugins-init/pickadate-init.js',
+				],
+				'OrderController_index' => [
+					'vendor/select2/js/select2.full.min.js',
 				],
 			]
 		],

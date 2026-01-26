@@ -15,13 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'manager', 'staff'])->default('staff');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->rememberToken();
             $table->timestamps();
+            
+            // Composite unique index on tenant_id and email (email unique per tenant)
+            $table->unique(['tenant_id', 'email'], 'users_tenant_email_unique');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

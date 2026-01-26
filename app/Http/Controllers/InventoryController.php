@@ -5,19 +5,71 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
-use App\Models\StockTransaction;
-use App\Models\Vendor;
+use App\Services\InventoryService;
+use App\Services\VendorService;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
-    public function index()
-    {
-        $inventoryItems = InventoryItem::where('tenant_id', auth()->user()->tenant_id)
-            ->orderBy('name')
-            ->paginate(15);
+    public function __construct(
+        private readonly InventoryService $inventoryService,
+        private readonly VendorService $vendorService
+    ) {}
 
-        return view('inventory.index', compact('inventoryItems'));
+    public function index(Request $request)
+    {
+        $tenantId = auth()->user()->tenant_id;
+        
+        // Build filters from request
+        $filters = ['tenant_id' => $tenantId];
+        
+        // Name filter
+        if ($request->has('name_like') && !empty($request->name_like)) {
+            $filters['name_like'] = $request->name_like;
+        }
+        
+        // Unit filter
+        if ($request->has('unit') && !empty($request->unit)) {
+            $filters['unit'] = $request->unit;
+        }
+        
+        // Stock status filter (low stock)
+        if ($request->has('stock_status') && !empty($request->stock_status)) {
+            if ($request->stock_status === 'low') {
+                // This will be handled in the service/repository
+                $filters['stock_status'] = 'low';
+            }
+        }
+        
+        // Sorting parameters
+        if ($request->has('sort_by') && !empty($request->sort_by)) {
+            $filters['sort_by'] = $request->sort_by;
+        }
+        if ($request->has('sort_order') && !empty($request->sort_order)) {
+            $filters['sort_order'] = $request->sort_order;
+        }
+        
+        $inventoryItems = $this->inventoryService->getByTenant($tenantId, 15, $filters);
+        
+        // Pass filter values to view for form preservation
+        $filterValues = [
+            'name_like' => $request->input('name_like', ''),
+            'unit' => $request->input('unit', ''),
+            'stock_status' => $request->input('stock_status', ''),
+        ];
+        
+        // Get unique units for filter dropdown
+        $units = $this->inventoryService->getAll()
+            ->where('tenant_id', $tenantId)
+            ->pluck('unit')
+            ->unique()
+            ->sort()
+            ->values();
+        
+        $page_title = 'Inventory';
+        $subtitle = 'Manage your inventory items';
+        
+        return view('inventory.index', compact('inventoryItems', 'filterValues', 'units', 'page_title', 'subtitle'));
     }
 
     public function create()
@@ -36,16 +88,26 @@ class InventoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        InventoryItem::create([
-            'tenant_id' => auth()->user()->tenant_id,
-            ...$validated,
-        ]);
+        $tenantId = auth()->user()->tenant_id;
+        $result = $this->inventoryService->createItem($validated, $tenantId);
+
+        if (!$result['status']) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $result['message']]);
+        }
 
         return redirect()->route('inventory.index')->with('success', 'Inventory item created successfully!');
     }
 
     public function show(InventoryItem $inventoryItem)
     {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($inventoryItem->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized');
+        }
+
         $inventoryItem->load('stockTransactions.vendor');
         
         return view('inventory.show', compact('inventoryItem'));
@@ -53,6 +115,12 @@ class InventoryController extends Controller
 
     public function edit(InventoryItem $inventoryItem)
     {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($inventoryItem->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized');
+        }
+
         return view('inventory.edit', compact('inventoryItem'));
     }
 
@@ -67,21 +135,35 @@ class InventoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $inventoryItem->update($validated);
+        $tenantId = auth()->user()->tenant_id;
+        $result = $this->inventoryService->updateItem($inventoryItem, $validated, $tenantId);
+
+        if (!$result['status']) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $result['message']]);
+        }
 
         return redirect()->route('inventory.index')->with('success', 'Inventory item updated successfully!');
     }
 
     public function destroy(InventoryItem $inventoryItem)
     {
-        $inventoryItem->delete();
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($inventoryItem->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized');
+        }
+
+        $this->inventoryService->delete($inventoryItem);
         return redirect()->route('inventory.index')->with('success', 'Inventory item deleted successfully!');
     }
 
     public function stockIn(Request $request)
     {
-        $vendors = Vendor::where('tenant_id', auth()->user()->tenant_id)->get();
-        $inventoryItems = InventoryItem::where('tenant_id', auth()->user()->tenant_id)->get();
+        $tenantId = auth()->user()->tenant_id;
+        $vendors = $this->vendorService->getByTenant($tenantId);
+        $inventoryItems = $this->inventoryService->getAll()->where('tenant_id', $tenantId);
 
         return view('inventory.stock-in', compact('vendors', 'inventoryItems'));
     }
@@ -96,26 +178,22 @@ class InventoryController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $inventoryItem = InventoryItem::findOrFail($validated['inventory_item_id']);
+        $tenantId = auth()->user()->tenant_id;
+        $result = $this->inventoryService->stockIn($validated, $tenantId);
 
-        StockTransaction::create([
-            'tenant_id' => auth()->user()->tenant_id,
-            'inventory_item_id' => $validated['inventory_item_id'],
-            'type' => 'in',
-            'quantity' => $validated['quantity'],
-            'price' => $validated['price'] ?? null,
-            'vendor_id' => $validated['vendor_id'] ?? null,
-            'notes' => $validated['notes'] ?? null,
-        ]);
-
-        $inventoryItem->increment('current_stock', $validated['quantity']);
+        if (!$result['status']) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $result['message']]);
+        }
 
         return redirect()->route('inventory.index')->with('success', 'Stock added successfully!');
     }
 
     public function stockOut(Request $request)
     {
-        $inventoryItems = InventoryItem::where('tenant_id', auth()->user()->tenant_id)->get();
+        $tenantId = auth()->user()->tenant_id;
+        $inventoryItems = $this->inventoryService->getAll()->where('tenant_id', $tenantId);
 
         return view('inventory.stock-out', compact('inventoryItems'));
     }
@@ -128,33 +206,23 @@ class InventoryController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $inventoryItem = InventoryItem::findOrFail($validated['inventory_item_id']);
+        $tenantId = auth()->user()->tenant_id;
+        $result = $this->inventoryService->stockOut($validated, $tenantId);
 
-        if ($inventoryItem->current_stock < $validated['quantity']) {
-            return back()->withErrors(['quantity' => 'Insufficient stock available.']);
+        if (!$result['status']) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $result['message']]);
         }
-
-        StockTransaction::create([
-            'tenant_id' => auth()->user()->tenant_id,
-            'inventory_item_id' => $validated['inventory_item_id'],
-            'type' => 'out',
-            'quantity' => $validated['quantity'],
-            'notes' => $validated['notes'] ?? null,
-        ]);
-
-        $inventoryItem->decrement('current_stock', $validated['quantity']);
 
         return redirect()->route('inventory.index')->with('success', 'Stock reduced successfully!');
     }
 
     public function lowStock()
     {
-        $lowStockItems = InventoryItem::where('tenant_id', auth()->user()->tenant_id)
-            ->whereRaw('current_stock <= minimum_stock')
-            ->orderBy('name')
-            ->get();
+        $tenantId = auth()->user()->tenant_id;
+        $lowStockItems = $this->inventoryService->getLowStock($tenantId);
 
         return view('inventory.low-stock', compact('lowStockItems'));
     }
 }
-

@@ -4,14 +4,6 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="javascript:void(0)">Reports</a></li>
-            <li class="breadcrumb-item active"><a href="javascript:void(0)">Customers</a></li>
-        </ol>
-    </div>
-    
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -77,7 +69,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-responsive-md">
+                                        <table class="datatable table table-responsive-md">
                                             <thead>
                                                 <tr>
                                                     <th><strong>Customer</strong></th>
