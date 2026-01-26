@@ -16,21 +16,21 @@
                             @csrf
                             <div class="mb-3">
                                 <label class="mb-1"><strong>Business Name</strong></label>
-                                <input type="text" name="tenant_name" class="form-control @error('tenant_name') is-invalid @enderror" placeholder="Enter your business name" value="{{ old('tenant_name') }}" required autofocus>
+                                <input type="text" name="tenant_name" class="form-control @error('tenant_name') is-invalid @enderror" value="{{ old('tenant_name') }}" required autofocus>
                                 @error('tenant_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="mb-3">
                                 <label class="mb-1"><strong>Your Name</strong></label>
-                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Enter your full name" value="{{ old('name') }}" required>
+                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="mb-3">
                                 <label class="mb-1"><strong>Email</strong></label>
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="hello@example.com" value="{{ old('email') }}" required>
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -47,7 +47,7 @@
                                 <input type="password" name="password_confirmation" class="form-control" required>
                             </div>
                             <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-block">Sign me up</button>
+                                <button type="submit" class="btn btn-primary btn-block">Sign up</button>
                             </div>
                         </form>
                         <div class="new-account mt-3">

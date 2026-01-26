@@ -307,11 +307,10 @@
 @if($lowStockItems > 0)
 <div class="row mt-4">
     <div class="col-12">
-        <div class="alert alert-warning solid alert-dismissible fade show" role="alert">
-            <strong>Warning!</strong> You have {{ $lowStockItems }} {{ Str::plural('item', $lowStockItems) }} with low stock. 
+        <x-alert type="warning" title="Warning!">
+            You have {{ $lowStockItems }} {{ Str::plural('item', $lowStockItems) }} with low stock. 
             <a href="{{ route('inventory.low-stock') }}" class="alert-link">View low stock items</a> to restock.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+        </x-alert>
     </div>
 </div>
 @endif

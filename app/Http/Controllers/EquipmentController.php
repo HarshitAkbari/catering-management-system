@@ -28,13 +28,13 @@ class EquipmentController extends Controller
         }
         
         // Category filter
-        if ($request->has('category') && !empty($request->category)) {
-            $filters['category'] = $request->category;
+        if ($request->has('equipment_category_id') && !empty($request->equipment_category_id)) {
+            $filters['equipment_category_id'] = $request->equipment_category_id;
         }
         
         // Status filter
-        if ($request->has('status') && !empty($request->status)) {
-            $filters['status'] = $request->status;
+        if ($request->has('equipment_status_id') && !empty($request->equipment_status_id)) {
+            $filters['equipment_status_id'] = $request->equipment_status_id;
         }
         
         // Sorting parameters
@@ -46,39 +46,39 @@ class EquipmentController extends Controller
         }
         
         $equipment = $this->equipmentService->getByTenant($tenantId, 15, $filters);
+        $equipment->load(['equipmentCategory', 'equipmentStatus']);
         
         // Pass filter values to view for form preservation
         $filterValues = [
             'name_like' => $request->input('name_like', ''),
-            'category' => $request->input('category', ''),
-            'status' => $request->input('status', ''),
+            'equipment_category_id' => $request->input('equipment_category_id', ''),
+            'equipment_status_id' => $request->input('equipment_status_id', ''),
         ];
         
-        // Get unique categories for filter dropdown
-        $categories = $this->equipmentService->getAll()
-            ->where('tenant_id', $tenantId)
-            ->pluck('category')
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values();
+        // Get categories and statuses for filter dropdowns
+        $categories = $this->equipmentService->getEquipmentCategories($tenantId);
+        $statuses = $this->equipmentService->getEquipmentStatuses($tenantId);
         
         $page_title = 'Equipment';
         $subtitle = 'Manage your equipment inventory';
         
-        return view('equipment.index', compact('equipment', 'filterValues', 'categories', 'page_title', 'subtitle'));
+        return view('equipment.index', compact('equipment', 'filterValues', 'categories', 'statuses', 'page_title', 'subtitle'));
     }
 
     public function create()
     {
-        return view('equipment.create');
+        $tenantId = auth()->user()->tenant_id;
+        $categories = $this->equipmentService->getEquipmentCategories($tenantId);
+        $statuses = $this->equipmentService->getEquipmentStatuses($tenantId);
+        
+        return view('equipment.create', compact('categories', 'statuses'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'equipment_category_id' => 'nullable|exists:equipment_categories,id',
             'quantity' => 'required|integer|min:0',
             'available_quantity' => [
                 'required',
@@ -90,7 +90,7 @@ class EquipmentController extends Controller
                     }
                 },
             ],
-            'status' => 'required|in:available,damaged',
+            'equipment_status_id' => 'required|exists:equipment_statuses,id',
         ]);
 
         $tenantId = auth()->user()->tenant_id;
@@ -113,7 +113,7 @@ class EquipmentController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $equipment->load('orders');
+        $equipment->load(['orders', 'equipmentStatus', 'equipmentCategory']);
         
         return view('equipment.show', compact('equipment'));
     }
@@ -126,7 +126,10 @@ class EquipmentController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        return view('equipment.edit', compact('equipment'));
+        $categories = $this->equipmentService->getEquipmentCategories($tenantId);
+        $statuses = $this->equipmentService->getEquipmentStatuses($tenantId);
+
+        return view('equipment.edit', compact('equipment', 'categories', 'statuses'));
     }
 
     public function update(Request $request, Equipment $equipment)
@@ -139,7 +142,7 @@ class EquipmentController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'equipment_category_id' => 'nullable|exists:equipment_categories,id',
             'quantity' => 'required|integer|min:0',
             'available_quantity' => [
                 'required',
@@ -151,7 +154,7 @@ class EquipmentController extends Controller
                     }
                 },
             ],
-            'status' => 'required|in:available,damaged',
+            'equipment_status_id' => 'required|exists:equipment_statuses,id',
         ]);
 
         $this->equipmentService->update($equipment, $validated);

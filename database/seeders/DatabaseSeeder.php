@@ -15,6 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed system settings (order statuses, event times, inventory units)
+        $this->call(OrderStatusSeeder::class);
+        $this->call(EventTimeSeeder::class);
+        $this->call(InventoryUnitSeeder::class);
+
         // User::factory(10)->create();
 
         User::factory()->create([

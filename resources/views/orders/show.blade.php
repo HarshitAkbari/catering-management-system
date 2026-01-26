@@ -8,32 +8,27 @@
     $eventCount = $relatedOrders->count();
     $firstOrder = $relatedOrders->first();
     // Get current status - if all orders have same status, use it; otherwise use first order's status
-    $statuses = $relatedOrders->pluck('status')->unique();
-    $currentStatus = $statuses->count() === 1 ? $statuses->first() : $firstOrder->status;
+    $statuses = $relatedOrders->pluck('orderStatus.id')->unique()->filter();
+    $currentStatus = $statuses->count() === 1 ? $statuses->first() : ($firstOrder->orderStatus ? $firstOrder->orderStatus->id : null);
 @endphp
-<!-- Action Buttons -->
-<div class="row mb-3">
-    <div class="col-lg-12">
-        <div class="d-flex gap-2 align-items-center justify-content-end" style="position: relative; z-index: 10;">
-            <a href="{{ route('orders.edit', $firstOrder) }}" class="btn btn-info btn-sm" style="pointer-events: auto; cursor: pointer;">
-                <i class="bi bi-pencil me-1"></i>Edit Orders
-            </a>
-            <button type="button" onclick="openStatusModal('{{ $firstOrder->id }}', '{{ $currentStatus }}')" class="btn btn-primary btn-sm" style="pointer-events: auto; cursor: pointer;">
-                <i class="bi bi-arrow-repeat me-1"></i>Change Status
-            </button>
-            <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm" style="pointer-events: auto; cursor: pointer;">
-                <i class="bi bi-arrow-left me-1"></i>Back
-            </a>
-        </div>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-lg-12">
         <!-- Summary Section -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title">{{ $page_title ?? 'Order Details' }}</h4>
+                <div class="d-flex gap-2 align-items-center" style="position: relative; z-index: 10;">
+                    <a href="{{ route('orders.edit', $firstOrder) }}" class="btn btn-info btn-sm" style="pointer-events: auto; cursor: pointer;">
+                        Edit
+                    </a>
+                    <button type="button" onclick="openStatusModal('{{ $firstOrder->id }}', '{{ $currentStatus }}')" class="btn btn-primary btn-sm" style="pointer-events: auto; cursor: pointer;">
+                        Change Status
+                    </button>
+                    <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm" style="pointer-events: auto; cursor: pointer;">
+                        Back
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -87,18 +82,6 @@
                         </thead>
                         <tbody>
                             @foreach($relatedOrders as $relatedOrder)
-                                @php
-                                    $eventTimeLabels = [
-                                        'morning' => 'Morning',
-                                        'afternoon' => 'Afternoon',
-                                        'evening' => 'Evening',
-                                        'night_snack' => 'Snack'
-                                    ];
-                                    $orderTypeLabels = [
-                                        'full_service' => 'Full Service',
-                                        'preparation_only' => 'Preparation Only'
-                                    ];
-                                @endphp
                                 <tr class="btn-reveal-trigger">
                                     <td class="py-2">
                                         <strong>{{ $relatedOrder->order_number }}</strong>
@@ -107,7 +90,7 @@
                                         {{ $relatedOrder->event_date ? $relatedOrder->event_date->format('M d, Y') : 'N/A' }}
                                     </td>
                                     <td class="py-2">
-                                        {{ $relatedOrder->event_time ? ($eventTimeLabels[$relatedOrder->event_time] ?? ucfirst(str_replace('_', ' ', $relatedOrder->event_time))) : 'N/A' }}
+                                        {{ $relatedOrder->eventTime ? $relatedOrder->eventTime->name : 'N/A' }}
                                     </td>
                                     <td class="py-2">
                                         {{ $relatedOrder->event_menu ?? 'N/A' }}
@@ -116,7 +99,7 @@
                                         {{ $relatedOrder->guest_count ?? 'N/A' }}
                                     </td>
                                     <td class="py-2">
-                                        {{ $relatedOrder->order_type ? ($orderTypeLabels[$relatedOrder->order_type] ?? $relatedOrder->order_type) : 'N/A' }}
+                                        {{ $relatedOrder->orderType ? $relatedOrder->orderType->name : 'N/A' }}
                                     </td>
                                     <td class="py-2">
                                         @if($relatedOrder->guest_count && $relatedOrder->estimated_cost)
@@ -129,16 +112,10 @@
                                         <strong>₹{{ number_format($relatedOrder->estimated_cost ?? 0, 2) }}</strong>
                                     </td>
                                     <td class="py-2 text-end">
-                                        @if($relatedOrder->status === 'confirmed')
-                                            <span class="badge badge-success">Confirmed</span>
-                                        @elseif($relatedOrder->status === 'pending')
-                                            <span class="badge badge-warning">Pending</span>
-                                        @elseif($relatedOrder->status === 'completed')
-                                            <span class="badge badge-primary">Completed</span>
-                                        @elseif($relatedOrder->status === 'cancelled')
-                                            <span class="badge badge-danger">Cancelled</span>
+                                        @if($relatedOrder->orderStatus)
+                                            <span class="badge badge-secondary">{{ $relatedOrder->orderStatus->name }}</span>
                                         @else
-                                            <span class="badge badge-secondary">{{ ucfirst($relatedOrder->status ?? 'N/A') }}</span>
+                                            <span class="badge badge-secondary">N/A</span>
                                         @endif
                                     </td>
                                     <td class="py-2 text-end">
@@ -184,30 +161,20 @@
             <form id="status-update-form" class="needs-validation" action="" method="POST" novalidate>
                 @csrf
                 <div class="modal-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>There were errors with your submission:</strong>
-                            <ul class="mb-0 mt-2">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                    @include('error.alerts')
 
                     <div class="mb-3">
                         <label for="modal-order-status" class="form-label">Order Status <span class="text-danger">*</span></label>
-                        <select name="status" id="modal-order-status" required class="form-control default-select">
+                        <select name="order_status_id" id="modal-order-status" required class="form-control default-select">
                             <option value="">Select Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            @foreach($orderStatuses as $status)
+                                <option value="{{ $status->id }}">{{ $status->name }}</option>
+                            @endforeach
                         </select>
                         <div class="invalid-feedback">
                             Please select an order status.
                         </div>
-                        @error('status')
+                        @error('order_status_id')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
                     </div>

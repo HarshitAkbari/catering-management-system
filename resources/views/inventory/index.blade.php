@@ -2,22 +2,24 @@
 
 @section('title', $page_title ?? 'Inventory')
 
-@section('page_content')
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex flex-column">
-                    <div class="d-flex align-items-center gap-2">
-                        <h4 class="card-title mb-0">{{ $page_title ?? 'Inventory' }}</h4>
-                    </div>
-                    @if(isset($subtitle))
-                        <div class="d-flex align-items-center gap-2 mt-2">
-                            <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center gap-2">
+                            <h4 class="card-title mb-0">{{ $page_title ?? 'Inventory' }}</h4>
                         </div>
-                    @endif
+                        @if(isset($subtitle))
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                            </div>
+                        @endif
+                    </div>
+                    <a href="{{ route('inventory.create') }}" class="btn btn-sm btn-primary btn-add">Add {{ $page_title ?? 'Inventory Item' }}</a>
                 </div>
-            </div>
             <div class="card-body">
                 <!-- Filter Form -->
                 <form method="GET" action="{{ route('inventory.index') }}" class="mb-4">
@@ -39,10 +41,10 @@
                         <!-- Unit Filter -->
                         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                             <label for="unit_filter" class="form-label">Unit</label>
-                            <select name="unit" id="unit_filter" class="form-control form-control-sm">
+                            <select name="inventory_unit_id" id="unit_filter" class="form-control form-control-sm">
                                 <option value="">All Units</option>
-                                @foreach($units ?? [] as $unit)
-                                    <option value="{{ $unit }}" {{ ($filterValues['unit'] ?? '') == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                                @foreach($inventoryUnits ?? [] as $unit)
+                                    <option value="{{ $unit->id }}" {{ ($filterValues['inventory_unit_id'] ?? '') == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -88,7 +90,7 @@
                             @forelse($inventoryItems as $item)
                                 <tr>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->unit }}</td>
+                                    <td>{{ $item->inventoryUnit->name ?? '-' }}</td>
                                     <td>{{ number_format($item->current_stock, 2) }}</td>
                                     <td>{{ number_format($item->minimum_stock, 2) }}</td>
                                     <td>₹{{ number_format($item->price_per_unit, 2) }}</td>
@@ -100,12 +102,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('inventory.show', $item) }}" class="btn btn-primary btn-sm" title="View">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a href="{{ route('inventory.edit', $item) }}" class="btn btn-info btn-sm" title="Edit">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                        <a href="{{ route('inventory.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
+                                        <a href="{{ route('inventory.edit', $item) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+
                                         <x-delete-button 
                                             item-name="{{ $item->name }}"
                                             delete-url="{{ route('inventory.destroy', $item) }}"

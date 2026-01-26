@@ -36,7 +36,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <a href="{{ route('forgot-password') }}">Forgot Password?</a>
+                                    <a href="{{ route('password.request') }}">Forgot Password?</a>
                                 </div>
                             </div>
                             <div class="text-center mt-4">

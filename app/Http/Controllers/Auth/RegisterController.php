@@ -7,10 +7,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 
 class RegisterController extends Controller
@@ -52,6 +54,17 @@ class RegisterController extends Controller
 
         // Sync user with admin role
         $user->syncRoleModel();
+
+        // Send welcome email notification
+        try {
+            $user->notify(new WelcomeNotification($tenant->name));
+        } catch (\Exception $e) {
+            // Log the error but don't fail registration
+            Log::error('Failed to send welcome email: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'email' => $user->email,
+            ]);
+        }
 
         Auth::login($user);
 

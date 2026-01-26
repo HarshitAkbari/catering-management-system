@@ -38,8 +38,9 @@ class OrderRepository extends BaseRepository
         return $this->model
             ->where('tenant_id', $tenantId)
             ->where('order_number', $orderNumber)
+            ->with(['eventTime', 'orderType', 'orderStatus'])
             ->orderBy('event_date', 'asc')
-            ->orderBy('event_time', 'asc')
+            ->orderBy('event_time_id', 'asc')
             ->get();
     }
 
