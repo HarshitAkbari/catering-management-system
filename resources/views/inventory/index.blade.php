@@ -18,7 +18,6 @@
                             </div>
                         @endif
                     </div>
-                    <a href="{{ route('inventory.create') }}" class="btn btn-sm btn-primary btn-add">Add {{ $page_title ?? 'Inventory Item' }}</a>
                 </div>
             <div class="card-body">
                 <!-- Filter Form -->

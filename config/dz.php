@@ -30,6 +30,7 @@ return [
 				'vendor/jquery-nice-select/css/nice-select.css',
 				'vendor/datatables/css/jquery.dataTables.min.css',
 				'css/style.css',
+				'css/custom.css',
 			],
 			'js' => [
 				'top'=>[
