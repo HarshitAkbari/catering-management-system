@@ -18,9 +18,6 @@
                             </div>
                         @endif
                     </div>
-                    <a href="{{ route('equipment.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle me-1"></i>Add Equipment
-                    </a>
                 </div>
                 <div class="card-body">
                     <!-- Filter Form -->

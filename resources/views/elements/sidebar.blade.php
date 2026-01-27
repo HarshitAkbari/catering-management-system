@@ -41,6 +41,7 @@
                 </a>
                 <ul aria-expanded="{{ request()->routeIs('inventory.*') ? 'true' : 'false' }}">
                     <li><a href="{{ route('inventory.index') }}" class="{{ request()->routeIs('inventory.index') ? 'mm-active' : '' }}">Item List</a></li>
+                    <li><a href="{{ route('inventory.create') }}" class="{{ request()->routeIs('inventory.create') ? 'mm-active' : '' }}">Add Inventory Item</a></li>
                     <li><a href="{{ route('inventory.stock-in') }}" class="{{ request()->routeIs('inventory.stock-in*') ? 'mm-active' : '' }}">Stock In</a></li>
                     <li><a href="{{ route('inventory.stock-out') }}" class="{{ request()->routeIs('inventory.stock-out*') ? 'mm-active' : '' }}">Stock Out</a></li>
                 </ul>
