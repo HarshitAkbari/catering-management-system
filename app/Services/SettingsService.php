@@ -10,6 +10,8 @@ use App\Models\InventoryUnit;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\OrderType;
+use App\Models\Staff;
+use App\Models\StaffRole;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -479,6 +481,104 @@ class SettingsService
             return [
                 'status' => false,
                 'message' => 'Failed to toggle inventory unit: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    // Staff Roles Methods
+    public function getStaffRoles(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
+    {
+        $query = StaffRole::where('tenant_id', $tenantId);
+        
+        // Apply name filter
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+        }
+        
+        // Apply status filter
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+        
+        // Apply sorting
+        if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
+            $sortOrder = $filters['sort_order'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+        
+        return $query->paginate($perPage)->appends($filters);
+    }
+
+    public function createStaffRole(array $data, int $tenantId): array
+    {
+        try {
+            $data['tenant_id'] = $tenantId;
+            $data['is_active'] = $data['is_active'] ?? true;
+
+            StaffRole::create($data);
+
+            return ['status' => true];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'Failed to create staff role: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    public function updateStaffRole(StaffRole $staffRole, array $data): array
+    {
+        try {
+            $staffRole->update($data);
+
+            return ['status' => true];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'Failed to update staff role: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    public function deleteStaffRole(StaffRole $staffRole): array
+    {
+        try {
+            // Check if role is used by staff members
+            $staffCount = Staff::where('staff_role_id', $staffRole->id)->count();
+
+            if ($staffCount > 0) {
+                return [
+                    'status' => false,
+                    'message' => "Cannot delete staff role. It is being used by {$staffCount} staff member(s).",
+                ];
+            }
+
+            $staffRole->delete();
+
+            return ['status' => true];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'Failed to delete staff role: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    public function toggleStaffRole(StaffRole $staffRole): array
+    {
+        try {
+            $staffRole->update(['is_active' => !$staffRole->is_active]);
+
+            return [
+                'status' => true,
+                'is_active' => $staffRole->is_active,
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'message' => 'Failed to toggle staff role: ' . $e->getMessage(),
             ];
         }
     }

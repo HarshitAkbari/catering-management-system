@@ -47,17 +47,6 @@
                                     @endforeach
                                 </select>
                             </div>
-
-                            <!-- Status Filter -->
-                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                                <label for="status_filter" class="form-label">Status</label>
-                                <select name="equipment_status_id" id="status_filter" class="form-control form-control-sm">
-                                    <option value="">All Status</option>
-                                    @foreach($statuses ?? [] as $status)
-                                        <option value="{{ $status->id }}" {{ ($filterValues['equipment_status_id'] ?? '') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
                         </div>
 
                         <!-- Filter Buttons -->
@@ -80,9 +69,6 @@
                                     <th>
                                         <x-table.sort-link field="available_quantity" label="Available" />
                                     </th>
-                                    <th>
-                                        <x-table.sort-link field="status" label="Status" />
-                                    </th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -101,13 +87,6 @@
                                         <td class="py-2">
                                             {{ $item->available_quantity }}
                                         </td>
-                                        <td class="py-2">
-                                            @if($item->equipmentStatus)
-                                                <span class="badge light badge-success">{{ $item->equipmentStatus->name }}</span>
-                                            @else
-                                                <span class="badge light badge-secondary">-</span>
-                                            @endif
-                                        </td>
                                         <td class="py-2 text-end">
                                             <a href="{{ route('equipment.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
                                             <a href="{{ route('equipment.edit', $item) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
@@ -119,7 +98,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="5" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>

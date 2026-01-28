@@ -9,6 +9,8 @@ use App\Models\InventoryItem;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\Payment;
+use App\Models\Staff;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -71,10 +73,28 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Staff-related data
+        $totalStaff = Staff::where('tenant_id', $tenantId)->where('status', 'active')->count();
+        $todayAttendance = Attendance::where('tenant_id', $tenantId)
+            ->where('date', today())
+            ->get();
+        $todayPresent = $todayAttendance->where('status', 'present')->count();
+        $todayAbsent = $todayAttendance->where('status', 'absent')->count();
+        
+        // Upcoming staff assignments (events with staff assigned in next 7 days)
+        $upcomingStaffAssignments = Order::where('tenant_id', $tenantId)
+            ->where('event_date', '>=', today())
+            ->where('event_date', '<=', now()->addDays(7))
+            ->whereHas('staff')
+            ->with(['customer', 'staff', 'orderStatus', 'eventTime'])
+            ->orderBy('event_date')
+            ->limit(5)
+            ->get();
+
         // Chart data
         $chartData = $this->getChartData($tenantId);
 
-        return view('dashboard', compact('stats', 'upcomingEvents', 'todayDeliveries', 'lowStockItems', 'pendingPayments', 'chartData'));
+        return view('dashboard', compact('stats', 'upcomingEvents', 'todayDeliveries', 'lowStockItems', 'pendingPayments', 'chartData', 'totalStaff', 'todayPresent', 'todayAbsent', 'upcomingStaffAssignments'));
     }
 
     /**

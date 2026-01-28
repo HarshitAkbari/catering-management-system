@@ -56,7 +56,7 @@
                 </ul>
             </li>
             <li><a class="has-arrow {{ request()->routeIs('equipment.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('equipment.*') ? 'true' : 'false' }}">
-                    <i class="bi bi-tools"></i>
+<i class="bi bi-tools"></i>
                     <span class="nav-text">Equipment</span>
                 </a>
                 <ul aria-expanded="{{ request()->routeIs('equipment.*') ? 'true' : 'false' }}">
@@ -64,6 +64,34 @@
                     <li><a href="{{ route('equipment.create') }}" class="{{ request()->routeIs('equipment.create') ? 'mm-active' : '' }}">Add Equipment</a></li>
                 </ul>
             </li>
+            @hasPermission('staff.view')
+            <li><a class="has-arrow {{ request()->routeIs('staff.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('staff.*') ? 'true' : 'false' }}">
+                    <i class="bi bi-people-fill"></i>
+                    <span class="nav-text">Staff</span>
+                </a>
+                <ul aria-expanded="{{ request()->routeIs('staff.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('staff.index') }}" class="{{ request()->routeIs('staff.index') ? 'mm-active' : '' }}">Staff List</a></li>
+                    @hasPermission('staff.create')
+                    <li><a href="{{ route('staff.create') }}" class="{{ request()->routeIs('staff.create') ? 'mm-active' : '' }}">Add Staff</a></li>
+                    @endhasPermission
+                </ul>
+            </li>
+            @endhasPermission
+            @hasPermission('attendance.view')
+            <li><a class="has-arrow {{ request()->routeIs('attendance.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('attendance.*') ? 'true' : 'false' }}">
+                    <i class="bi bi-calendar-check"></i>
+                    <span class="nav-text">Attendance</span>
+                </a>
+                <ul aria-expanded="{{ request()->routeIs('attendance.*') ? 'true' : 'false' }}">
+                    <li><a href="{{ route('attendance.index') }}" class="{{ request()->routeIs('attendance.index') ? 'mm-active' : '' }}">Attendance List</a></li>
+                    @hasPermission('attendance.create')
+                    <li><a href="{{ route('attendance.create') }}" class="{{ request()->routeIs('attendance.create') ? 'mm-active' : '' }}">Mark Attendance</a></li>
+                    <li><a href="{{ route('attendance.bulk') }}" class="{{ request()->routeIs('attendance.bulk*') ? 'mm-active' : '' }}">Bulk Mark</a></li>
+                    @endhasPermission
+                    <li><a href="{{ route('attendance.report') }}" class="{{ request()->routeIs('attendance.report') ? 'mm-active' : '' }}">Attendance Report</a></li>
+                </ul>
+            </li>
+            @endhasPermission
             <li><a class="has-arrow {{ request()->routeIs('reports.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('reports.*') ? 'true' : 'false' }}">
                     <i class="bi bi-graph-up"></i>
                     <span class="nav-text">Reports</span>
@@ -89,7 +117,7 @@
                     <li><a href="{{ route('settings.order-types') }}" class="{{ request()->routeIs('settings.order-types*') ? 'mm-active' : '' }}">Order Types</a></li>
                     <li><a href="{{ route('settings.inventory-units') }}" class="{{ request()->routeIs('settings.inventory-units*') ? 'mm-active' : '' }}">Inventory Units</a></li>
                     <li><a href="{{ route('settings.equipment-categories') }}" class="{{ request()->routeIs('settings.equipment-categories*') ? 'mm-active' : '' }}">Equipment Categories</a></li>
-                    <li><a href="{{ route('settings.equipment-statuses') }}" class="{{ request()->routeIs('settings.equipment-statuses*') ? 'mm-active' : '' }}">Equipment Statuses</a></li>
+                    <li><a href="{{ route('settings.staff-roles') }}" class="{{ request()->routeIs('settings.staff-roles*') ? 'mm-active' : '' }}">Staff Roles</a></li>
                 </ul>
             </li>
         </ul>

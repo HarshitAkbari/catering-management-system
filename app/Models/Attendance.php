@@ -4,31 +4,34 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\Blameable;
 use App\Traits\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class EquipmentStatus extends Model
+class Attendance extends Model
 {
-    use HasTenant, SoftDeletes;
+    use HasTenant, Blameable;
 
     protected $fillable = [
         'tenant_id',
-        'name',
-        'is_active',
+        'staff_id',
+        'date',
+        'status',
+        'check_in_time',
+        'check_out_time',
+        'notes',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
+            'date' => 'date',
         ];
     }
 
     /**
-     * Get the tenant that owns the equipment status.
+     * Get the tenant that owns the attendance.
      */
     public function tenant(): BelongsTo
     {
@@ -36,10 +39,10 @@ class EquipmentStatus extends Model
     }
 
     /**
-     * Get the equipment items with this status.
+     * Get the staff for the attendance.
      */
-    public function equipment(): HasMany
+    public function staff(): BelongsTo
     {
-        return $this->hasMany(Equipment::class);
+        return $this->belongsTo(Staff::class);
     }
 }

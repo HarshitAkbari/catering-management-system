@@ -149,7 +149,7 @@ class OrderController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $order->load('customer', 'invoice.payments', 'eventTime', 'orderType', 'orderStatus');
+        $order->load('customer', 'invoice.payments', 'eventTime', 'orderType', 'orderStatus', 'staff');
         
         // Build filters from request
         $filters = [];

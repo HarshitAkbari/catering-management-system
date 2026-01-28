@@ -74,6 +74,16 @@ class Order extends Model
     }
 
     /**
+     * Get the staff assigned to the order.
+     */
+    public function staff(): BelongsToMany
+    {
+        return $this->belongsToMany(Staff::class, 'event_staff')
+            ->withPivot('role', 'notes')
+            ->withTimestamps();
+    }
+
+    /**
      * Get the order status.
      */
     public function orderStatus(): BelongsTo

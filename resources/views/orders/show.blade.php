@@ -25,8 +25,9 @@
                     <button type="button" onclick="openStatusModal('{{ $firstOrder->id }}', '{{ $currentStatus }}')" class="btn btn-primary btn-sm" style="pointer-events: auto; cursor: pointer;">
                         Change Status
                     </button>
-                    <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm" style="pointer-events: auto; cursor: pointer;">
-                        Back
+                    <a href="{{ route('orders.index') }}" style="pointer-events: auto; cursor: pointer;">
+                        <i class="bi bi-arrow-left"></i>
+                        Back to list
                     </a>
                 </div>
             </div>
@@ -149,6 +150,68 @@
         </div>
     </div>
 </div>
+
+@php
+    // Get staff assigned to this order (using first order to get staff)
+    $assignedStaff = $firstOrder->staff ?? collect();
+@endphp
+
+@hasPermission('staff.view')
+<div class="row">
+    <div class="col-lg-12">
+        <!-- Assigned Staff Section -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title">Assigned Staff</h4>
+                @hasPermission('staff.create')
+                <a href="{{ route('staff.assign', $firstOrder) }}" class="btn btn-primary btn-sm">
+                    Assign Staff
+                </a>
+                @endhasPermission
+            </div>
+            <div class="card-body">
+                @if($assignedStaff->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Role (Event)</th>
+                                    <th>Default Role</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($assignedStaff as $staff)
+                                    <tr>
+                                        <td>
+                                            <a href="{{ route('staff.show', $staff) }}">{{ $staff->name }}</a>
+                                        </td>
+                                        <td><a href="tel:{{ $staff->phone }}">{{ $staff->phone }}</a></td>
+                                        <td><span class="badge badge-info light">{{ $staff->pivot->role ?? $staff->staff_role }}</span></td>
+                                        <td><span class="badge badge-secondary light">{{ $staff->staff_role }}</span></td>
+                                        <td>{{ $staff->pivot->notes ?? '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <strong>{{ $assignedStaff->count() }}</strong> staff member(s) assigned to this order
+                        </small>
+                    </div>
+                @else
+                    <div class="text-center py-4">
+                        <p class="text-muted mb-3">No staff assigned to this order yet</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endhasPermission
 
 <!-- Status Update Modal -->
 <div class="modal fade" id="status-modal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">

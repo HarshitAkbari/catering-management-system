@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Equipment Status')
+@section('title', 'Edit Staff Role')
 
 @section('content')
 <div class="container-fluid">
@@ -9,19 +9,19 @@
             @include('error.alerts')
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Edit Equipment Status</h4>
+                    <h4 class="card-title">Edit Staff Role</h4>
                     <div class="card-tools">
-                        <a href="{{ route('settings.equipment-statuses') }}" class="btn btn-default btn-sm">
+                        <a href="{{ route('settings.staff-roles') }}" class="btn btn-default btn-sm">
                             <i class="bi bi-arrow-left"></i> Back to List
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="form-validation">
-                        <form class="needs-validation" action="{{ route('settings.equipment-statuses.update', $equipmentStatus) }}" method="POST" novalidate>
+                        <form class="needs-validation" action="{{ route('settings.staff-roles.update', $staffRole) }}" method="POST" novalidate>
                             @csrf
                             @method('PUT')
-                            @include('settings.equipment_statuses.form')
+                            @include('settings.staff_roles.form')
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                             </div>
