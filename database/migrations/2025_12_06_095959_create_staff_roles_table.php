@@ -11,15 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('equipment_statuses', function (Blueprint $table) {
+        Schema::create('staff_roles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->boolean('is_active')->default(true)->comment('0 = Inactive, 1 = Active');
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            $table->softDeletes();
             
+            $table->unique(['tenant_id', 'name']);
             $table->index('tenant_id');
+            $table->index('is_active');
         });
     }
 
@@ -28,7 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('equipment_statuses');
+        Schema::dropIfExists('staff_roles');
     }
 };
-

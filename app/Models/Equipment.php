@@ -20,7 +20,6 @@ class Equipment extends Model
         'equipment_category_id',
         'quantity',
         'available_quantity',
-        'equipment_status_id',
     ];
 
     /**
@@ -37,14 +36,6 @@ class Equipment extends Model
     public function equipmentCategory(): BelongsTo
     {
         return $this->belongsTo(EquipmentCategory::class);
-    }
-
-    /**
-     * Get the equipment status for this equipment.
-     */
-    public function equipmentStatus(): BelongsTo
-    {
-        return $this->belongsTo(EquipmentStatus::class);
     }
 
     /**

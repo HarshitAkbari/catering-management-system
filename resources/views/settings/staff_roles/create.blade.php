@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $page_title ?? 'Create Equipment Status')
+@section('title', $page_title ?? 'Create Staff Role')
 
 @section('content')
 <div class="container-fluid">
@@ -9,18 +9,18 @@
             @include('error.alerts')
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Add {{ $page_title ?? 'Equipment Status' }}</h3>
+                    <h3 class="card-title">Add {{ $page_title ?? 'Staff Role' }}</h3>
                     <div class="card-tools">
-                        <a href="{{ route('settings.equipment-statuses') }}" class="btn btn-default btn-sm">
+                        <a href="{{ route('settings.staff-roles') }}" class="btn btn-default btn-sm">
                             <i class="bi bi-arrow-left"></i> Back to List
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="form-validation">
-                        <form class="needs-validation" method="POST" action="{{ route('settings.equipment-statuses.store') }}" novalidate>
+                        <form class="needs-validation" method="POST" action="{{ route('settings.staff-roles.store') }}" novalidate>
                             @csrf
-                            @include('settings.equipment_statuses.form')
+                            @include('settings.staff_roles.form')
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                             </div>
@@ -34,19 +34,19 @@
     {{-- Tips Section --}}
     <x-tips-section>
         <x-tip-item>
-            Use clear, descriptive names for equipment statuses (e.g., "Available", "Maintenance", "Damaged")
+            Use clear, descriptive names for staff roles (e.g., "Cook", "Waiter", "Manager", "Helper")
         </x-tip-item>
         
         <x-tip-item>
-            Equipment statuses help track the condition and availability of your catering equipment
+            Staff roles help categorize and manage your staff members
         </x-tip-item>
         
         <x-tip-item>
-            You can activate/deactivate statuses as needed from the equipment statuses list
+            You can activate/deactivate roles as needed from the staff roles list
         </x-tip-item>
         
         <x-tip-item>
-            Deactivated statuses won't appear in dropdowns but existing equipment keeps its status
+            Deactivated roles won't appear in dropdowns but existing staff keep their role
         </x-tip-item>
     </x-tips-section>
 </div>

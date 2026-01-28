@@ -31,15 +31,6 @@
                         <div class="col-lg-6 col-md-6 mb-3">
                             <p class="mb-0"><span class="text-muted">Available Quantity :</span> <strong>{{ $equipment->available_quantity }}</strong></p>
                         </div>
-                        <div class="col-lg-6 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Status :</span> 
-                                @if($equipment->equipmentStatus)
-                                    <span class="badge light badge-success">{{ $equipment->equipmentStatus->name }}</span>
-                                @else
-                                    <span class="badge light badge-secondary">-</span>
-                                @endif
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>

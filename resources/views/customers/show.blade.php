@@ -50,7 +50,6 @@
                                         <th>Amount</th>
                                         <th>Status</th>
                                         <th>Payment Status</th>
-                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,11 +100,6 @@
                                                 @else
                                                     <span class="badge light badge-secondary">{{ ucfirst($paymentStatus) }}</span>
                                                 @endif
-                                            </td>
-                                            <td class="py-2 text-end">
-                                                <a href="{{ route('orders.show', $firstOrder) }}" class="btn btn-primary btn-sm" title="View">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach

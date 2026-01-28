@@ -17,6 +17,8 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -286,6 +288,55 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // Global Search
     Route::get('search', [SearchController::class, 'search'])->name('search');
     
+    // Staff Management Menu
+    // Staff - List
+    Route::middleware(['permission:staff,staff.view'])->group(function () {
+        Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
+    });
+    // Staff - Create (must be before staff/{staff} route)
+    Route::middleware(['permission:staff.create'])->group(function () {
+        Route::get('staff/create', [StaffController::class, 'create'])->name('staff.create');
+        Route::post('staff', [StaffController::class, 'store'])->name('staff.store');
+        Route::get('orders/{order}/assign-staff', [StaffController::class, 'assignToEvent'])->name('staff.assign');
+        Route::post('orders/{order}/assign-staff', [StaffController::class, 'storeAssignment'])->name('staff.assign.store');
+    });
+    // Staff - Edit (must be before staff/{staff} route)
+    Route::middleware(['permission:staff.edit'])->group(function () {
+        Route::get('staff/{staff}/edit', [StaffController::class, 'edit'])->name('staff.edit');
+        Route::put('staff/{staff}', [StaffController::class, 'update'])->name('staff.update');
+        Route::patch('staff/{staff}/toggle', [StaffController::class, 'toggle'])->name('staff.toggle');
+    });
+    // Staff - View (specific routes before parameterized route)
+    Route::middleware(['permission:staff,staff.view'])->group(function () {
+        Route::get('staff/{staff}/workload', [StaffController::class, 'workload'])->name('staff.workload');
+        Route::get('staff/{staff}/performance', [StaffController::class, 'performance'])->name('staff.performance');
+        Route::get('staff/{staff}', [StaffController::class, 'show'])->name('staff.show');
+    });
+    // Staff - Delete
+    Route::middleware(['permission:staff.delete'])->group(function () {
+        Route::delete('staff/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
+    });
+    
+    // Attendance Management Menu
+    // Attendance - List, View & Report
+    Route::middleware(['permission:attendance,attendance.view'])->group(function () {
+        Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
+        Route::get('attendance/staff/{staff}', [AttendanceController::class, 'staffHistory'])->name('attendance.staff');
+    });
+    // Attendance - Create
+    Route::middleware(['permission:attendance.create'])->group(function () {
+        Route::get('attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
+        Route::post('attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+        Route::get('attendance/bulk', [AttendanceController::class, 'bulkCreate'])->name('attendance.bulk');
+        Route::post('attendance/bulk', [AttendanceController::class, 'bulkStore'])->name('attendance.bulk.store');
+    });
+    // Attendance - Edit
+    Route::middleware(['permission:attendance.edit'])->group(function () {
+        Route::get('attendance/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
+        Route::put('attendance/{attendance}', [AttendanceController::class, 'update'])->name('attendance.update');
+    });
+    
     // Settings Menu
     Route::prefix('settings')->name('settings.')->group(function () {
         // Settings - Order Statuses
@@ -333,14 +384,14 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::patch('equipment-categories/{equipmentCategory}/toggle', [SettingsController::class, 'toggleEquipmentCategory'])->name('equipment-categories.toggle');
         Route::delete('equipment-categories/{equipmentCategory}', [SettingsController::class, 'destroyEquipmentCategory'])->name('equipment-categories.destroy');
         
-        // Settings - Equipment Statuses
-        Route::get('equipment-statuses', [SettingsController::class, 'equipmentStatuses'])->name('equipment-statuses');
-        Route::get('equipment-statuses/create', [SettingsController::class, 'createEquipmentStatus'])->name('equipment-statuses.create');
-        Route::post('equipment-statuses', [SettingsController::class, 'storeEquipmentStatus'])->name('equipment-statuses.store');
-        Route::get('equipment-statuses/{equipmentStatus}/edit', [SettingsController::class, 'editEquipmentStatus'])->name('equipment-statuses.edit');
-        Route::put('equipment-statuses/{equipmentStatus}', [SettingsController::class, 'updateEquipmentStatus'])->name('equipment-statuses.update');
-        Route::patch('equipment-statuses/{equipmentStatus}/toggle', [SettingsController::class, 'toggleEquipmentStatus'])->name('equipment-statuses.toggle');
-        Route::delete('equipment-statuses/{equipmentStatus}', [SettingsController::class, 'destroyEquipmentStatus'])->name('equipment-statuses.destroy');
+        // Settings - Staff Roles
+        Route::get('staff-roles', [\App\Http\Controllers\Settings\StaffRoleController::class, 'index'])->name('staff-roles');
+        Route::get('staff-roles/create', [\App\Http\Controllers\Settings\StaffRoleController::class, 'create'])->name('staff-roles.create');
+        Route::post('staff-roles', [\App\Http\Controllers\Settings\StaffRoleController::class, 'store'])->name('staff-roles.store');
+        Route::get('staff-roles/{staffRole}/edit', [\App\Http\Controllers\Settings\StaffRoleController::class, 'edit'])->name('staff-roles.edit');
+        Route::put('staff-roles/{staffRole}', [\App\Http\Controllers\Settings\StaffRoleController::class, 'update'])->name('staff-roles.update');
+        Route::patch('staff-roles/{staffRole}/toggle', [\App\Http\Controllers\Settings\StaffRoleController::class, 'toggle'])->name('staff-roles.toggle');
+        Route::delete('staff-roles/{staffRole}', [\App\Http\Controllers\Settings\StaffRoleController::class, 'destroy'])->name('staff-roles.destroy');
     });
 });
  

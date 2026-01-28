@@ -303,6 +303,129 @@
     </div>
 </div>
 
+@hasPermission('staff.view')
+<!-- Staff Widgets Row -->
+<div class="row mt-4">
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="widget-stat card bg-primary">
+            <div class="card-body p-4">
+                <div class="media ai-icon">
+                    <span class="me-3 bgl-primary text-primary">
+                        <i class="flaticon-381-user-7"></i>
+                    </span>
+                    <div class="media-body">
+                        <p class="mb-1 text-white fw-bold">Total Staff</p>
+                        <h4 class="mb-0 text-white fw-bold">{{ $totalStaff ?? 0 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="widget-stat card bg-success">
+            <div class="card-body p-4">
+                <div class="media ai-icon">
+                    <span class="me-3 bgl-success text-success">
+                        <i class="flaticon-381-check"></i>
+                    </span>
+                    <div class="media-body">
+                        <p class="mb-1 text-white fw-bold">Present Today</p>
+                        <h4 class="mb-0 text-white fw-bold">{{ $todayPresent ?? 0 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="widget-stat card bg-danger">
+            <div class="card-body p-4">
+                <div class="media ai-icon">
+                    <span class="me-3 bgl-danger text-danger">
+                        <i class="flaticon-381-close"></i>
+                    </span>
+                    <div class="media-body">
+                        <p class="mb-1 text-white fw-bold">Absent Today</p>
+                        <h4 class="mb-0 text-white fw-bold">{{ $todayAbsent ?? 0 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="widget-stat card bg-info">
+            <div class="card-body p-4">
+                <div class="media ai-icon">
+                    <span class="me-3 bgl-info text-info">
+                        <i class="flaticon-381-calendar-1"></i>
+                    </span>
+                    <div class="media-body">
+                        <p class="mb-1 text-white fw-bold">Upcoming Assignments</p>
+                        <h4 class="mb-0 text-white fw-bold">{{ $upcomingStaffAssignments->count() ?? 0 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Staff Assignments Widget -->
+@if(isset($upcomingStaffAssignments) && $upcomingStaffAssignments->count() > 0)
+<div class="row mt-4">
+    <div class="col-xl-6 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Upcoming Staff Assignments</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Event Date</th>
+                                <th>Customer</th>
+                                <th>Staff Assigned</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($upcomingStaffAssignments as $order)
+                                <tr>
+                                    <td>
+                                        <small>{{ $order->event_date->format('M d, Y') }}</small><br>
+                                        <small class="text-muted">{{ $order->eventTime->name ?? 'N/A' }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('customers.show', $order->customer) }}">
+                                            {{ $order->customer->name ?? 'N/A' }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if($order->staff->count() > 0)
+                                            <span class="badge badge-info light">{{ $order->staff->count() }} staff</span>
+                                        @else
+                                            <span class="text-muted">No staff</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ $order->orderStatus && $order->orderStatus->name === 'confirmed' ? 'success' : 'warning' }} light">
+                                            {{ $order->orderStatus->name ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ route('staff.index') }}" class="btn btn-primary btn-sm">View All Staff</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+@endhasPermission
+
 <!-- Low Stock Alert -->
 @if($lowStockItems > 0)
 <div class="row mt-4">

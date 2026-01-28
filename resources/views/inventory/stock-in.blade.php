@@ -94,10 +94,8 @@
                             </div>
 
                             <div class="row mt-4">
-                                <div class="col-xl-8 col-lg-10 mx-auto">
-                                    <div class="d-flex justify-content-end">
-                                        <button type="submit" class="btn btn-primary btn-submit">Submit</button>
-                                    </div>
+                                <div>
+                                    <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                                 </div>
                             </div>
                         </form>

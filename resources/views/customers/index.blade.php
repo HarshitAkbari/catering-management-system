@@ -103,8 +103,8 @@
                                             </span>
                                         </td>
                                         <td class="py-2 text-end">
-                                            <a href="{{ route('customers.show', $customer) }}" class="btn btn-primary btn-sm" title="View">
-                                                <i class="bi bi-eye"></i>
+                                            <a href="{{ route('customers.show', $customer) }}" class="btn btn-primary btn-xs" title="View">
+                                                View
                                             </a>
                                         </td>
                                     </tr>

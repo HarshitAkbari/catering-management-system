@@ -35,7 +35,7 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" class="form-control" id="customer_name" name="customer_name" 
-                                                    placeholder="Enter customer name.." value="{{ old('customer_name', $order->customer->name) }}" required>
+                                                    value="{{ old('customer_name', $order->customer->name) }}" required>
                                                 <div class="invalid-feedback">
                                                     Please enter a customer name.
                                                 </div>
@@ -48,7 +48,7 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="email" class="form-control" id="customer_email" name="customer_email" 
-                                                    placeholder="Enter customer email.." value="{{ old('customer_email', $order->customer->email ?? '') }}" required>
+                                                    value="{{ old('customer_email', $order->customer->email ?? '') }}" required>
                                                 <div class="invalid-feedback">
                                                     Please enter a valid email.
                                                 </div>
@@ -61,7 +61,7 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" 
-                                                    placeholder="Enter contact number.." value="{{ old('customer_mobile', $order->customer->mobile) }}" required>
+                                                    value="{{ old('customer_mobile', $order->customer->mobile) }}" required>
                                                 <div class="invalid-feedback">
                                                     Please enter a contact number.
                                                 </div>
@@ -78,7 +78,7 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <textarea class="form-control" id="address" name="address" rows="3" 
-                                                    placeholder="Enter address.." required>{{ old('address', $order->address) }}</textarea>
+                                                    required>{{ old('address', $order->address) }}</textarea>
                                                 <div class="invalid-feedback">
                                                     Please enter an address.
                                                 </div>
@@ -166,7 +166,6 @@
                                 name="modal-event-date" 
                                 required 
                                 minDate="today"
-                                placeholder="Select event date"
                             />
                         </div>
 

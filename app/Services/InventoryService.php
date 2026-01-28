@@ -116,7 +116,7 @@ class InventoryService extends BaseService
     {
         try {
             return DB::transaction(function () use ($data, $tenantId) {
-                $item = $this->repository->find($data['inventory_item_id']);
+                $item = $this->repository->find((int) $data['inventory_item_id']);
 
                 if (!$item || $item->tenant_id !== $tenantId) {
                     return ['status' => false, 'message' => 'Inventory item not found'];
@@ -153,7 +153,7 @@ class InventoryService extends BaseService
     {
         try {
             return DB::transaction(function () use ($data, $tenantId) {
-                $item = $this->repository->find($data['inventory_item_id']);
+                $item = $this->repository->find((int) $data['inventory_item_id']);
 
                 if (!$item || $item->tenant_id !== $tenantId) {
                     return ['status' => false, 'message' => 'Inventory item not found'];
