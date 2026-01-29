@@ -60,6 +60,9 @@ return [
 				'OrderController_calendar' => [
 					'vendor/fullcalendar/lib/main.min.css',
 				],
+				'DashboardController_index' => [
+					'vendor/fullcalendar/lib/main.min.css',
+				],
 				'OrderController_create' => [
 					'vendor/pickadate/themes/default.css',
 					'vendor/pickadate/themes/default.date.css',
@@ -94,6 +97,9 @@ return [
 					'vendor/apexchart/apexchart.js',
 				],
 				'OrderController_calendar' => [
+					'vendor/fullcalendar/lib/main.min.js',
+				],
+				'DashboardController_index' => [
 					'vendor/fullcalendar/lib/main.min.js',
 				],
 				'OrderController_create' => [

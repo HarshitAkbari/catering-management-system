@@ -107,7 +107,7 @@
                     </span>
                     <div class="media-body">
                         <p class="mb-1 text-white fw-bold">Low Stock Items</p>
-                        <h4 class="mb-0 text-white fw-bold">{{ $lowStockItems }}</h4>
+                        <h4 class="mb-0 text-white fw-bold">{{ $lowStockItemsCount }}</h4>
                     </div>
                 </div>
             </div>
@@ -151,101 +151,53 @@
 
 <!-- Lists & Alerts Row -->
 <div class="row mt-4">
-    <!-- Upcoming Events -->
-    <div class="col-xl-4 col-lg-6 col-md-12">
+    <!-- Low Stock Alerts -->
+    <div class="col-xl-6 col-lg-6 col-md-12">
         <div class="card">
             <div class="card-header">
-                <h4 class="card-title">Upcoming Events</h4>
+                <h4 class="card-title">Low Stock Alerts</h4>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-sm mb-0">
                         <thead>
                             <tr>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Status</th>
+                                <th>Item</th>
+                                <th>Current</th>
+                                <th>Minimum</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($upcomingEvents as $event)
+                            @forelse($lowStockItems as $item)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('customers.show', $event->customer) }}">
-                                            {{ $event->customer->name ?? 'N/A' }}
+                                        <strong>{{ $item->name }}</strong><br>
+                                        <small class="text-muted">{{ $item->inventoryUnit?->name ?? 'N/A' }}</small>
+                                    </td>
+                                    <td>
+                                        <strong class="text-danger">{{ number_format($item->current_stock, 2) }}</strong>
+                                    </td>
+                                    <td>
+                                        <span>{{ number_format($item->minimum_stock, 2) }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('inventory.stock-in') }}?item={{ $item->id }}" class="btn btn-success btn-xs">
+                                            <i class="flaticon-381-add-1"></i> Add Stock
                                         </a>
-                                    </td>
-                                    <td>
-                                        <small>{{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }}</small><br>
-                                        <small class="text-muted">{{ $event->event_time ?? 'N/A' }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-{{ $event->status === 'confirmed' ? 'success' : 'warning' }} light">
-                                            {{ ucfirst($event->status) }}
-                                        </span>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center py-3 text-muted">No upcoming events</td>
+                                    <td colspan="4" class="text-center py-3 text-muted">No low stock items</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-                @if($upcomingEvents->count() > 0)
+                @if($lowStockItems->count() > 0)
                     <div class="text-center mt-3">
-                        <a href="{{ route('orders.index') }}" class="btn btn-primary btn-sm">View All Orders</a>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Today's Deliveries -->
-    <div class="col-xl-4 col-lg-6 col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">Today's Deliveries</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm mb-0">
-                        <thead>
-                            <tr>
-                                <th>Customer</th>
-                                <th>Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($todayDeliveries as $delivery)
-                                <tr>
-                                    <td>
-                                        <a href="{{ route('customers.show', $delivery->customer) }}">
-                                            {{ $delivery->customer->name ?? 'N/A' }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <small>{{ $delivery->event_time ?? 'N/A' }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-{{ $delivery->status === 'confirmed' ? 'success' : 'warning' }} light">
-                                            {{ ucfirst($delivery->status) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center py-3 text-muted">No deliveries today</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                @if($todayDeliveries->count() > 0)
-                    <div class="text-center mt-3">
-                        <a href="{{ route('orders.index') }}" class="btn btn-primary btn-sm">View All Orders</a>
+                        <a href="{{ route('inventory.low-stock') }}" class="btn btn-primary btn-sm">View All Low Stock</a>
                     </div>
                 @endif
             </div>
@@ -253,7 +205,7 @@
     </div>
 
     <!-- Pending Payments -->
-    <div class="col-xl-4 col-lg-6 col-md-12">
+    <div class="col-xl-6 col-lg-6 col-md-12">
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Pending Payments</h4>
@@ -427,16 +379,124 @@
 @endhasPermission
 
 <!-- Low Stock Alert -->
-@if($lowStockItems > 0)
+
+<!-- Calendar Widget Row - Full Width -->
 <div class="row mt-4">
-    <div class="col-12">
-        <x-alert type="warning" title="Warning!">
-            You have {{ $lowStockItems }} {{ Str::plural('item', $lowStockItems) }} with low stock. 
-            <a href="{{ route('inventory.low-stock') }}" class="alert-link">View low stock items</a> to restock.
-        </x-alert>
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Schedule</h4>
+            </div>
+            <div class="card-body">
+                <div id="calendar" class="app-fullcalendar1"></div>
+            </div>
+        </div>
     </div>
 </div>
-@endif
+
+<!-- Upcoming Schedule and Today's Deliveries Row - Side by Side -->
+<div class="row mt-4">
+    <!-- Upcoming Schedule Widget -->
+    <div class="col-xl-6 col-lg-12">
+        <div class="widget-heading d-flex justify-content-between align-items-center">
+            <h3 class="m-0">Upcoming Schedule</h3>
+            <a href="{{ route('orders.index') }}" class="btn btn-primary btn-sm">View all</a>
+        </div>
+        @if(!empty($upcomingSchedule) && count($upcomingSchedule) > 0)
+            @foreach($upcomingSchedule as $schedule)
+            <div class="card-schedule">
+                <span class="side-label {{ $schedule['color'] }}"></span>
+                <div class="up-comming-schedule">
+                    <div>
+                        {{-- <h4><a href="{{ $schedule['url'] }}">{{ $schedule['title'] }}</a></h4> --}}
+                        <div class="mb-sm-0 mb-2">
+                            <span>{{ $schedule['customer_name'] }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <svg class="me-1" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2.73499H12.255V2.25C12.255 1.83999 11.92 1.5 11.505 1.5C11.09 1.5 10.755 1.83999 10.755 2.25V2.73499H8.75V2.25C8.75 1.83999 8.41501 1.5 8 1.5C7.58499 1.5 7.25 1.83999 7.25 2.25V2.73499H5.245V2.25C5.245 1.83999 4.91001 1.5 4.495 1.5C4.07999 1.5 3.745 1.83999 3.745 2.25V2.73499H3C1.48498 2.73499 0.25 3.96499 0.25 5.48498V12.75C0.25 14.265 1.48498 15.5 3 15.5H13C14.515 15.5 15.75 14.265 15.75 12.75V5.48498C15.75 3.96499 14.515 2.73499 13 2.73499ZM14.25 6.31H1.75V5.48498C1.75 4.79498 2.31 4.23499 3 4.23499H3.745V4.69C3.745 5.10498 4.07999 5.44 4.495 5.44C4.91001 5.44 5.245 5.10498 5.245 4.69V4.23499H7.25V4.69C7.25 5.10498 7.58499 5.44 8 5.44C8.41501 5.44 8.75 5.10498 8.75 4.69V4.23499H10.755V4.69C10.755 5.10498 11.09 5.44 11.505 5.44C11.92 5.44 12.255 5.10498 12.255 4.69V4.23499H13C13.69 4.23499 14.25 4.79498 14.25 5.48498V6.31Z" fill="#c7c7c7"/>
+                        </svg>
+                        <span>{{ $schedule['date'] }}</span>
+                    </div>
+                    <div>
+                        <svg class="me-1" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_1049_649)">
+                            <path d="M8 16.25C12.275 16.25 15.75 12.775 15.75 8.5C15.75 4.22501 12.275 0.75 8 0.75C3.72501 0.75 0.25 4.22501 0.25 8.5C0.25 12.775 3.72501 16.25 8 16.25ZM7.25 4.345C7.25 3.92999 7.58499 3.595 8 3.595C8.41501 3.595 8.75 3.92999 8.75 4.345V7.75H10.5C10.915 7.75 11.25 8.08499 11.25 8.5C11.25 8.91501 10.915 9.25 10.5 9.25H8C7.58499 9.25 7.25 8.91501 7.25 8.5V4.345Z" fill="#c7c7c7"/>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_1049_649">
+                            <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
+                            </clipPath>
+                            </defs>
+                        </svg>
+                        <span>{{ $schedule['time'] }}</span>
+                    </div>
+                    <div>
+                        <a href="{{ $schedule['url'] }}"><i class="las la-angle-right text-secondary"></i></a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        @else
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-center text-muted mb-0">No upcoming events scheduled</p>
+                </div>
+            </div>
+        @endif
+    </div>
+
+    <!-- Today's Deliveries Widget -->
+    <div class="col-xl-6 col-lg-12">
+        <div class="widget-heading d-flex justify-content-between align-items-center">
+            <h3 class="m-0">Today's Deliveries</h3>
+            <a href="{{ route('orders.index') }}" class="btn btn-primary btn-sm">View all</a>
+        </div>
+        @if(!empty($todayDeliveriesSchedule) && count($todayDeliveriesSchedule) > 0)
+            @foreach($todayDeliveriesSchedule as $delivery)
+            <div class="card-schedule">
+                <span class="side-label {{ $delivery['color'] }}"></span>
+                <div class="up-comming-schedule">
+                    <div>
+                        <div class="mb-sm-0 mb-2">
+                            <span>{{ $delivery['customer_name'] }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <svg class="me-1" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2.73499H12.255V2.25C12.255 1.83999 11.92 1.5 11.505 1.5C11.09 1.5 10.755 1.83999 10.755 2.25V2.73499H8.75V2.25C8.75 1.83999 8.41501 1.5 8 1.5C7.58499 1.5 7.25 1.83999 7.25 2.25V2.73499H5.245V2.25C5.245 1.83999 4.91001 1.5 4.495 1.5C4.07999 1.5 3.745 1.83999 3.745 2.25V2.73499H3C1.48498 2.73499 0.25 3.96499 0.25 5.48498V12.75C0.25 14.265 1.48498 15.5 3 15.5H13C14.515 15.5 15.75 14.265 15.75 12.75V5.48498C15.75 3.96499 14.515 2.73499 13 2.73499ZM14.25 6.31H1.75V5.48498C1.75 4.79498 2.31 4.23499 3 4.23499H3.745V4.69C3.745 5.10498 4.07999 5.44 4.495 5.44C4.91001 5.44 5.245 5.10498 5.245 4.69V4.23499H7.25V4.69C7.25 5.10498 7.58499 5.44 8 5.44C8.41501 5.44 8.75 5.10498 8.75 4.69V4.23499H10.755V4.69C10.755 5.10498 11.09 5.44 11.505 5.44C11.92 5.44 12.255 5.10498 12.255 4.69V4.23499H13C13.69 4.23499 14.25 4.79498 14.25 5.48498V6.31Z" fill="#c7c7c7"/>
+                        </svg>
+                        <span>{{ $delivery['date'] }}</span>
+                    </div>
+                    <div>
+                        <svg class="me-1" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_1049_649)">
+                            <path d="M8 16.25C12.275 16.25 15.75 12.775 15.75 8.5C15.75 4.22501 12.275 0.75 8 0.75C3.72501 0.75 0.25 4.22501 0.25 8.5C0.25 12.775 3.72501 16.25 8 16.25ZM7.25 4.345C7.25 3.92999 7.58499 3.595 8 3.595C8.41501 3.595 8.75 3.92999 8.75 4.345V7.75H10.5C10.915 7.75 11.25 8.08499 11.25 8.5C11.25 8.91501 10.915 9.25 10.5 9.25H8C7.58499 9.25 7.25 8.91501 7.25 8.5V4.345Z" fill="#c7c7c7"/>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_1049_649">
+                            <rect width="16" height="16" fill="white" transform="translate(0 0.5)"/>
+                            </clipPath>
+                            </defs>
+                        </svg>
+                        <span>{{ $delivery['time'] }}</span>
+                    </div>
+                    <div>
+                        <a href="{{ $delivery['url'] }}"><i class="las la-angle-right text-secondary"></i></a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        @else
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-center text-muted mb-0">No deliveries today</p>
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -570,5 +630,32 @@
             }
         });
     }
+
+    // FullCalendar Initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        if (calendarEl) {
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                initialView: 'dayGridMonth',
+                weekNumbers: true,
+                navLinks: true,
+                nowIndicator: true,
+                selectable: false,
+                editable: false,
+                events: @json($calendarEvents ?? []),
+                eventClick: function(info) {
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                }
+            });
+            calendar.render();
+        }
+    });
 </script>
 @endsection

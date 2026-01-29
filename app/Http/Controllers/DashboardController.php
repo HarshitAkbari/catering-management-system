@@ -64,7 +64,12 @@ class DashboardController extends Controller
 
         $lowStockItems = InventoryItem::where('tenant_id', $tenantId)
             ->whereRaw('current_stock <= minimum_stock')
-            ->count();
+            ->with('inventoryUnit')
+            ->orderBy('current_stock', 'asc')
+            ->limit(5)
+            ->get();
+        
+        $lowStockItemsCount = $lowStockItems->count();
 
         $pendingPayments = Order::where('tenant_id', $tenantId)
             ->whereIn('payment_status', ['pending', 'partial'])
@@ -94,7 +99,16 @@ class DashboardController extends Controller
         // Chart data
         $chartData = $this->getChartData($tenantId);
 
-        return view('dashboard', compact('stats', 'upcomingEvents', 'todayDeliveries', 'lowStockItems', 'pendingPayments', 'chartData', 'totalStaff', 'todayPresent', 'todayAbsent', 'upcomingStaffAssignments'));
+        // Calendar events for FullCalendar
+        $calendarEvents = $this->getCalendarEvents($tenantId);
+
+        // Upcoming schedule data for widget (limit to 3 most recent)
+        $upcomingSchedule = $this->getUpcomingSchedule($tenantId);
+
+        // Today's deliveries data for widget
+        $todayDeliveriesSchedule = $this->getTodayDeliveriesSchedule($tenantId);
+
+        return view('dashboard', compact('stats', 'upcomingEvents', 'todayDeliveries', 'lowStockItems', 'lowStockItemsCount', 'pendingPayments', 'chartData', 'totalStaff', 'todayPresent', 'todayAbsent', 'upcomingStaffAssignments', 'calendarEvents', 'upcomingSchedule', 'todayDeliveriesSchedule'));
     }
 
     /**
@@ -196,5 +210,125 @@ class DashboardController extends Controller
                 'labels' => [now()->subMonth()->format('M Y'), now()->format('M Y')],
             ],
         ];
+    }
+
+    /**
+     * Get calendar events formatted for FullCalendar
+     */
+    private function getCalendarEvents(int $tenantId): array
+    {
+        $orders = Order::where('tenant_id', $tenantId)
+            ->whereNotNull('event_date')
+            ->with('customer', 'orderStatus', 'eventTime')
+            ->get();
+
+        $events = [];
+        foreach ($orders as $order) {
+            $statusName = $order->orderStatus?->name ?? 'pending';
+            $customerName = $order->customer?->name ?? 'Unknown';
+            
+            // Determine color based on status
+            $className = match($statusName) {
+                'confirmed' => 'bg-primary',
+                'completed' => 'bg-success',
+                'cancelled' => 'bg-danger',
+                default => 'bg-warning',
+            };
+
+            $events[] = [
+                'title' => $customerName . ($order->event_menu ? ' - ' . $order->event_menu : ''),
+                'start' => $order->event_date->format('Y-m-d'),
+                'end' => $order->event_date->format('Y-m-d'),
+                'url' => route('orders.show', $order->id),
+                'className' => $className,
+            ];
+        }
+
+        return $events;
+    }
+
+    /**
+     * Get upcoming schedule data for widget
+     */
+    private function getUpcomingSchedule(int $tenantId): array
+    {
+        // Get all upcoming orders (future dates only, excluding today)
+        $orders = Order::where('tenant_id', $tenantId)
+            ->whereNotNull('event_date')
+            ->whereDate('event_date', '>', today())
+            ->with('customer', 'orderStatus', 'eventTime')
+            ->orderBy('event_date')
+            ->orderBy('event_time_id')
+            ->limit(3)
+            ->get();
+
+        $schedule = [];
+        $colors = ['bg-primary', 'bg-warning', 'bg-secondary'];
+        $index = 0;
+
+        foreach ($orders as $order) {
+            $statusName = $order->orderStatus?->name ?? 'pending';
+            $color = match($statusName) {
+                'confirmed' => 'bg-primary',
+                'pending' => 'bg-warning',
+                default => $colors[$index % count($colors)],
+            };
+
+            $schedule[] = [
+                'id' => $order->id,
+                'title' => $order->event_menu ?? 'Event',
+                'customer_name' => $order->customer?->name ?? 'Unknown',
+                'customer_avatar' => null, // Can be added if customer avatars are implemented
+                'date' => $order->event_date->format('F j, Y'),
+                'time' => $order->eventTime?->name ?? 'N/A',
+                'color' => $color,
+                'url' => route('orders.show', $order->id),
+            ];
+            $index++;
+        }
+
+        return $schedule;
+    }
+
+    /**
+     * Get today's deliveries data for widget
+     */
+    private function getTodayDeliveriesSchedule(int $tenantId): array
+    {
+        // Get all orders for today regardless of status (like calendar does)
+        $orders = Order::where('tenant_id', $tenantId)
+            ->whereNotNull('event_date')
+            ->whereDate('event_date', today())
+            ->with('customer', 'orderStatus', 'eventTime')
+            ->orderBy('event_time_id')
+            ->limit(3)
+            ->get();
+
+        $schedule = [];
+        $colors = ['bg-primary', 'bg-warning', 'bg-info'];
+        $index = 0;
+
+        foreach ($orders as $order) {
+            $statusName = $order->orderStatus?->name ?? 'pending';
+            $color = match($statusName) {
+                'confirmed' => 'bg-primary',
+                'pending' => 'bg-warning',
+                default => $colors[$index % count($colors)],
+            };
+
+            $schedule[] = [
+                'id' => $order->id,
+                'title' => $order->event_menu ?? 'Event',
+                'customer_name' => $order->customer?->name ?? 'Unknown',
+                'customer_avatar' => null,
+                'date' => $order->event_date->format('F j, Y'),
+                'time' => $order->eventTime?->name ?? 'N/A',
+                'color' => $color,
+                'url' => route('orders.show', $order->id),
+            ];
+            $index++;
+        }
+
+        return $schedule;
     }
 }

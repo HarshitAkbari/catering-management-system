@@ -18,24 +18,24 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-4 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $vendor->name }}</strong></p>
+                            <p class="mb-0"><strong>Name :</strong> <span class="text-muted">{{ $vendor->name }}</span></p>
                         </div>
                         @if($vendor->contact_person)
                             <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Contact Person :</span> <strong>{{ $vendor->contact_person }}</strong></p>
+                                <p class="mb-0"><strong>Contact Person :</strong> <span class="text-muted">{{ $vendor->contact_person }}</span></p>
                             </div>
                         @endif
                         <div class="col-lg-4 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Phone :</span> <strong><a href="tel:{{ $vendor->phone }}">{{ $vendor->phone }}</a></strong></p>
+                            <p class="mb-0"><strong>Phone :</strong> <span class="text-muted"><a href="tel:{{ $vendor->phone }}">{{ $vendor->phone }}</a></span></p>
                         </div>
                         @if($vendor->email)
                             <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Email :</span> <strong><a href="mailto:{{ $vendor->email }}">{{ $vendor->email }}</a></strong></p>
+                                <p class="mb-0"><strong>Email :</strong> <span class="text-muted"><a href="mailto:{{ $vendor->email }}">{{ $vendor->email }}</a></span></p>
                             </div>
                         @endif
                         @if($vendor->address)
                             <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Address :</span> <strong>{{ $vendor->address }}</strong></p>
+                                <p class="mb-0"><strong>Address :</strong> <span class="text-muted">{{ $vendor->address }}</span></p>
                             </div>
                         @endif
                     </div>
