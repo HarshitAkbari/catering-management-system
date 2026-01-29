@@ -36,7 +36,6 @@
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end profile-dropdown">
                                     @if(auth()->check())
-                                        <div class="dropdown-divider"></div>
                                         <a href="{{ route('profile.edit') }}" class="dropdown-item ai-icon">
                                             <i class="bi bi-person text-primary"></i>
                                             <span class="ms-2">Profile</span>
@@ -45,7 +44,6 @@
                                             <i class="bi bi-key text-success"></i>
                                             <span class="ms-2">Change Password</span>
                                         </a>
-                                        <div class="dropdown-divider"></div>
                                     @endif
                                     <a href="{{ route('logout') }}" class="dropdown-item ai-icon logout-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                         <i class="bi bi-box-arrow-right text-danger"></i>
