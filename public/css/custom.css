@@ -18,12 +18,13 @@
     transition: all 0.3s ease;
     border-radius: 8px;
     margin: 0 0.5rem;
+    background: #ffffff;
 }
 
-.header-profile .profile-toggle:hover {
+/* .header-profile .profile-toggle:hover {
     background-color: rgba(0, 0, 0, 0.02);
     transform: translateY(-1px);
-}
+} */
 
 .profile-info {
     display: flex;
