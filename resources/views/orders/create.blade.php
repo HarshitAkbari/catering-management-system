@@ -1,89 +1,26 @@
-@extends('layout.default')
+@extends('layouts.app')
+
+@section('title', $page_title ?? 'Create New Order')
 
 @section('content')
-	<div class="container-fluid">
-        <!-- row -->
-        <div class="row">
-            <div class="col-lg-12">
-                @include('error.alerts')
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">{{ $page_title ?? 'Create New Order' }}</h4>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            @include('error.alerts')
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Add {{ $page_title ?? 'Order' }}</h3>
+                    <div class="card-tools">
+                        <a href="{{ route('orders.index') }}" class="btn btn-default btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
                     </div>
-                    <div class="card-body">
-
-                        <div class="form-validation">
-                            <form class="needs-validation" action="{{ route('orders.store') }}" method="POST" novalidate>
-                                @csrf
-
-                                <div class="row">
-                                        <div class="row">
-                                            <!-- First Row: 3 Columns -->
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_name">Customer Name
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
-                                                    value="{{ old('customer_name') }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a customer name.
-                                                </div>
-                                                @error('customer_name')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_email">Customer Email
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="email" class="form-control" id="customer_email" name="customer_email" 
-                                                    value="{{ old('customer_email') }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a valid email.
-                                                </div>
-                                                @error('customer_email')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_mobile">Contact Number
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" 
-                                                    value="{{ old('customer_mobile') }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a contact number.
-                                                </div>
-                                                @error('customer_mobile')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Second Row: Full Width Address -->
-                                        <div class="row">
-                                            <div class="col-12 mb-4">
-                                                <label class="form-label" for="address">Address
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <textarea class="form-control" id="address" name="address" rows="3" 
-                                                    required>{{ old('address') }}</textarea>
-                                                <div class="invalid-feedback">
-                                                    Please enter an address.
-                                                </div>
-                                                @error('address')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Add Event Button -->
-                                        <div class="mb-4">
-                                            <button type="button" id="add-event-btn" class="btn btn-success">
-                                                <i class="bi bi-plus-circle me-2"></i>Add Event
-                                            </button>
-                                        </div>
-                                </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-validation">
+                        <form class="needs-validation" action="{{ route('orders.store') }}" method="POST" novalidate>
+                            @csrf
+                            @include('orders.form')
 
                                 <!-- Events Table -->
                                 <div class="row">
@@ -120,18 +57,37 @@
                                 <!-- Hidden input for events data -->
                                 <input type="hidden" name="events" id="events-data" value="">
 
-                                <div class="row mt-4">
-                                        <div>
-                                            <button type="submit" id="submit-btn" class="btn btn-primary">Submit</button>
-                                        </div>
+                            <div class="row mt-4">
+                                <div class="mb-3">
+                                    <button type="submit" id="submit-btn" class="btn btn-primary btn-submit">Submit</button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    {{-- Tips Section --}}
+    <x-tips-section>
+        <x-tip-item>
+            Enter accurate customer information to ensure proper communication and delivery
+        </x-tip-item>
+        
+        <x-tip-item>
+            Add at least one event to create an order. You can add multiple events for the same customer
+        </x-tip-item>
+        
+        <x-tip-item>
+            Event details including date, time, menu, and guest count are required for each event
+        </x-tip-item>
+        
+        <x-tip-item>
+            The cost is automatically calculated based on guest count and dish price
+        </x-tip-item>
+    </x-tips-section>
+</div>
 @endsection
 
 <!-- Event Modal -->

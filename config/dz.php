@@ -41,6 +41,7 @@ return [
 					'vendor/datatables/js/jquery.dataTables.min.js',
 					'js/custom.js',
 					'js/dlabnav-init.js',
+					'js/plugins-init/jquery.validate-init.js',
 				],
 			],
 		],
