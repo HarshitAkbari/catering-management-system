@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="d-flex flex-column">
                     <div class="d-flex align-items-center gap-2">
                         <h4 class="card-title mb-0">{{ $page_title ?? 'Orders' }}</h4>
@@ -17,6 +17,9 @@
                         </div>
                     @endif
                 </div>
+                @hasPermission('orders.create')
+                <a href="{{ route('orders.create') }}" class="btn btn-sm btn-primary btn-add">Create Order</a>
+                @endhasPermission
             </div>
             <div class="card-body">
                 <!-- Filter Form -->
@@ -145,8 +148,8 @@
                                     </td>
                                     <td><strong>₹{{ number_format($group['total_amount'], 2) }}</strong></td>
                                     <td>
-                                        <a href="{{ route('orders.show', $firstOrder) }}" class="btn btn-primary btn-sm" title="View">
-                                            <i class="bi bi-eye"></i>
+                                        <a href="{{ route('orders.show', $firstOrder) }}" class="btn btn-primary btn-xs" title="View">
+                                            View
                                         </a>
                                     </td>
                                 </tr>

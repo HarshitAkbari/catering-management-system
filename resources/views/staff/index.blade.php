@@ -6,19 +6,20 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex flex-column">
-                        <div class="d-flex align-items-center gap-2">
-                            <h4 class="card-title mb-0">{{ $page_title ?? 'Staff' }}</h4>
-                        </div>
-                        @if(isset($subtitle))
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
-                            </div>
-                        @endif
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center gap-2">
+                        <h4 class="card-title mb-0">{{ $page_title ?? 'Staff' }}</h4>
                     </div>
+                    @if(isset($subtitle))
+                        <div class="d-flex align-items-center gap-2 mt-2">
+                            <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                        </div>
+                    @endif
                 </div>
+                @hasPermission('staff.create')
+                <a href="{{ route('staff.create') }}" class="btn btn-sm btn-primary btn-add">Add Staff</a>
+                @endhasPermission
             </div>
             <div class="card-body">
                 <!-- Filter Form -->

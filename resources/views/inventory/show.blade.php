@@ -20,7 +20,7 @@
                         <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $inventoryItem->name }}</strong></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Unit :</span> <strong>{{ $inventoryItem->unit }}</strong></p>
+                        <p class="mb-0"><span class="text-muted">Unit :</span> <strong>{{ $inventoryItem->inventoryUnit->name ?? '-' }}</strong></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
                         <p class="mb-0"><span class="text-muted">Current Stock :</span> <strong>{{ number_format($inventoryItem->current_stock, 2) }}</strong></p>
@@ -78,7 +78,7 @@
                                             {{ strtoupper($transaction->type) }}
                                         </span>
                                     </td>
-                                    <td>{{ number_format($transaction->quantity, 2) }} {{ $inventoryItem->unit }}</td>
+                                    <td>{{ number_format($transaction->quantity, 2) }} {{ $inventoryItem->inventoryUnit->name ?? '-' }}</td>
                                     <td>
                                         @if($transaction->price)
                                             ₹{{ number_format($transaction->price, 2) }}

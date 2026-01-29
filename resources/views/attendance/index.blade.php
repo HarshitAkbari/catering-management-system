@@ -115,8 +115,8 @@
                                     <td>{{ $attendance->notes ?? '-' }}</td>
                                     <td class="text-end">
                                         @hasPermission('attendance.edit')
-                                        <a href="{{ route('attendance.edit', $attendance) }}" class="btn btn-info btn-sm" title="Edit">
-                                            <i class="bi bi-pencil"></i>
+                                        <a href="{{ route('attendance.edit', $attendance) }}" class="btn btn-primary btn-xs" title="Edit">
+                                            Edit
                                         </a>
                                         @endhasPermission
                                     </td>

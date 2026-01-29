@@ -12,7 +12,9 @@
                     @hasPermission('staff.edit')
                     <a href="{{ route('staff.edit', $staff) }}" class="btn btn-info btn-sm">Edit</a>
                     @endhasPermission
-                    <a href="{{ route('staff.index') }}" class="btn btn-secondary btn-sm">Back</a>
+                    <a href="{{ route('staff.index') }}" class="btn btn-dark btn-xs">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
                 </div>
             </div>
             <div class="card-body">
