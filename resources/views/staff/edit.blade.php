@@ -11,8 +11,8 @@
                 <div class="card-header">
                     <h4 class="card-title">Edit {{ $page_title ?? 'Staff Member' }}</h4>
                     <div class="card-tools">
-                        <a href="{{ route('staff.index') }}" class="btn btn-default btn-sm">
-                            <i class="bi bi-arrow-left"></i> Back to List
+                        <a href="{{ route('staff.index') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back
                         </a>
                     </div>
                 </div>

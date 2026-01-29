@@ -25,9 +25,8 @@
                     <button type="button" onclick="openStatusModal('{{ $firstOrder->id }}', '{{ $currentStatus }}')" class="btn btn-primary btn-sm" style="pointer-events: auto; cursor: pointer;">
                         Change Status
                     </button>
-                    <a href="{{ route('orders.index') }}" style="pointer-events: auto; cursor: pointer;">
-                        <i class="bi bi-arrow-left"></i>
-                        Back to list
+                    <a href="{{ route('orders.index') }}" class="btn btn-dark btn-xs">
+                        <i class="bi bi-arrow-left"></i> Back
                     </a>
                 </div>
             </div>

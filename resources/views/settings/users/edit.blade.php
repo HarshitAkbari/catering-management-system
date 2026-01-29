@@ -11,8 +11,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
                         <div class="card-tools">
-                            <a href="{{ route('users.index') }}" class="btn btn-default btn-sm">
-                                <i class="bi bi-arrow-left"></i> Back to List
+                            <a href="{{ route('users.index') }}" class="btn btn-dark btn-sm">
+                                <i class="bi bi-arrow-left"></i> Back
                             </a>
                         </div>
                         <h3 class="card-title mb-0">Edit {{ $page_title ?? 'User' }}</h3>
