@@ -15,7 +15,6 @@
                 </a>
                 <ul class="{{ request()->routeIs('orders.*') ? 'mm-show' : '' }}" aria-expanded="{{ request()->routeIs('orders.*') ? 'true' : 'false' }}">
                     <li><a href="{{ route('orders.index') }}" class="{{ request()->routeIs('orders.index') || request()->routeIs('orders.show') || request()->routeIs('orders.edit') ? 'mm-active' : '' }}">Orders</a></li>
-                    <li><a href="{{ route('orders.create') }}" class="{{ request()->routeIs('orders.create') ? 'mm-active' : '' }}">Create Order</a></li>
                     <li><a href="{{ route('orders.calendar') }}" class="{{ request()->routeIs('orders.calendar') ? 'mm-active' : '' }}">Order Calendar</a></li>
                 </ul>
             </li>
@@ -41,7 +40,6 @@
                 </a>
                 <ul class="{{ request()->routeIs('inventory.*') ? 'mm-show' : '' }}" aria-expanded="{{ request()->routeIs('inventory.*') ? 'true' : 'false' }}">
                     <li><a href="{{ route('inventory.index') }}" class="{{ request()->routeIs('inventory.index') || request()->routeIs('inventory.show') || request()->routeIs('inventory.edit') ? 'mm-active' : '' }}">Item List</a></li>
-                    <li><a href="{{ route('inventory.create') }}" class="{{ request()->routeIs('inventory.create') ? 'mm-active' : '' }}">Add Inventory Item</a></li>
                     <li><a href="{{ route('inventory.stock-in') }}" class="{{ request()->routeIs('inventory.stock-in*') ? 'mm-active' : '' }}">Stock In</a></li>
                     <li><a href="{{ route('inventory.stock-out') }}" class="{{ request()->routeIs('inventory.stock-out*') ? 'mm-active' : '' }}">Stock Out</a></li>
                 </ul>
@@ -61,7 +59,6 @@
                 </a>
                 <ul class="{{ request()->routeIs('equipment.*') ? 'mm-show' : '' }}" aria-expanded="{{ request()->routeIs('equipment.*') ? 'true' : 'false' }}">
                     <li><a href="{{ route('equipment.index') }}" class="{{ request()->routeIs('equipment.index') || request()->routeIs('equipment.show') || request()->routeIs('equipment.edit') ? 'mm-active' : '' }}">Equipment List</a></li>
-                    <li><a href="{{ route('equipment.create') }}" class="{{ request()->routeIs('equipment.create') ? 'mm-active' : '' }}">Add Equipment</a></li>
                 </ul>
             </li>
             @hasPermission('staff.view')
@@ -71,9 +68,6 @@
                 </a>
                 <ul class="{{ request()->routeIs('staff.*') ? 'mm-show' : '' }}" aria-expanded="{{ request()->routeIs('staff.*') ? 'true' : 'false' }}">
                     <li><a href="{{ route('staff.index') }}" class="{{ request()->routeIs('staff.index') || request()->routeIs('staff.show') || request()->routeIs('staff.edit') || request()->routeIs('staff.workload') || request()->routeIs('staff.performance') ? 'mm-active' : '' }}">Staff List</a></li>
-                    @hasPermission('staff.create')
-                    <li><a href="{{ route('staff.create') }}" class="{{ request()->routeIs('staff.create') ? 'mm-active' : '' }}">Add Staff</a></li>
-                    @endhasPermission
                 </ul>
             </li>
             @endhasPermission

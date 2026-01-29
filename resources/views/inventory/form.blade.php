@@ -2,7 +2,7 @@
     <div class="col-md-6 mb-4">
         <label class="form-label" for="name">Name <span class="text-danger">*</span></label>
         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" 
-            placeholder="Enter item name.." value="{{ old('name', $inventoryItem->name ?? '') }}" required>
+            value="{{ old('name', $inventoryItem->name ?? '') }}" required>
         <div class="invalid-feedback">Please enter an item name.</div>
     </div>
 
@@ -42,8 +42,7 @@
 
     <div class="col-md-12 mb-4">
         <label class="form-label" for="description">Description</label>
-        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3" 
-            placeholder="Enter description..">{{ old('description', $inventoryItem->description ?? '') }}</textarea>
+        <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description', $inventoryItem->description ?? '') }}</textarea>
     </div>
 </div>
 

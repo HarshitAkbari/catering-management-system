@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('components.flash-messages')
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
@@ -18,6 +19,9 @@
                             </div>
                         @endif
                     </div>
+                    @hasPermission('inventory.create')
+                    <a href="{{ route('inventory.create') }}" class="btn btn-sm btn-primary btn-add">Add Inventory Item</a>
+                    @endhasPermission
                 </div>
             <div class="card-body">
                 <!-- Filter Form -->
@@ -34,7 +38,7 @@
                         <!-- Name Filter -->
                         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                             <label for="name_filter" class="form-label">Name</label>
-                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm">
                         </div>
 
                         <!-- Unit Filter -->

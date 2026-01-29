@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('components.flash-messages')
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
@@ -18,6 +19,9 @@
                             </div>
                         @endif
                     </div>
+                    @hasPermission('equipment.create')
+                    <a href="{{ route('equipment.create') }}" class="btn btn-sm btn-primary btn-add">Add Equipment</a>
+                    @endhasPermission
                 </div>
                 <div class="card-body">
                     <!-- Filter Form -->

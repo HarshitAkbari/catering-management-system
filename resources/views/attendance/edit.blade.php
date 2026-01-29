@@ -11,7 +11,7 @@
             </div>
             <div class="card-body">
                 @include('error.alerts')
-                <form action="{{ route('attendance.update', $attendance) }}" method="POST">
+                <form class="needs-validation" action="{{ route('attendance.update', $attendance) }}" method="POST" novalidate>
                     @csrf
                     @method('PUT')
                     <div class="row">
@@ -23,6 +23,7 @@
                                     <option value="{{ $staff->id }}" {{ old('staff_id', $attendance->staff_id) == $staff->id ? 'selected' : '' }}>{{ $staff->name }} ({{ $staff->staff_role }})</option>
                                 @endforeach
                             </select>
+                            <div class="invalid-feedback">Please select a staff member.</div>
                             @error('staff_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -30,6 +31,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="date" class="form-label">Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control @error('date') is-invalid @enderror" id="date" name="date" value="{{ old('date', $attendance->date->toDateString()) }}" max="{{ now()->toDateString() }}" required>
+                            <div class="invalid-feedback">Please select a date.</div>
                             @error('date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -42,6 +44,7 @@
                                 <option value="late" {{ old('status', $attendance->status) == 'late' ? 'selected' : '' }}>Late</option>
                                 <option value="half_day" {{ old('status', $attendance->status) == 'half_day' ? 'selected' : '' }}>Half Day</option>
                             </select>
+                            <div class="invalid-feedback">Please select a status.</div>
                             @error('status')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

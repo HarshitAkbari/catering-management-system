@@ -51,7 +51,6 @@ class InventoryController extends Controller
         }
         
         $inventoryItems = $this->inventoryService->getByTenant($tenantId, 15, $filters);
-        $inventoryItems->load('inventoryUnit');
         
         // Pass filter values to view for form preservation
         $filterValues = [

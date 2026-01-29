@@ -9,6 +9,9 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Customer Information</h4>
+                    <a href="{{ route('customers.index') }}" class="btn btn-dark btn-xs">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
                 </div>
                 <div class="card-body">
                     <div class="row">

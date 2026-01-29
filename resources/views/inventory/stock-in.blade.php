@@ -7,6 +7,7 @@
     <div class="row">
         <div class="col-lg-12">
             @include('error.alerts')
+            @include('components.flash-messages')
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Stock In</h4>
@@ -83,8 +84,7 @@
 
                                 <div class="col-md-12 mb-4">
                                     <label class="form-label" for="notes">Notes</label>
-                                    <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3" 
-                                        placeholder="Enter notes..">{{ old('notes') }}</textarea>
+                                    <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
                                     <div class="invalid-feedback">
                                         @error('notes')
                                             {{ $message }}
