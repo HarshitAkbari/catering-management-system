@@ -13,6 +13,33 @@
                     <h4 class="card-title">Stock Out</h4>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Select the inventory item you want to reduce stock for from the dropdown list
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Enter the quantity being used or removed. The system will validate that sufficient stock is available
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Use stock out to record items used in orders, damaged items, expired items, or any other stock reduction
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Add notes to document the reason for stock out, order number, or any other relevant information
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Stock out transactions are automatically recorded and will update the current stock level of the selected item
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            If stock goes below the minimum threshold after stock out, you'll receive a low stock alert
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" action="{{ route('inventory.stock-out.store') }}" method="POST" novalidate>
                             @csrf
@@ -76,32 +103,5 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Select the inventory item you want to reduce stock for from the dropdown list
-        </x-tip-item>
-        
-        <x-tip-item>
-            Enter the quantity being used or removed. The system will validate that sufficient stock is available
-        </x-tip-item>
-        
-        <x-tip-item>
-            Use stock out to record items used in orders, damaged items, expired items, or any other stock reduction
-        </x-tip-item>
-        
-        <x-tip-item>
-            Add notes to document the reason for stock out, order number, or any other relevant information
-        </x-tip-item>
-        
-        <x-tip-item>
-            Stock out transactions are automatically recorded and will update the current stock level of the selected item
-        </x-tip-item>
-        
-        <x-tip-item>
-            If stock goes below the minimum threshold after stock out, you'll receive a low stock alert
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection

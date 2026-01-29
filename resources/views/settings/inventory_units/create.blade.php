@@ -17,6 +17,25 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Use standard unit names for inventory units (e.g., "kg", "liter", "piece", "box")
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Inventory units help standardize measurements across your inventory items
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            You can activate/deactivate units as needed from the inventory units list
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Deactivated units won't appear in dropdowns but existing inventory items keep their unit
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('settings.inventory-units.store') }}" novalidate>
                             @csrf
@@ -30,25 +49,6 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Use standard unit names for inventory units (e.g., "kg", "liter", "piece", "box")
-        </x-tip-item>
-        
-        <x-tip-item>
-            Inventory units help standardize measurements across your inventory items
-        </x-tip-item>
-        
-        <x-tip-item>
-            You can activate/deactivate units as needed from the inventory units list
-        </x-tip-item>
-        
-        <x-tip-item>
-            Deactivated units won't appear in dropdowns but existing inventory items keep their unit
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
 

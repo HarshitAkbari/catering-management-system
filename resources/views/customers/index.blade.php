@@ -102,10 +102,13 @@
                                                 {{ $customer->orders_count }} {{ Str::plural('order', $customer->orders_count) }}
                                             </span>
                                         </td>
-                                        <td class="py-2 text-end">
+                                        <td class="py-2">
                                             <a href="{{ route('customers.show', $customer) }}" class="btn btn-primary btn-xs" title="View">
                                                 View
                                             </a>
+                                                <a href="{{ route('customers.edit', $customer) }}" class="btn btn-warning btn-xs" title="Edit">
+                                                    Edit
+                                                </a>
                                         </td>
                                     </tr>
                                 @empty

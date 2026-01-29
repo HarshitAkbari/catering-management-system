@@ -17,6 +17,25 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Use clear, descriptive names for order statuses (e.g., "Pending", "In Progress", "Completed")
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Order statuses help track the progress of orders through your workflow
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            You can activate/deactivate statuses as needed from the order statuses list
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Deactivated statuses won't appear in dropdowns but existing orders keep their status
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('settings.order-statuses.store') }}" novalidate>
                             @csrf
@@ -30,25 +49,6 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Use clear, descriptive names for order statuses (e.g., "Pending", "In Progress", "Completed")
-        </x-tip-item>
-        
-        <x-tip-item>
-            Order statuses help track the progress of orders through your workflow
-        </x-tip-item>
-        
-        <x-tip-item>
-            You can activate/deactivate statuses as needed from the order statuses list
-        </x-tip-item>
-        
-        <x-tip-item>
-            Deactivated statuses won't appear in dropdowns but existing orders keep their status
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
 

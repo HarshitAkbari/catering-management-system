@@ -17,6 +17,25 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Use clear, descriptive names for equipment categories (e.g., "Tables", "Chairs", "Linens")
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Equipment categories help organize and manage your catering equipment inventory
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            You can activate/deactivate categories as needed from the equipment categories list
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Deactivated categories won't appear in dropdowns but existing equipment keeps its category
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('settings.equipment-categories.store') }}" novalidate>
                             @csrf
@@ -30,25 +49,6 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Use clear, descriptive names for equipment categories (e.g., "Tables", "Chairs", "Linens")
-        </x-tip-item>
-        
-        <x-tip-item>
-            Equipment categories help organize and manage your catering equipment inventory
-        </x-tip-item>
-        
-        <x-tip-item>
-            You can activate/deactivate categories as needed from the equipment categories list
-        </x-tip-item>
-        
-        <x-tip-item>
-            Deactivated categories won't appear in dropdowns but existing equipment keeps its category
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
 

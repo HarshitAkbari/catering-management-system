@@ -19,6 +19,25 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Your password must be at least 8 characters long
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Use a strong password with a combination of letters, numbers, and special characters
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Make sure your new password is different from your current password
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            After changing your password, you'll need to log in again with your new password
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" action="{{ route('change-password.update') }}" method="POST" novalidate>
                             @csrf
@@ -94,24 +113,5 @@
         </div>
     </div>
 </div>
-
-{{-- Tips Section --}}
-<x-tips-section>
-    <x-tip-item>
-        Your password must be at least 8 characters long
-    </x-tip-item>
-    
-    <x-tip-item>
-        Use a strong password with a combination of letters, numbers, and special characters
-    </x-tip-item>
-    
-    <x-tip-item>
-        Make sure your new password is different from your current password
-    </x-tip-item>
-    
-    <x-tip-item>
-        After changing your password, you'll need to log in again with your new password
-    </x-tip-item>
-</x-tips-section>
 @endsection
 

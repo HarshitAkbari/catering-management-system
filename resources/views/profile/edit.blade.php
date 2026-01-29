@@ -19,6 +19,21 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Update your profile information to keep your account details current
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Your email address is used for login and important notifications
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            To change your password, use the "Change Password" option in the profile menu
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" action="{{ route('profile.update') }}" method="POST" novalidate>
                             @csrf
@@ -75,20 +90,5 @@
         </div>
     </div>
 </div>
-
-{{-- Tips Section --}}
-<x-tips-section>
-    <x-tip-item>
-        Update your profile information to keep your account details current
-    </x-tip-item>
-    
-    <x-tip-item>
-        Your email address is used for login and important notifications
-    </x-tip-item>
-    
-    <x-tip-item>
-        To change your password, use the "Change Password" option in the profile menu
-    </x-tip-item>
-</x-tips-section>
 @endsection
 

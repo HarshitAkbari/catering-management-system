@@ -9,9 +9,16 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Customer Information</h4>
-                    <a href="{{ route('customers.index') }}" class="btn btn-dark btn-xs">
-                        <i class="bi bi-arrow-left"></i> Back
-                    </a>
+                    <div class="d-flex gap-2">
+                        @can('customers.edit')
+                            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-warning btn-xs">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                        @endcan
+                        <a href="{{ route('customers.index') }}" class="btn btn-dark btn-xs">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -21,6 +28,11 @@
                         <div class="col-lg-4 col-md-6 mb-3">
                             <p class="mb-0"><span class="text-muted">Mobile :</span> <strong>{{ $customer->mobile }}</strong></p>
                         </div>
+                        @if($customer->secondary_mobile)
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <p class="mb-0"><span class="text-muted">Secondary Mobile :</span> <strong>{{ $customer->secondary_mobile }}</strong></p>
+                            </div>
+                        @endif
                         @if($customer->email)
                             <div class="col-lg-4 col-md-6 mb-3">
                                 <p class="mb-0"><span class="text-muted">Email :</span> <strong>{{ $customer->email }}</strong></p>
