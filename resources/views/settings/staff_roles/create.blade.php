@@ -11,8 +11,8 @@
                 <div class="card-header">
                     <h3 class="card-title">Add {{ $page_title ?? 'Staff Role' }}</h3>
                     <div class="card-tools">
-                        <a href="{{ route('settings.staff-roles') }}" class="btn btn-default btn-sm">
-                            <i class="bi bi-arrow-left"></i> Back to List
+                        <a href="{{ route('settings.staff-roles') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back
                         </a>
                     </div>
                 </div>

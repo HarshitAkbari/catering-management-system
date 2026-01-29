@@ -9,8 +9,8 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title">{{ $inventoryItem->name }}</h4>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('inventory.index') }}">
-                        <i class="bi bi-arrow-left me-2"></i>Back to List
+                    <a href="{{ route('inventory.index') }}" class="btn btn-dark btn-sm">
+                        <i class="bi bi-arrow-left me-2"></i>Back
                     </a>
                 </div>
             </div>

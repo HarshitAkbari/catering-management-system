@@ -10,6 +10,11 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Edit Vendor</h4>
+                    <div class="card-tools">
+                        <a href="{{ route('vendors.index') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="form-validation">

@@ -11,8 +11,8 @@
                 <div class="card-header">
                     <h3 class="card-title">Add {{ $page_title ?? 'Order' }}</h3>
                     <div class="card-tools">
-                        <a href="{{ route('orders.index') }}" class="btn btn-default btn-sm">
-                            <i class="bi bi-arrow-left"></i> Back to List
+                        <a href="{{ route('orders.index') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back
                         </a>
                     </div>
                 </div>
