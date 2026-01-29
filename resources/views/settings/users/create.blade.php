@@ -20,7 +20,7 @@
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('users.store') }}" novalidate>
                             @csrf
-                            @include('settings.users._form')
+                            @include('settings.users.form')
                             <div class="mb-3">
                                 <button type="submit" class="btn btn-primary btn-submit">Submit</button>
                             </div>

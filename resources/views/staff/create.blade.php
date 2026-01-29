@@ -1,70 +1,54 @@
 @extends('layouts.app')
 
-@section('title', 'Add Staff')
+@section('title', $page_title ?? 'Add Staff')
 
-@section('page_content')
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">Add Staff Member</h4>
-            </div>
-            <div class="card-body">
-                @include('error.alerts')
-                <form action="{{ route('staff.store') }}" method="POST">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}" required>
-                            @error('phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}">
-                            @error('email')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="staff_role_id" class="form-label">Role <span class="text-danger">*</span></label>
-                            <select class="form-control @error('staff_role_id') is-invalid @enderror" id="staff_role_id" name="staff_role_id" required>
-                                <option value="">Select Role</option>
-                                @foreach($roles ?? [] as $role)
-                                    <option value="{{ $role->id }}" {{ old('staff_role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('staff_role_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            @error('staff_role')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="address" class="form-label">Address</label>
-                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="3">{{ old('address') }}</textarea>
-                            @error('address')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            @include('error.alerts')
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Add {{ $page_title ?? 'Staff Member' }}</h3>
+                    <div class="card-tools">
+                        <a href="{{ route('staff.index') }}" class="btn btn-default btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                <div class="card-body">
+                    <div class="form-validation">
+                        <form class="needs-validation" method="POST" action="{{ route('staff.store') }}" novalidate>
+                            @csrf
+                            @include('staff.form')
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary btn-submit">Submit</button>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
+    
+    {{-- Tips Section --}}
+    <x-tips-section>
+        <x-tip-item>
+            Use clear, descriptive names for staff members to easily identify them in the system
+        </x-tip-item>
+        
+        <x-tip-item>
+            Assign appropriate roles to staff members based on their responsibilities and skills
+        </x-tip-item>
+        
+        <x-tip-item>
+            Provide accurate contact information (phone and email) for effective communication
+        </x-tip-item>
+        
+        <x-tip-item>
+            You can update staff status and information later from the staff list
+        </x-tip-item>
+    </x-tips-section>
 </div>
 @endsection
 

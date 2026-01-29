@@ -1,100 +1,27 @@
-@extends('layout.default')
+@extends('layouts.app')
+
+@section('title', $page_title ?? 'Edit Order')
 
 @section('content')
-	<div class="container-fluid">
-        <!-- row -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">{{ $page_title ?? 'Edit Order' }}</h4>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            @include('error.alerts')
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Edit {{ $page_title ?? 'Order' }}</h4>
+                    <div class="card-tools">
+                        <a href="{{ route('orders.index') }}" class="btn btn-default btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
                     </div>
-                    <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-alt alert-danger solid alert-dismissible fade show" role="alert">
-                                <strong>There were errors with your submission:</strong>
-                                <ul class="mb-0 mt-2">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        <div class="form-validation">
-                            <form class="needs-validation" action="{{ route('orders.update', $order) }}" method="POST" novalidate>
-                                @csrf
-                                @method('PUT')
-
-                                <div class="row">
-                                        <div class="row">
-                                            <!-- First Row: 3 Columns -->
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_name">Customer Name
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
-                                                    value="{{ old('customer_name', $order->customer->name) }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a customer name.
-                                                </div>
-                                                @error('customer_name')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_email">Customer Email
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="email" class="form-control" id="customer_email" name="customer_email" 
-                                                    value="{{ old('customer_email', $order->customer->email ?? '') }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a valid email.
-                                                </div>
-                                                @error('customer_email')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_mobile">Contact Number
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" 
-                                                    value="{{ old('customer_mobile', $order->customer->mobile) }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a contact number.
-                                                </div>
-                                                @error('customer_mobile')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Second Row: Full Width Address -->
-                                        <div class="row">
-                                            <div class="col-12 mb-4">
-                                                <label class="form-label" for="address">Address
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <textarea class="form-control" id="address" name="address" rows="3" 
-                                                    required>{{ old('address', $order->address) }}</textarea>
-                                                <div class="invalid-feedback">
-                                                    Please enter an address.
-                                                </div>
-                                                @error('address')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Add Event Button -->
-                                        <div class="mb-4">
-                                            <button type="button" id="add-event-btn" class="btn btn-success">
-                                                <i class="bi bi-plus-circle me-2"></i>Add Event
-                                            </button>
-                                        </div>
-                                </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-validation">
+                        <form class="needs-validation" action="{{ route('orders.update', $order) }}" method="POST" novalidate>
+                            @csrf
+                            @method('PUT')
+                            @include('orders.form')
 
                                 <!-- Events Table -->
                                 <div class="row">
@@ -131,21 +58,18 @@
                                 <!-- Hidden input for events data -->
                                 <input type="hidden" name="events" id="events-data" value="">
 
-                                <div class="row mt-4">
-                                    <div class="col-xl-8 col-lg-10 mx-auto">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a href="{{ route('orders.index') }}" class="btn btn-secondary">Cancel</a>
-                                            <button type="submit" id="submit-btn" class="btn btn-primary">Update Order</button>
-                                        </div>
-                                    </div>
+                            <div class="row mt-4">
+                                <div class="mb-3">
+                                    <button type="submit" id="submit-btn" class="btn btn-primary btn-submit">Submit</button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 <!-- Event Modal -->

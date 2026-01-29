@@ -44,7 +44,7 @@
                             @csrf
                             @method('PUT')
 
-                            @include('settings.users._form')
+                            @include('settings.users.form')
 
                             <div class="row mt-4">
                                 <div class="col-xl-8 col-lg-10 mx-auto">
@@ -61,29 +61,6 @@
         </div>
     </div>
 </div>
-
-{{-- Tips Section --}}
-<x-tips-section>
-    <x-tip-item>
-        Update user roles and permissions as needed. Changes take effect immediately
-    </x-tip-item>
-    
-    <x-tip-item>
-        Leave password fields blank to keep the current password unchanged
-    </x-tip-item>
-    
-    <x-tip-item>
-        Use the activate/deactivate buttons to manage user access without deleting the account
-    </x-tip-item>
-    
-    <x-tip-item>
-        Users can be assigned multiple roles for flexible permission management
-    </x-tip-item>
-    
-    <x-tip-item>
-        Deactivated users cannot log in but their data remains in the system
-    </x-tip-item>
-</x-tips-section>
 
 {{-- Settings Deactivation Modal --}}
 <x-settings-deactivation-modal 
