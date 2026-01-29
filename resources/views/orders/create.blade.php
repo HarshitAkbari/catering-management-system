@@ -17,6 +17,25 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Enter accurate customer information to ensure proper communication and delivery
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Add at least one event to create an order. You can add multiple events for the same customer
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Event details including date, time, menu, and guest count are required for each event
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            The cost is automatically calculated based on guest count and dish price
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" action="{{ route('orders.store') }}" method="POST" novalidate>
                             @csrf
@@ -68,25 +87,6 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Enter accurate customer information to ensure proper communication and delivery
-        </x-tip-item>
-        
-        <x-tip-item>
-            Add at least one event to create an order. You can add multiple events for the same customer
-        </x-tip-item>
-        
-        <x-tip-item>
-            Event details including date, time, menu, and guest count are required for each event
-        </x-tip-item>
-        
-        <x-tip-item>
-            The cost is automatically calculated based on guest count and dish price
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
 

@@ -17,6 +17,25 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Use clear, descriptive names for staff members to easily identify them in the system
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Assign appropriate roles to staff members based on their responsibilities and skills
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Provide accurate contact information (phone and email) for effective communication
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            You can update staff status and information later from the staff list
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('staff.store') }}" novalidate>
                             @csrf
@@ -30,25 +49,6 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Use clear, descriptive names for staff members to easily identify them in the system
-        </x-tip-item>
-        
-        <x-tip-item>
-            Assign appropriate roles to staff members based on their responsibilities and skills
-        </x-tip-item>
-        
-        <x-tip-item>
-            Provide accurate contact information (phone and email) for effective communication
-        </x-tip-item>
-        
-        <x-tip-item>
-            You can update staff status and information later from the staff list
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
 

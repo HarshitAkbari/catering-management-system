@@ -17,6 +17,25 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Use clear, descriptive names for order types (e.g., "Full Service", "Preparation Only", "Delivery Only")
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Order types help categorize and manage different service levels for your catering orders
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            You can activate/deactivate order types as needed from the order types list
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Deactivated order types won't appear in dropdowns but existing orders keep their type
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('settings.order-types.store') }}" novalidate>
                             @csrf
@@ -30,25 +49,6 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Use clear, descriptive names for order types (e.g., "Full Service", "Preparation Only", "Delivery Only")
-        </x-tip-item>
-        
-        <x-tip-item>
-            Order types help categorize and manage different service levels for your catering orders
-        </x-tip-item>
-        
-        <x-tip-item>
-            You can activate/deactivate order types as needed from the order types list
-        </x-tip-item>
-        
-        <x-tip-item>
-            Deactivated order types won't appear in dropdowns but existing orders keep their type
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
 

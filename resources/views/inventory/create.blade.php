@@ -12,6 +12,25 @@
                     <h3 class="card-title">Add {{ $page_title ?? 'Inventory Item' }}</h3>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Use clear, descriptive names for inventory items (e.g., "Basmati Rice", "Olive Oil", "Chicken Breast")
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Set appropriate minimum stock levels to avoid running out of essential items during operations
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Regularly update current stock through stock-in/stock-out operations to maintain accurate inventory levels
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Keep price per unit updated for accurate cost calculations and profit margin analysis
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('inventory.store') }}" novalidate>
                             @csrf
@@ -25,24 +44,5 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Use clear, descriptive names for inventory items (e.g., "Basmati Rice", "Olive Oil", "Chicken Breast")
-        </x-tip-item>
-        
-        <x-tip-item>
-            Set appropriate minimum stock levels to avoid running out of essential items during operations
-        </x-tip-item>
-        
-        <x-tip-item>
-            Regularly update current stock through stock-in/stock-out operations to maintain accurate inventory levels
-        </x-tip-item>
-        
-        <x-tip-item>
-            Keep price per unit updated for accurate cost calculations and profit margin analysis
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection

@@ -13,6 +13,29 @@
                     <h4 class="card-title">Stock In</h4>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Select the inventory item you want to add stock for from the dropdown list
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Enter the quantity being added. Use decimal values for items measured in units like kg, liters, etc.
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Optionally record the purchase price and vendor for better inventory tracking and cost management
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Add notes to document the reason for stock in, purchase order number, or any other relevant information
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Stock in transactions are automatically recorded and will update the current stock level of the selected item
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" action="{{ route('inventory.stock-in.store') }}" method="POST" novalidate>
                             @csrf
@@ -104,28 +127,5 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Select the inventory item you want to add stock for from the dropdown list
-        </x-tip-item>
-        
-        <x-tip-item>
-            Enter the quantity being added. Use decimal values for items measured in units like kg, liters, etc.
-        </x-tip-item>
-        
-        <x-tip-item>
-            Optionally record the purchase price and vendor for better inventory tracking and cost management
-        </x-tip-item>
-        
-        <x-tip-item>
-            Add notes to document the reason for stock in, purchase order number, or any other relevant information
-        </x-tip-item>
-        
-        <x-tip-item>
-            Stock in transactions are automatically recorded and will update the current stock level of the selected item
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
