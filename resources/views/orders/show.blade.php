@@ -33,22 +33,22 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Order Number :</span> <strong>{{ $order->order_number }}</strong></p>
+                        <p class="mb-0"><strong>Order Number :</strong> <span class="text-muted">{{ $order->order_number }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Customer :</span> <strong>{{ $order->customer->name }}</strong></p>
+                        <p class="mb-0"><strong>Customer :</strong> <span class="text-muted">{{ $order->customer->name }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Contact :</span> <strong>{{ $order->customer->mobile }}</strong></p>
+                        <p class="mb-0"><strong>Contact :</strong> <span class="text-muted">{{ $order->customer->mobile }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Total Amount :</span> <strong>₹{{ number_format($totalAmount, 2) }}</strong></p>
+                        <p class="mb-0"><strong>Total Amount :</strong> <span class="text-muted">₹{{ number_format($totalAmount, 2) }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Number of Events :</span> <strong>{{ $eventCount }}</strong></p>
+                        <p class="mb-0"><strong>Number of Events :</strong> <span class="text-muted">{{ $eventCount }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Address :</span> <strong>{{ $order->address }}</strong></p>
+                        <p class="mb-0"><strong>Address :</strong> <span class="text-muted">{{ $order->address }}</span></p>
                     </div>
                 </div>
             </div>

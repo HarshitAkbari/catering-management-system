@@ -24,23 +24,23 @@
                         <table class="table table-borderless">
                             <tr>
                                 <td><strong>Name:</strong></td>
-                                <td>{{ $staff->name }}</td>
+                                <td class="text-muted">{{ $staff->name }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Phone:</strong></td>
-                                <td><a href="tel:{{ $staff->phone }}">{{ $staff->phone }}</a></td>
+                                <td class="text-muted"><a href="tel:{{ $staff->phone }}">{{ $staff->phone }}</a></td>
                             </tr>
                             <tr>
                                 <td><strong>Email:</strong></td>
-                                <td>@if($staff->email)<a href="mailto:{{ $staff->email }}">{{ $staff->email }}</a>@else N/A @endif</td>
+                                <td class="text-muted">@if($staff->email)<a href="mailto:{{ $staff->email }}">{{ $staff->email }}</a>@else N/A @endif</td>
                             </tr>
                             <tr>
                                 <td><strong>Role:</strong></td>
-                                <td><span class="badge badge-info light">{{ $staff->staff_role }}</span></td>
+                                <td class="text-muted"><span class="badge badge-info light">{{ $staff->staff_role }}</span></td>
                             </tr>
                             <tr>
                                 <td><strong>Status:</strong></td>
-                                <td>
+                                <td class="text-muted">
                                     @if($staff->status === 'active')
                                         <span class="badge badge-success light">Active</span>
                                     @else
@@ -51,7 +51,7 @@
                             @if($staff->address)
                             <tr>
                                 <td><strong>Address:</strong></td>
-                                <td>{{ $staff->address }}</td>
+                                <td class="text-muted">{{ $staff->address }}</td>
                             </tr>
                             @endif
                         </table>

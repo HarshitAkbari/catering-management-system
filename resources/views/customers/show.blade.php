@@ -23,24 +23,24 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-4 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $customer->name }}</strong></p>
+                            <p class="mb-0"><strong>Name :</strong> <span class="text-muted">{{ $customer->name }}</span></p>
                         </div>
                         <div class="col-lg-4 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Mobile :</span> <strong>{{ $customer->mobile }}</strong></p>
+                            <p class="mb-0"><strong>Mobile :</strong> <span class="text-muted">{{ $customer->mobile }}</span></p>
                         </div>
                         @if($customer->secondary_mobile)
                             <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Secondary Mobile :</span> <strong>{{ $customer->secondary_mobile }}</strong></p>
+                                <p class="mb-0"><strong>Secondary Mobile :</strong> <span class="text-muted">{{ $customer->secondary_mobile }}</span></p>
                             </div>
                         @endif
                         @if($customer->email)
                             <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Email :</span> <strong>{{ $customer->email }}</strong></p>
+                                <p class="mb-0"><strong>Email :</strong> <span class="text-muted">{{ $customer->email }}</span></p>
                             </div>
                         @endif
                         @if($customer->address)
                         <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Address :</span> <strong>{{ $customer->address }}</strong></p>
+                                <p class="mb-0"><strong>Address :</strong> <span class="text-muted">{{ $customer->address }}</span></p>
                             </div>
                         @endif
                     </div>

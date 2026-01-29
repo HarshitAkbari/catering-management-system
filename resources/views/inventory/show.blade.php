@@ -17,19 +17,19 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $inventoryItem->name }}</strong></p>
+                        <p class="mb-0"><strong>Name :</strong> <span class="text-muted">{{ $inventoryItem->name }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Unit :</span> <strong>{{ $inventoryItem->inventoryUnit->name ?? '-' }}</strong></p>
+                        <p class="mb-0"><strong>Unit :</strong> <span class="text-muted">{{ $inventoryItem->inventoryUnit->name ?? '-' }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Current Stock :</span> <strong>{{ number_format($inventoryItem->current_stock, 2) }}</strong></p>
+                        <p class="mb-0"><strong>Current Stock :</strong> <span class="text-muted">{{ number_format($inventoryItem->current_stock, 2) }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Minimum Stock :</span> <strong>{{ number_format($inventoryItem->minimum_stock, 2) }}</strong></p>
+                        <p class="mb-0"><strong>Minimum Stock :</strong> <span class="text-muted">{{ number_format($inventoryItem->minimum_stock, 2) }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Price Per Unit :</span> <strong>₹{{ number_format($inventoryItem->price_per_unit, 2) }}</strong></p>
+                        <p class="mb-0"><strong>Price Per Unit :</strong> <span class="text-muted">₹{{ number_format($inventoryItem->price_per_unit, 2) }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
                         <p class="mb-0"><span class="text-muted">Status :</span> 
@@ -42,7 +42,7 @@
                     </div>
                     @if($inventoryItem->description)
                     <div class="col-lg-12 mb-3">
-                        <p class="mb-0"><span class="text-muted">Description :</span> <strong>{{ $inventoryItem->description }}</strong></p>
+                        <p class="mb-0"><strong>Description :</strong> <span class="text-muted">{{ $inventoryItem->description }}</span></p>
                     </div>
                     @endif
                 </div>
