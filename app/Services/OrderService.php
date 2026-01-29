@@ -159,6 +159,7 @@ class OrderService extends BaseService
                     [
                         'name' => $customerData['customer_name'],
                         'email' => $customerData['customer_email'] ?? null,
+                        'secondary_mobile' => $customerData['customer_secondary_mobile'] ?? null,
                     ]
                 );
 
@@ -231,10 +232,13 @@ class OrderService extends BaseService
                     $customer = $customerService->findOrCreateByMobile(
                         $data['customer_mobile'],
                         $tenantId,
-                        ['name' => $data['customer_name'] ?? $order->customer->name]
+                        [
+                            'name' => $data['customer_name'] ?? $order->customer->name,
+                            'secondary_mobile' => $data['customer_secondary_mobile'] ?? null,
+                        ]
                     );
                     $data['customer_id'] = $customer->id;
-                    unset($data['customer_mobile'], $data['customer_name']);
+                    unset($data['customer_mobile'], $data['customer_name'], $data['customer_secondary_mobile']);
                 }
 
                 $this->repository->update($order, $data);
@@ -267,6 +271,7 @@ class OrderService extends BaseService
                     [
                         'name' => $customerData['customer_name'],
                         'email' => $customerData['customer_email'] ?? null,
+                        'secondary_mobile' => $customerData['customer_secondary_mobile'] ?? null,
                     ]
                 );
 

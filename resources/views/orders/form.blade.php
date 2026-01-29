@@ -1,7 +1,7 @@
 <div class="row">
     <div class="row">
         <!-- First Row: 3 Columns -->
-        <div class="col-md-4 mb-4">
+        <div class="col-md-3 mb-4">
             <label class="form-label" for="customer_name">Customer Name
                 <span class="text-danger">*</span>
             </label>
@@ -14,7 +14,7 @@
                 <div class="text-danger small mt-1">{{ $message }}</div>
             @enderror
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-md-3 mb-4">
             <label class="form-label" for="customer_email">Customer Email
                 <span class="text-danger">*</span>
             </label>
@@ -27,7 +27,7 @@
                 <div class="text-danger small mt-1">{{ $message }}</div>
             @enderror
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-md-3 mb-4">
             <label class="form-label" for="customer_mobile">Contact Number
                 <span class="text-danger">*</span>
             </label>
@@ -40,9 +40,19 @@
                 <div class="text-danger small mt-1">{{ $message }}</div>
             @enderror
         </div>
+        <div class="col-md-3 mb-4">
+            <label class="form-label" for="customer_secondary_mobile">Secondary Contact Number</label>
+            <input type="text" class="form-control" id="customer_secondary_mobile" name="customer_secondary_mobile" 
+                value="{{ old('customer_secondary_mobile', isset($order) && $order->customer ? ($order->customer->secondary_mobile ?? '') : '') }}">
+            <div class="invalid-feedback">
+                Please enter a valid secondary contact number.
+            </div>
+            @error('customer_secondary_mobile')
+                <div class="text-danger small mt-1">{{ $message }}</div>
+            @enderror
+        </div>
     </div>
-    
-    <!-- Second Row: Full Width Address -->
+    <!-- Third Row: Full Width Address -->
     <div class="row">
         <div class="col-12 mb-4">
             <label class="form-label" for="address">Address
@@ -61,7 +71,7 @@
     
     <!-- Add Event Button -->
     <div class="mb-4">
-        <button type="button" id="add-event-btn" class="btn btn-success">
+        <button type="button" id="add-event-btn" class="btn btn-success ">
             <i class="bi bi-plus-circle me-2"></i>Add Event
         </button>
     </div>

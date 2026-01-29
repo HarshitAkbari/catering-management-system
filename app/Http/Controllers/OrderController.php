@@ -121,6 +121,7 @@ class OrderController extends Controller
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
                 'customer_mobile' => $validated['customer_mobile'],
+                'customer_secondary_mobile' => $validated['customer_secondary_mobile'] ?? null,
             ],
             $validated['address'],
             $tenantId
@@ -270,6 +271,7 @@ class OrderController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'customer_mobile' => 'required|string|max:20',
+            'customer_secondary_mobile' => 'nullable|string|max:20',
             'address' => 'required|string',
             'events' => 'required|array|min:1',
             'events.*.event_date' => 'required|date',
@@ -302,6 +304,7 @@ class OrderController extends Controller
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
                 'customer_mobile' => $validated['customer_mobile'],
+                'customer_secondary_mobile' => $validated['customer_secondary_mobile'] ?? null,
             ],
             $validated['address'],
             $tenantId
