@@ -31,8 +31,17 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Register custom Blade directive for permission checks
-        Blade::if('hasPermission', function ($permission) {
-            return auth()->check() && auth()->user()->hasPermission($permission);
+        // This directive always renders content but adds permission metadata for JavaScript handling
+        Blade::directive('hasPermission', function ($permission) {
+            return "<?php 
+                \$permissionValue = {$permission};
+                \$hasPermission = auth()->check() && auth()->user()->hasPermission(\$permissionValue); 
+                echo '<span data-permission-wrapper=\"' . htmlspecialchars(\$permissionValue, ENT_QUOTES, 'UTF-8') . '\" data-has-permission=\"' . (\$hasPermission ? 'true' : 'false') . '\">'; 
+            ?>";
+        });
+        
+        Blade::directive('endhasPermission', function () {
+            return "<?php echo '</span>'; ?>";
         });
 
         // Share user menus with sidebar view

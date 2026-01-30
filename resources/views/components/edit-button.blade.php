@@ -20,8 +20,15 @@
     }
 @endphp
 
-@if($hasPermission && $routeUrl)
-    <a href="{{ $routeUrl }}" class="{{ $class }}" title="{{ $label }}">
+@if($routeUrl)
+    <a href="{{ $routeUrl }}" 
+       class="{{ $class }}" 
+       title="{{ $label }}"
+       @if($permission)
+       data-permission="{{ $permission }}"
+       data-has-permission="{{ $hasPermission ? 'true' : 'false' }}"
+       @endif
+       onclick="@if($permission && !$hasPermission)event.preventDefault(); showPermissionDeniedModal(); return false;@endif">
         @if($icon)
             <i class="{{ $icon }}"></i>
         @endif

@@ -9,10 +9,17 @@
 @php
     $permission = $module ? "{$module}.create" : null;
     $hasPermission = $permission ? (auth()->check() && auth()->user()->hasPermission($permission)) : true;
+    $routeUrl = $route ? route($route) : null;
 @endphp
 
-@if($hasPermission && $route)
-    <a href="{{ route($route) }}" class="{{ $class }}">
+@if($routeUrl)
+    <a href="{{ $routeUrl }}" 
+       class="{{ $class }}"
+       @if($permission)
+       data-permission="{{ $permission }}"
+       data-has-permission="{{ $hasPermission ? 'true' : 'false' }}"
+       @endif
+       onclick="@if($permission && !$hasPermission)event.preventDefault(); showPermissionDeniedModal(); return false;@endif">
         @if($icon)
             <i class="{{ $icon }}"></i>
         @endif

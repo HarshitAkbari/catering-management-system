@@ -242,5 +242,8 @@
 
     @yield('scripts')
     @stack('datepicker-init')
+    
+    <!-- Permission Denied Modal - Available on all pages -->
+    <x-permission-denied-modal />
 </body>
 </html>
