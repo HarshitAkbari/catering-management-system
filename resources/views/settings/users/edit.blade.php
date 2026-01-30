@@ -8,34 +8,13 @@
         <div class="col-lg-12">
             @include('error.alerts')
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="card-tools">
-                            <a href="{{ route('users.index') }}" class="btn btn-dark btn-sm">
-                                <i class="bi bi-arrow-left"></i> Back
-                            </a>
-                        </div>
-                        <h3 class="card-title mb-0">Edit {{ $page_title ?? 'User' }}</h3>
+                <div class="card-header">
+                    <h4 class="card-title">Edit {{ $page_title ?? 'User' }}</h4>
+                    <div class="card-tools">
+                        <a href="{{ route('users.index') }}" class="btn btn-dark btn-xs">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
                     </div>
-                    @hasPermission('users.edit')
-                        @if($user->id !== auth()->id())
-                            <div class="d-flex gap-2">
-                                @if($user->status === 'active')
-                                    <button type="button" 
-                                        class="btn btn-danger btn-sm" 
-                                        onclick="showSettingsDeactivationModal('user-deactivation-modal', '{{ $user->name }}', 'user', '{{ route('users.toggle', $user) }}', 'PATCH')">
-                                        <i class="bi bi-x-circle me-1"></i>Deactivate
-                                    </button>
-                                @else
-                                    <button type="button" 
-                                        class="btn btn-success btn-sm" 
-                                        onclick="showSettingsActivationModal('user-activation-modal', '{{ $user->name }}', 'user', '{{ route('users.toggle', $user) }}', 'PATCH')">
-                                        <i class="bi bi-check-circle me-1"></i>Activate
-                                    </button>
-                                @endif
-                            </div>
-                        @endif
-                    @endhasPermission
                 </div>
                 <div class="card-body">
 
@@ -47,12 +26,9 @@
                             @include('settings.users.form')
 
                             <div class="row mt-4">
-                                <div class="col-xl-8 col-lg-10 mx-auto">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancel</a>
-                                        <button type="submit" class="btn btn-primary">Update User</button>
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
-                                </div>
                             </div>
                         </form>
                     </div>
