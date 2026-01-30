@@ -114,11 +114,7 @@
                                     <td>{{ $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : '-' }}</td>
                                     <td>{{ $attendance->notes ?? '-' }}</td>
                                     <td class="text-end">
-                                        @hasPermission('attendance.edit')
-                                        <a href="{{ route('attendance.edit', $attendance) }}" class="btn btn-primary btn-xs" title="Edit">
-                                            Edit
-                                        </a>
-                                        @endhasPermission
+                                        <x-edit-button module="attendance" route="attendance.edit" :model="$attendance" />
                                     </td>
                                 </tr>
                             @empty

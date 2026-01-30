@@ -17,9 +17,7 @@
                         </div>
                     @endif
                 </div>
-                @hasPermission('orders.create')
-                <a href="{{ route('orders.create') }}" class="btn btn-sm btn-primary btn-add">Create Order</a>
-                @endhasPermission
+                <x-add-button module="orders" route="orders.create" label="Create Order" />
             </div>
             <div class="card-body">
                 <!-- Filter Form -->

@@ -34,9 +34,13 @@
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label class="form-label">&nbsp;</label>
-                                    <a href="{{ route('reports.export', ['type' => 'profit-loss', 'start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-success btn-block">
-                                        <i class="fa fa-download me-2"></i>Export Excel
-                                    </a>
+                                    <x-export-button 
+                                        module="reports" 
+                                        route="reports.export" 
+                                        :params="['type' => 'profit-loss', 'start_date' => $startDate, 'end_date' => $endDate]"
+                                        label="Export Excel"
+                                        class="btn btn-success btn-block"
+                                    />
                                 </div>
                             </div>
                         </div>

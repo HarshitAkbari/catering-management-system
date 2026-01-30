@@ -105,8 +105,9 @@
                                         </td>
                                         <td class="py-2 text-end">
                                             <a href="{{ route('vendors.show', $vendor) }}" class="btn btn-primary btn-xs btn-view">View</a>
-                                            <a href="{{ route('vendors.edit', $vendor) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                            <x-edit-button module="vendors" route="vendors.edit" :model="$vendor" />
                                             <x-delete-button 
+                                                module="vendors"
                                                 item-name="{{ $vendor->name }}"
                                                 delete-url="{{ route('vendors.destroy', $vendor) }}"
                                                 modal-id="deleteVendorModal"
