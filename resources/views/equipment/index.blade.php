@@ -20,7 +20,7 @@
                         @endif
                     </div>
                     @hasPermission('equipment.create')
-                    <a href="{{ route('equipment.create') }}" class="btn btn-sm btn-primary btn-add">Add Equipment</a>
+                    <x-add-button module="equipment" route="equipment.create" label="Add Equipment" />
                     @endhasPermission
                 </div>
                 <div class="card-body">
@@ -93,8 +93,9 @@
                                         </td>
                                         <td class="py-2 text-end">
                                             <a href="{{ route('equipment.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
-                                            <a href="{{ route('equipment.edit', $item) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                            <x-edit-button module="equipment" route="equipment.edit" :model="$item" />
                                             <x-delete-button 
+                                                module="equipment"
                                                 item-name="{{ $item->name }}"
                                                 delete-url="{{ route('equipment.destroy', $item) }}"
                                             />

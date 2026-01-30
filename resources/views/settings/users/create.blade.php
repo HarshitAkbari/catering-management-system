@@ -24,7 +24,11 @@
                         </x-tip-item>
                         
                         <x-tip-item>
-                            Users can be assigned multiple roles for flexible permission management
+                            Mobile number and Staff Role are required for Staff and Manager roles. Users with these roles will automatically be added to the staff directory
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Provide mobile number and address for better contact management and staff assignment
                         </x-tip-item>
                         
                         <x-tip-item>

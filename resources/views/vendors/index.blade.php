@@ -8,15 +8,20 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex flex-column">
-                        <div class="d-flex align-items-center gap-2">
-                            <h4 class="card-title mb-0">{{ $page_title ?? 'Vendors' }}</h4>
-                        </div>
-                        @if(isset($subtitle))
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center gap-2">
+                                <h4 class="card-title mb-0">{{ $page_title ?? 'Vendors' }}</h4>
                             </div>
-                        @endif
+                            @if(isset($subtitle))
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                                </div>
+                            @endif
+                        </div>
+                        <div>
+                            <x-add-button module="vendors" route="vendors.create" label="Add Vendor" class="btn btn-primary btn-sm" />
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -105,8 +110,9 @@
                                         </td>
                                         <td class="py-2 text-end">
                                             <a href="{{ route('vendors.show', $vendor) }}" class="btn btn-primary btn-xs btn-view">View</a>
-                                            <a href="{{ route('vendors.edit', $vendor) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                            <x-edit-button module="vendors" route="vendors.edit" :model="$vendor" />
                                             <x-delete-button 
+                                                module="vendors"
                                                 item-name="{{ $vendor->name }}"
                                                 delete-url="{{ route('vendors.destroy', $vendor) }}"
                                                 modal-id="deleteVendorModal"

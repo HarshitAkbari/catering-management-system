@@ -106,9 +106,7 @@
                                             <a href="{{ route('customers.show', $customer) }}" class="btn btn-primary btn-xs" title="View">
                                                 View
                                             </a>
-                                                <a href="{{ route('customers.edit', $customer) }}" class="btn btn-warning btn-xs" title="Edit">
-                                                    Edit
-                                                </a>
+                                            <x-edit-button module="customers" route="customers.edit" :model="$customer" />
                                         </td>
                                     </tr>
                                 @empty

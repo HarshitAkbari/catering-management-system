@@ -19,9 +19,7 @@
                             </div>
                         @endif
                     </div>
-                    @hasPermission('inventory.create')
-                    <a href="{{ route('inventory.create') }}" class="btn btn-sm btn-primary btn-add">Add Inventory Item</a>
-                    @endhasPermission
+                    <x-add-button module="inventory" route="inventory.create" label="Add Inventory Item" />
                 </div>
             <div class="card-body">
                 <!-- Filter Form -->
@@ -106,9 +104,9 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('inventory.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
-                                        <a href="{{ route('inventory.edit', $item) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
-
+                                        <x-edit-button module="inventory" route="inventory.edit" :model="$item" />
                                         <x-delete-button 
+                                            module="inventory"
                                             item-name="{{ $item->name }}"
                                             delete-url="{{ route('inventory.destroy', $item) }}"
                                         />

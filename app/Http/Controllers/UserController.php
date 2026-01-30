@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\StaffService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -14,7 +15,8 @@ use Illuminate\Validation\Rules;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserService $userService
+        private readonly UserService $userService,
+        private readonly StaffService $staffService
     ) {}
 
     /**
@@ -77,9 +79,9 @@ class UserController extends Controller
     public function create()
     {
         $tenantId = auth()->user()->tenant_id;
-        $roles = $this->userService->getRolesForTenant($tenantId);
-
-        return view('settings.users.create', compact('roles'));
+        $staffRoles = $this->staffService->getStaffRoles($tenantId);
+        
+        return view('settings.users.create', compact('staffRoles'));
     }
 
     /**
@@ -100,9 +102,24 @@ class UserController extends Controller
                     return $query->where('tenant_id', $tenantId);
                 }),
             ],
+            'mobile' => [
+                'required_if:role,staff,manager',
+                'nullable',
+                'string',
+                'max:20',
+                Rule::unique('users')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                }),
+            ],
+            'address' => ['nullable', 'string', 'max:1000'],
             'role' => ['required', 'in:admin,manager,staff'],
-            'role_ids' => ['nullable', 'array'],
-            'role_ids.*' => ['exists:roles,id'],
+            'staff_role_id' => [
+                'required_if:role,staff,manager',
+                'nullable',
+                Rule::exists('staff_roles', 'id')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                }),
+            ],
         ]);
 
         // Generate a secure random password
@@ -117,8 +134,11 @@ class UserController extends Controller
                 ->withErrors(['error' => $result['message']]);
         }
 
+        $role = $validated['role'];
+        $roleName = ucfirst($role);
+        
         return redirect()->route('users.index')
-            ->with('success', 'User created successfully. An email with login credentials has been sent to the user.');
+            ->with('success', "User created successfully with {$roleName} role. An email with login credentials has been sent to {$validated['email']}.");
     }
 
     /**
@@ -132,9 +152,21 @@ class UserController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $roles = $this->userService->getRolesForTenant($tenantId);
-
-        return view('settings.users.edit', compact('user', 'roles'));
+        $tenantId = auth()->user()->tenant_id;
+        $staffRoles = $this->staffService->getStaffRoles($tenantId);
+        
+        // Get existing staff entry's staff_role_id if user is staff/manager
+        $staffRoleId = null;
+        if (in_array($user->role, ['staff', 'manager']) && $user->mobile) {
+            $staff = \App\Models\Staff::where('tenant_id', $tenantId)
+                ->where('phone', $user->mobile)
+                ->first();
+            if ($staff) {
+                $staffRoleId = $staff->staff_role_id;
+            }
+        }
+        
+        return view('settings.users.edit', compact('user', 'staffRoles', 'staffRoleId'));
     }
 
     /**
@@ -159,10 +191,25 @@ class UserController extends Controller
                     return $query->where('tenant_id', $tenantId);
                 })->ignore($user->id),
             ],
+            'mobile' => [
+                'required_if:role,staff,manager',
+                'nullable',
+                'string',
+                'max:20',
+                Rule::unique('users')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                })->ignore($user->id),
+            ],
+            'address' => ['nullable', 'string', 'max:1000'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:admin,manager,staff'],
-            'role_ids' => ['nullable', 'array'],
-            'role_ids.*' => ['exists:roles,id'],
+            'staff_role_id' => [
+                'required_if:role,staff,manager',
+                'nullable',
+                Rule::exists('staff_roles', 'id')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                }),
+            ],
         ]);
 
         $result = $this->userService->updateUser($user, $validated, $tenantId);

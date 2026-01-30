@@ -5,6 +5,7 @@
 @section('page_content')
 <!-- Stat Cards Row -->
 <div class="row">
+    @if($isAdmin || $isManager)
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
         <div class="widget-stat card bg-primary">
             <div class="card-body p-4">
@@ -14,12 +15,13 @@
                     </span>
                     <div class="media-body">
                         <p class="mb-1 text-white fw-bold">Total Orders</p>
-                        <h4 class="mb-0 text-white fw-bold">{{ $stats['total_orders'] }}</h4>
+                        <h4 class="mb-0 text-white fw-bold">{{ $stats['total_orders'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @endif
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
         <div class="widget-stat card bg-info">
             <div class="card-body p-4">
@@ -28,13 +30,14 @@
                         <i class="flaticon-381-calendar-1"></i>
                     </span>
                     <div class="media-body">
-                        <p class="mb-1 text-white fw-bold">Upcoming Events</p>
-                        <h4 class="mb-0 text-white fw-bold">{{ $stats['upcoming_events'] }}</h4>
+                        <p class="mb-1 text-white fw-bold">{{ $isStaff ? 'Upcoming Assignments' : 'Upcoming Events' }}</p>
+                        <h4 class="mb-0 text-white fw-bold">{{ $stats['upcoming_events'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @if($isAdmin || $isManager)
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
         <div class="widget-stat card bg-warning">
             <div class="card-body p-4">
@@ -44,12 +47,13 @@
                     </span>
                     <div class="media-body">
                         <p class="mb-1 text-white fw-bold">Pending Payments</p>
-                        <h4 class="mb-0 text-white fw-bold">{{ $stats['pending_payments'] }}</h4>
+                        <h4 class="mb-0 text-white fw-bold">{{ $stats['pending_payments'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @endif
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
         <div class="widget-stat card bg-success">
             <div class="card-body p-4">
@@ -59,14 +63,32 @@
                     </span>
                     <div class="media-body">
                         <p class="mb-1 text-white fw-bold">Completed Events</p>
-                        <h4 class="mb-0 text-white fw-bold">{{ $stats['completed_events'] }}</h4>
+                        <h4 class="mb-0 text-white fw-bold">{{ $stats['completed_events'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @if($isStaff)
+    <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+        <div class="widget-stat card bg-warning">
+            <div class="card-body p-4">
+                <div class="media ai-icon">
+                    <span class="me-3 bgl-warning text-warning">
+                        <i class="flaticon-381-calendar-1"></i>
+                    </span>
+                    <div class="media-body">
+                        <p class="mb-1 text-white fw-bold">Today's Tasks</p>
+                        <h4 class="mb-0 text-white fw-bold">{{ $stats['today_tasks'] ?? 0 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
+@if($isAdmin || $isManager)
 <div class="row">
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
         <div class="widget-stat card bg-secondary">
@@ -77,12 +99,13 @@
                     </span>
                     <div class="media-body">
                         <p class="mb-1 text-white fw-bold">Total Customers</p>
-                        <h4 class="mb-0 text-white fw-bold">{{ $stats['total_customers'] }}</h4>
+                        <h4 class="mb-0 text-white fw-bold">{{ $stats['total_customers'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @if($isAdmin)
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
         <div class="widget-stat card bg-success">
             <div class="card-body p-4">
@@ -92,12 +115,13 @@
                     </span>
                     <div class="media-body">
                         <p class="mb-1 text-white fw-bold">This Month Revenue</p>
-                        <h4 class="mb-0 text-white fw-bold">₹{{ number_format($stats['this_month_revenue'], 2) }}</h4>
+                        <h4 class="mb-0 text-white fw-bold">₹{{ number_format($stats['this_month_revenue'] ?? 0, 2) }}</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @endif
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
         <div class="widget-stat card bg-danger">
             <div class="card-body p-4">
@@ -114,9 +138,12 @@
         </div>
     </div>
 </div>
+@endif
 
 <!-- Charts Row -->
+@if(!empty($chartData) && ($isAdmin || $isManager))
 <div class="row mt-4">
+    @if($isAdmin && isset($chartData['revenue_trend']))
     <div class="col-xl-4 col-lg-6 col-md-12">
         <div class="card">
             <div class="card-header">
@@ -127,6 +154,8 @@
             </div>
         </div>
     </div>
+    @endif
+    @if(isset($chartData['orders_over_time']))
     <div class="col-xl-4 col-lg-6 col-md-12">
         <div class="card">
             <div class="card-header">
@@ -137,6 +166,8 @@
             </div>
         </div>
     </div>
+    @endif
+    @if(isset($chartData['payment_status']))
     <div class="col-xl-4 col-lg-6 col-md-12">
         <div class="card">
             <div class="card-header">
@@ -147,9 +178,12 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
+@endif
 
 <!-- Lists & Alerts Row -->
+@if($isAdmin || $isManager)
 <div class="row mt-4">
     <!-- Low Stock Alerts -->
     <div class="col-xl-6 col-lg-6 col-md-12">
@@ -254,8 +288,9 @@
         </div>
     </div>
 </div>
+@endif
 
-@hasPermission('staff.view')
+@if($isAdmin)
 <!-- Staff Widgets Row -->
 <div class="row mt-4">
     <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
@@ -376,7 +411,61 @@
     </div>
 </div>
 @endif
-@endhasPermission
+@elseif($isManager)
+<!-- Upcoming Staff Assignments Widget for Manager -->
+@if(isset($upcomingStaffAssignments) && $upcomingStaffAssignments->count() > 0)
+<div class="row mt-4">
+    <div class="col-xl-6 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Upcoming Staff Assignments</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Event Date</th>
+                                <th>Customer</th>
+                                <th>Staff Assigned</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($upcomingStaffAssignments as $order)
+                                <tr>
+                                    <td>
+                                        <small>{{ $order->event_date->format('M d, Y') }}</small><br>
+                                        <small class="text-muted">{{ $order->eventTime->name ?? 'N/A' }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('customers.show', $order->customer) }}">
+                                            {{ $order->customer->name ?? 'N/A' }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if($order->staff->count() > 0)
+                                            <span class="badge badge-info light">{{ $order->staff->count() }} staff</span>
+                                        @else
+                                            <span class="text-muted">No staff</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{{ $order->orderStatus && $order->orderStatus->name === 'confirmed' ? 'success' : 'warning' }} light">
+                                            {{ $order->orderStatus->name ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+@endif
 
 <!-- Low Stock Alert -->
 
@@ -500,18 +589,20 @@
 @endsection
 
 @section('scripts')
+@if(!empty($chartData) && ($isAdmin || $isManager))
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
 <script>
-    // Revenue Trend Chart
+    // Revenue Trend Chart (Admin only)
+    @if($isAdmin && isset($chartData['revenue_trend']))
     const revenueCtx = document.getElementById('revenueChart');
     if (revenueCtx) {
         new Chart(revenueCtx, {
             type: 'line',
             data: {
-                labels: @json($chartData['revenue_trend']['labels']),
+                labels: @json($chartData['revenue_trend']['labels'] ?? []),
                 datasets: [{
                     label: 'Revenue',
-                    data: @json($chartData['revenue_trend']['data']),
+                    data: @json($chartData['revenue_trend']['data'] ?? []),
                     borderColor: 'rgb(75, 192, 192)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     tension: 0.1,
@@ -547,24 +638,26 @@
             }
         });
     }
+    @endif
 
     // Orders Over Time Chart
+    @if(isset($chartData['orders_over_time']))
     const ordersCtx = document.getElementById('ordersChart');
     if (ordersCtx) {
         new Chart(ordersCtx, {
             type: 'line',
             data: {
-                labels: @json($chartData['orders_over_time']['labels']),
+                labels: @json($chartData['orders_over_time']['labels'] ?? []),
                 datasets: [{
                     label: 'Confirmed',
-                    data: @json($chartData['orders_over_time']['confirmed']),
+                    data: @json($chartData['orders_over_time']['confirmed'] ?? []),
                     borderColor: 'rgb(54, 162, 235)',
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     tension: 0.1,
                     fill: true
                 }, {
                     label: 'Completed',
-                    data: @json($chartData['orders_over_time']['completed']),
+                    data: @json($chartData['orders_over_time']['completed'] ?? []),
                     borderColor: 'rgb(75, 192, 192)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     tension: 0.1,
@@ -591,16 +684,18 @@
             }
         });
     }
+    @endif
 
     // Payment Status Distribution Chart
+    @if(isset($chartData['payment_status']))
     const paymentStatusCtx = document.getElementById('paymentStatusChart');
     if (paymentStatusCtx) {
         new Chart(paymentStatusCtx, {
             type: 'doughnut',
             data: {
-                labels: @json($chartData['payment_status']['labels']),
+                labels: @json($chartData['payment_status']['labels'] ?? []),
                 datasets: [{
-                    data: @json($chartData['payment_status']['data']),
+                    data: @json($chartData['payment_status']['data'] ?? []),
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.8)',
                         'rgba(255, 206, 86, 0.8)',
@@ -630,7 +725,11 @@
             }
         });
     }
+    @endif
+</script>
+@endif
 
+<script>
     // FullCalendar Initialization
     document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');
@@ -657,5 +756,5 @@
             calendar.render();
         }
     });
-</script>
+    </script>
 @endsection

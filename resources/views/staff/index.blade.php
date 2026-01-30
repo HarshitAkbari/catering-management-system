@@ -17,9 +17,6 @@
                         </div>
                     @endif
                 </div>
-                @hasPermission('staff.create')
-                <a href="{{ route('staff.create') }}" class="btn btn-sm btn-primary btn-add">Add Staff</a>
-                @endhasPermission
             </div>
             <div class="card-body">
                 <!-- Filter Form -->
@@ -128,10 +125,7 @@
                                         <a href="{{ route('staff.show', $member) }}" class="btn btn-primary btn-xs" title="View">
                                             View
                                         </a>
-                                        @hasPermission('staff.edit')
-                                        <a href="{{ route('staff.edit', $member) }}" class="btn btn-info btn-xs" title="Edit">
-                                            Edit
-                                        </a>
+                                        <x-edit-button module="staff" route="staff.edit" :model="$member" class="btn btn-info btn-xs" />
                                         @if($member->status === 'active')
                                             <button type="button" 
                                                 class="btn btn-danger btn-xs" 

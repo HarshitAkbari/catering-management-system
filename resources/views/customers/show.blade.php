@@ -10,11 +10,7 @@
                 <div class="card-header">
                     <h4 class="card-title">Customer Information</h4>
                     <div class="d-flex gap-2">
-                        @can('customers.edit')
-                            <a href="{{ route('customers.edit', $customer) }}" class="btn btn-warning btn-xs">
-                                <i class="bi bi-pencil"></i> Edit
-                            </a>
-                        @endcan
+                        <x-edit-button module="customers" route="customers.edit" :model="$customer" class="btn btn-warning btn-xs" label="Edit" icon="bi bi-pencil" />
                         <a href="{{ route('customers.index') }}" class="btn btn-dark btn-xs">
                             <i class="bi bi-arrow-left"></i> Back
                         </a>
