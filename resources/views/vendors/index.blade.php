@@ -8,15 +8,20 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex flex-column">
-                        <div class="d-flex align-items-center gap-2">
-                            <h4 class="card-title mb-0">{{ $page_title ?? 'Vendors' }}</h4>
-                        </div>
-                        @if(isset($subtitle))
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center gap-2">
+                                <h4 class="card-title mb-0">{{ $page_title ?? 'Vendors' }}</h4>
                             </div>
-                        @endif
+                            @if(isset($subtitle))
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <h6 class="text-muted mb-0">{{ $subtitle }}</h6>
+                                </div>
+                            @endif
+                        </div>
+                        <div>
+                            <x-add-button module="vendors" route="vendors.create" label="Add Vendor" class="btn btn-primary btn-sm" />
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">

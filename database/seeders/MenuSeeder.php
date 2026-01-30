@@ -247,21 +247,6 @@ class MenuSeeder extends Seeder
             ]
         );
 
-        Menu::firstOrCreate(
-            [
-                'tenant_id' => $tenant->id,
-                'name' => 'vendors.create',
-            ],
-            [
-                'display_name' => 'Add Vendor',
-                'route' => 'vendors.create',
-                'icon' => null,
-                'parent_id' => $vendors->id,
-                'order' => 2,
-                'is_active' => true,
-            ]
-        );
-
         // Equipment (parent)
         $equipment = Menu::firstOrCreate(
             [

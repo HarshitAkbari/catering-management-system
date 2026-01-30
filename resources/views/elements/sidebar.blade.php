@@ -108,7 +108,6 @@
                         </a>
                         <ul class="{{ request()->routeIs('vendors.*') ? 'mm-show' : '' }}" aria-expanded="{{ request()->routeIs('vendors.*') ? 'true' : 'false' }}">
                             <li><a href="{{ route('vendors.index') }}" class="{{ request()->routeIs('vendors.index') || request()->routeIs('vendors.show') || request()->routeIs('vendors.edit') ? 'mm-active' : '' }}">Vendor List</a></li>
-                            <li><a href="{{ route('vendors.create') }}" class="{{ request()->routeIs('vendors.create') ? 'mm-active' : '' }}">Add Vendor</a></li>
                         </ul>
                     </li>
                     <li class="{{ request()->routeIs('equipment.*') ? 'mm-active' : '' }}"><a class="has-arrow {{ request()->routeIs('equipment.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('equipment.*') ? 'true' : 'false' }}">
