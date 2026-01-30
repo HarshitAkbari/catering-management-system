@@ -17,9 +17,6 @@
                         </div>
                     @endif
                 </div>
-                @hasPermission('staff.create')
-                <a href="{{ route('staff.create') }}" class="btn btn-sm btn-primary btn-add">Add Staff</a>
-                @endhasPermission
             </div>
             <div class="card-body">
                 <!-- Filter Form -->

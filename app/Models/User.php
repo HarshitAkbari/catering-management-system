@@ -9,6 +9,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -25,6 +26,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'mobile',
+        'address',
         'password',
         'tenant_id',
         'role',
@@ -71,6 +74,15 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class, 'role_user')
             ->withTimestamps();
+    }
+
+    /**
+     * Get the staff entry associated with this user (if role is staff or manager).
+     */
+    public function staff(): HasOne
+    {
+        return $this->hasOne(Staff::class, 'phone', 'mobile')
+            ->where('tenant_id', $this->tenant_id);
     }
 
     /**

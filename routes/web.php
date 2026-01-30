@@ -293,10 +293,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::middleware(['permission:staff,staff.view'])->group(function () {
         Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
     });
-    // Staff - Create (must be before staff/{staff} route)
+    // Staff - Assign to Events (must be before staff/{staff} route)
     Route::middleware(['permission:staff.create'])->group(function () {
-        Route::get('staff/create', [StaffController::class, 'create'])->name('staff.create');
-        Route::post('staff', [StaffController::class, 'store'])->name('staff.store');
         Route::get('orders/{order}/assign-staff', [StaffController::class, 'assignToEvent'])->name('staff.assign');
         Route::post('orders/{order}/assign-staff', [StaffController::class, 'storeAssignment'])->name('staff.assign.store');
     });

@@ -33,6 +33,30 @@
         @enderror
     </div>
 
+    <div class="col-md-6 mb-4">
+        <label class="form-label" for="mobile">Mobile Number
+            <span class="text-danger mobile-required-indicator" style="display: none;">*</span>
+        </label>
+        <input type="text" class="form-control" id="mobile" name="mobile" 
+            placeholder="Enter mobile number.." value="{{ old('mobile', $user->mobile ?? '') }}">
+        <div class="invalid-feedback">
+            Please enter a mobile number.
+        </div>
+        @error('mobile')
+            <div class="text-danger small mt-1">{{ $message }}</div>
+        @enderror
+        <small class="text-muted">Required for Staff and Manager roles</small>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <label class="form-label" for="address">Address</label>
+        <textarea class="form-control" id="address" name="address" rows="3" 
+            placeholder="Enter address..">{{ old('address', $user->address ?? '') }}</textarea>
+        @error('address')
+            <div class="text-danger small mt-1">{{ $message }}</div>
+        @enderror
+    </div>
+
     @if($isEdit)
     <div class="col-md-6 mb-4">
         <label class="form-label" for="password">New Password
@@ -73,28 +97,67 @@
         @enderror
     </div>
 
-    @if(isset($roles) && $roles->count() > 0)
-    <div class="col-12 mb-4">
-        <label class="form-label">Additional Roles</label>
-        <div class="row">
-            @foreach($roles as $role)
-                <div class="col-md-4 mb-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="role_ids[]" value="{{ $role->id }}" 
-                            id="role_{{ $role->id }}" 
-                            {{ (isset($user) && $user->roles->contains($role->id)) || in_array($role->id, old('role_ids', [])) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="role_{{ $role->id }}">
-                            {{ $role->display_name ?? $role->name }}
-                        </label>
-                    </div>
-                </div>
-            @endforeach
+    <div class="col-md-6 mb-4 staff-role-field" id="staff-role-field" style="display: none;">
+        <label class="form-label" for="staff_role_id">Staff Role
+            <span class="text-danger">*</span>
+        </label>
+        <select class="form-control single-select" id="staff_role_id" name="staff_role_id">
+            <option value="">Select a staff role</option>
+            @if(isset($staffRoles) && $staffRoles->count() > 0)
+                @foreach($staffRoles as $staffRole)
+                    <option value="{{ $staffRole->id }}" 
+                        {{ old('staff_role_id', $staffRoleId ?? '') == $staffRole->id ? 'selected' : '' }}>
+                        {{ $staffRole->name }}
+                    </option>
+                @endforeach
+            @endif
+        </select>
+        <div class="invalid-feedback">
+            Please select a staff role.
         </div>
-        <small class="text-muted">Select additional roles to assign to this user. The primary role above will be synced automatically.</small>
-        @error('role_ids')
+        @error('staff_role_id')
             <div class="text-danger small mt-1">{{ $message }}</div>
         @enderror
+        <small class="text-muted">Select the staff role from settings</small>
     </div>
-    @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const mobileInput = document.getElementById('mobile');
+    const mobileRequiredIndicator = document.querySelector('.mobile-required-indicator');
+    const staffRoleField = document.getElementById('staff-role-field');
+    const staffRoleSelect = document.getElementById('staff_role_id');
+    
+    function toggleStaffFields() {
+        const role = roleSelect.value;
+        if (role === 'staff' || role === 'manager') {
+            mobileInput.setAttribute('required', 'required');
+            if (mobileRequiredIndicator) {
+                mobileRequiredIndicator.style.display = 'inline';
+            }
+            if (staffRoleField) {
+                staffRoleField.style.display = 'block';
+                staffRoleSelect.setAttribute('required', 'required');
+            }
+        } else {
+            mobileInput.removeAttribute('required');
+            if (mobileRequiredIndicator) {
+                mobileRequiredIndicator.style.display = 'none';
+            }
+            if (staffRoleField) {
+                staffRoleField.style.display = 'none';
+                staffRoleSelect.removeAttribute('required');
+                staffRoleSelect.value = '';
+            }
+        }
+    }
+    
+    if (roleSelect) {
+        roleSelect.addEventListener('change', toggleStaffFields);
+        toggleStaffFields(); // Check on page load
+    }
+});
+</script>
 

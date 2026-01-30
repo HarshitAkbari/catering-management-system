@@ -85,7 +85,6 @@
                                     <th>
                                         <x-table.sort-link field="role" label="Role" />
                                     </th>
-                                    <th>Roles</th>
                                     <th>
                                         <x-table.sort-link field="status" label="Status" />
                                     </th>
@@ -114,15 +113,6 @@
                                             <span class="badge badge-{{ $user->role === 'admin' ? 'danger' : ($user->role === 'manager' ? 'warning' : 'info') }}">
                                                 {{ ucfirst($user->role) }}
                                             </span>
-                                        </td>
-                                        <td class="py-2">
-                                            @if($user->roles->count() > 0)
-                                            @foreach($user->roles as $role)
-                                            <span class="badge badge-primary light me-1">{{ $role->display_name ?? $role->name }}</span>
-                                            @endforeach
-                                            @else
-                                            <span class="text-muted">No roles assigned</span>
-                                            @endif
                                         </td>
                                         <td>
                                             <span class="badge badge-{{ $user->is_active ? 'success' : 'danger' }}">
@@ -160,7 +150,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="5" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
