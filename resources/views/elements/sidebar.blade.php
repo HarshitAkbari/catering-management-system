@@ -8,14 +8,16 @@
                 @foreach($userMenus as $menu)
                     @if($menu->route)
                         {{-- Single menu item (no children) --}}
-                        <li>
-                            <a href="{{ route($menu->route) }}" class="{{ request()->routeIs($menu->route) ? 'mm-active' : '' }}" aria-expanded="false">
-                                @if($menu->icon)
-                                    <i class="{{ $menu->icon }}"></i>
-                                @endif
-                                <span class="nav-text">{{ $menu->display_name }}</span>
-                            </a>
-                        </li>
+                        @if(\Illuminate\Support\Facades\Route::has($menu->route))
+                            <li>
+                                <a href="{{ route($menu->route) }}" class="{{ request()->routeIs($menu->route) ? 'mm-active' : '' }}" aria-expanded="false">
+                                    @if($menu->icon)
+                                        <i class="{{ $menu->icon }}"></i>
+                                    @endif
+                                    <span class="nav-text">{{ $menu->display_name }}</span>
+                                </a>
+                            </li>
+                        @endif
                     @else
                         {{-- Parent menu with children --}}
                         @php
@@ -42,15 +44,23 @@
                                     @foreach($menu->children as $child)
                                         @if($child->route)
                                             @php
-                                                $childRouteParts = explode('.', $child->route);
-                                                $childRoutePattern = $childRouteParts[0] . '.*';
-                                                $isChildActive = request()->routeIs($child->route) || request()->routeIs($childRoutePattern);
+                                                // Check for exact route match first
+                                                $isChildActive = request()->routeIs($child->route);
+                                                
+                                                // For routes that may have sub-routes (e.g., attendance.bulk.store), 
+                                                // also check with wildcard pattern (e.g., attendance.bulk*)
+                                                // This handles cases where a route has related sub-routes
+                                                if (!$isChildActive) {
+                                                    $isChildActive = request()->routeIs($child->route . '*');
+                                                }
                                             @endphp
-                                            <li>
-                                                <a href="{{ route($child->route) }}" class="{{ $isChildActive ? 'mm-active' : '' }}">
-                                                    {{ $child->display_name }}
-                                                </a>
-                                            </li>
+                                            @if(\Illuminate\Support\Facades\Route::has($child->route))
+                                                <li>
+                                                    <a href="{{ route($child->route) }}" class="{{ $isChildActive ? 'mm-active' : '' }}">
+                                                        {{ $child->display_name }}
+                                                    </a>
+                                                </li>
+                                            @endif
                                         @endif
                                     @endforeach
                                 </ul>
@@ -134,7 +144,6 @@
                             <li><a href="{{ route('attendance.index') }}" class="{{ request()->routeIs('attendance.index') ? 'mm-active' : '' }}">Attendance List</a></li>
                             <li><a href="{{ route('attendance.create') }}" class="{{ request()->routeIs('attendance.create') ? 'mm-active' : '' }}">Mark Attendance</a></li>
                             <li><a href="{{ route('attendance.bulk') }}" class="{{ request()->routeIs('attendance.bulk*') ? 'mm-active' : '' }}">Bulk Mark</a></li>
-                            <li><a href="{{ route('attendance.report') }}" class="{{ request()->routeIs('attendance.report') ? 'mm-active' : '' }}">Attendance Report</a></li>
                         </ul>
                     </li>
                     <li class="{{ request()->routeIs('reports.*') ? 'mm-active' : '' }}"><a class="has-arrow {{ request()->routeIs('reports.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('reports.*') ? 'true' : 'false' }}">
@@ -147,6 +156,7 @@
                             <li><a href="{{ route('reports.expenses') }}" class="{{ request()->routeIs('reports.expenses') ? 'mm-active' : '' }}">Expenses</a></li>
                             <li><a href="{{ route('reports.customers') }}" class="{{ request()->routeIs('reports.customers') ? 'mm-active' : '' }}">Customers</a></li>
                             <li><a href="{{ route('reports.profit-loss') }}" class="{{ request()->routeIs('reports.profit-loss') ? 'mm-active' : '' }}">Profit & Loss</a></li>
+                            <li><a href="{{ route('reports.attendance') }}" class="{{ request()->routeIs('reports.attendance') ? 'mm-active' : '' }}">Attendance</a></li>
                         </ul>
                     </li>
                     <li class="{{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'mm-active' : '' }}"><a class="has-arrow {{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'mm-active' : '' }}" href="javascript:void(0);" aria-expanded="{{ request()->routeIs('settings.*') || request()->routeIs('users.*') ? 'true' : 'false' }}">

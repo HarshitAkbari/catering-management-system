@@ -29,6 +29,7 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/loginpage', [LoginController::class, 'showLoginForm'])->name('loginpage');
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
     
@@ -229,13 +230,14 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     });
     
     // Reports Menu
-    // Reports - Orders, Payments, Expenses, Customers, Profit-Loss
+    // Reports - Orders, Payments, Expenses, Customers, Profit-Loss, Attendance
     Route::middleware(['permission:reports,reports.view'])->prefix('reports')->name('reports.')->group(function () {
         Route::get('orders', [ReportController::class, 'orders'])->name('orders');
         Route::get('payments', [ReportController::class, 'payments'])->name('payments');
         Route::get('expenses', [ReportController::class, 'expenses'])->name('expenses');
         Route::get('customers', [ReportController::class, 'customers'])->name('customers');
         Route::get('profit-loss', [ReportController::class, 'profitLoss'])->name('profit-loss');
+        Route::get('attendance', [ReportController::class, 'attendance'])->name('attendance');
     });
     // Reports - Export
     Route::middleware(['permission:reports.export'])->prefix('reports')->name('reports.')->group(function () {
@@ -319,7 +321,6 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // Attendance - List, View & Report
     Route::middleware(['permission:attendance,attendance.view'])->group(function () {
         Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-        Route::get('attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
         Route::get('attendance/staff/{staff}', [AttendanceController::class, 'staffHistory'])->name('attendance.staff');
     });
     // Attendance - Create

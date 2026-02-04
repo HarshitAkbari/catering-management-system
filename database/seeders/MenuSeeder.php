@@ -370,21 +370,6 @@ class MenuSeeder extends Seeder
             ]
         );
 
-        Menu::firstOrCreate(
-            [
-                'tenant_id' => $tenant->id,
-                'name' => 'attendance.report',
-            ],
-            [
-                'display_name' => 'Attendance Report',
-                'route' => 'attendance.report',
-                'icon' => null,
-                'parent_id' => $attendance->id,
-                'order' => 4,
-                'is_active' => true,
-            ]
-        );
-
         // Reports (parent)
         $reports = Menu::firstOrCreate(
             [
@@ -472,6 +457,21 @@ class MenuSeeder extends Seeder
                 'icon' => null,
                 'parent_id' => $reports->id,
                 'order' => 5,
+                'is_active' => true,
+            ]
+        );
+
+        Menu::firstOrCreate(
+            [
+                'tenant_id' => $tenant->id,
+                'name' => 'reports.attendance',
+            ],
+            [
+                'display_name' => 'Attendance',
+                'route' => 'reports.attendance',
+                'icon' => null,
+                'parent_id' => $reports->id,
+                'order' => 6,
                 'is_active' => true,
             ]
         );

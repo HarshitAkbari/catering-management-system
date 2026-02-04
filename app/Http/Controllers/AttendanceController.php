@@ -185,18 +185,6 @@ class AttendanceController extends Controller
         return redirect()->route('attendance.index')->with('success', 'Attendance updated successfully!');
     }
 
-    public function report(Request $request)
-    {
-        $tenantId = auth()->user()->tenant_id;
-        
-        $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
-        $endDate = $request->get('end_date', now()->endOfMonth()->format('Y-m-d'));
-
-        $report = $this->attendanceService->getAttendanceReport($tenantId, $startDate, $endDate);
-
-        return view('attendance.report', compact('report', 'startDate', 'endDate'));
-    }
-
     public function staffHistory(Request $request, Staff $staff)
     {
         $tenantId = auth()->user()->tenant_id;

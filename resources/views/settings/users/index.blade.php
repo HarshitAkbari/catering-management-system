@@ -37,13 +37,13 @@
                             <!-- Name Filter -->
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                                 <label for="name_filter" class="form-label">Name</label>
-                                <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                                <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm">
                             </div>
 
                             <!-- Email Filter -->
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                                 <label for="email_filter" class="form-label">Email</label>
-                                <input type="text" name="email_like" id="email_filter" value="{{ $filterValues['email_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by email">
+                                <input type="text" name="email_like" id="email_filter" value="{{ $filterValues['email_like'] ?? '' }}" class="form-control form-control-sm">
                             </div>
 
                             <!-- Role Filter -->
