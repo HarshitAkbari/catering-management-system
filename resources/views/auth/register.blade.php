@@ -8,9 +8,9 @@
             <div class="row no-gutters">
                 <div class="col-xl-12">
                     <div class="auth-form">
-						<div class="text-center mb-3">
+						{{-- <div class="text-center mb-3">
 							<a href="{{ route('dashboard') }}"><img src="{{ asset('images/logo-full.png') }}" alt=""></a>
-						</div>
+						</div> --}}
                         <h4 class="text-center mb-4">Sign up your account</h4>
                         <form method="POST" action="{{ route('register') }}">
                             @csrf

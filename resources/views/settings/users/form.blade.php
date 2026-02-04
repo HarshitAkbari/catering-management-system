@@ -5,12 +5,12 @@
 @endphp
 
 <div class="row">
-    <div class="col-md-6 mb-4">
+    <div class="col-md-4 mb-4">
         <label class="form-label" for="name">Name
             <span class="text-danger">*</span>
         </label>
         <input type="text" class="form-control" id="name" name="name" 
-            placeholder="Enter user name.." value="{{ old('name', $user->name ?? '') }}" required>
+            value="{{ old('name', $user->name ?? '') }}" required>
         <div class="invalid-feedback">
             Please enter a name.
         </div>
@@ -19,12 +19,12 @@
         @enderror
     </div>
 
-    <div class="col-md-6 mb-4">
+    <div class="col-md-4 mb-4">
         <label class="form-label" for="email">Email
             <span class="text-danger">*</span>
         </label>
         <input type="email" class="form-control" id="email" name="email" 
-            placeholder="Enter email address.." value="{{ old('email', $user->email ?? '') }}" required>
+            value="{{ old('email', $user->email ?? '') }}" required>
         <div class="invalid-feedback">
             Please enter a valid email address.
         </div>
@@ -33,12 +33,12 @@
         @enderror
     </div>
 
-    <div class="col-md-6 mb-4">
+    <div class="col-md-4 mb-4">
         <label class="form-label" for="mobile">Mobile Number
             <span class="text-danger mobile-required-indicator" style="display: none;">*</span>
         </label>
         <input type="text" class="form-control" id="mobile" name="mobile" 
-            placeholder="Enter mobile number.." value="{{ old('mobile', $user->mobile ?? '') }}">
+            value="{{ old('mobile', $user->mobile ?? '') }}">
         <div class="invalid-feedback">
             Please enter a mobile number.
         </div>
@@ -48,10 +48,9 @@
         <small class="text-muted">Required for Staff and Manager roles</small>
     </div>
 
-    <div class="col-md-6 mb-4">
+    <div class="col-md-12 mb-4">
         <label class="form-label" for="address">Address</label>
-        <textarea class="form-control" id="address" name="address" rows="3" 
-            placeholder="Enter address..">{{ old('address', $user->address ?? '') }}</textarea>
+        <textarea class="form-control" id="address" name="address" rows="3">{{ old('address', $user->address ?? '') }}</textarea>
         @error('address')
             <div class="text-danger small mt-1">{{ $message }}</div>
         @enderror
@@ -62,8 +61,7 @@
         <label class="form-label" for="password">New Password
             <span class="text-muted small">(Leave blank to keep current password)</span>
         </label>
-        <input type="password" class="form-control" id="password" name="password" 
-            placeholder="Enter password..">
+        <input type="password" class="form-control" id="password" name="password">
         <div class="invalid-feedback">
             Please enter a password.
         </div>
@@ -74,8 +72,7 @@
 
     <div class="col-md-6 mb-4">
         <label class="form-label" for="password_confirmation">Confirm New Password</label>
-        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" 
-            placeholder="Confirm new password..">
+        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
     </div>
     @endif
 

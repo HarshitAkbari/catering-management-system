@@ -10,7 +10,6 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">Roles & Permissions</h4>
-                    <a href="{{ route('roles.create') }}" class="btn btn-sm btn-primary btn-add">Add New Role</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

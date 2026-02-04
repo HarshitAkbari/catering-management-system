@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Settings\StoreStaffRoleRequest;
-use App\Http\Requests\Settings\UpdateStaffRoleRequest;
 use App\Models\StaffRole;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class StaffRoleController extends Controller
 {
@@ -60,10 +59,22 @@ class StaffRoleController extends Controller
         return view('settings.staff_roles.create', compact('page_title'));
     }
 
-    public function store(StoreStaffRoleRequest $request)
+    public function store(Request $request)
     {
-        $validated = $request->validated();
         $tenantId = auth()->user()->tenant_id;
+        
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('staff_roles')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                }),
+            ],
+            'description' => 'nullable|string|max:1000',
+            'is_active' => 'boolean',
+        ]);
         
         $result = $this->settingsService->createStaffRole($validated, $tenantId);
 
@@ -89,7 +100,7 @@ class StaffRoleController extends Controller
         return view('settings.staff_roles.edit', compact('staffRole', 'page_title'));
     }
 
-    public function update(UpdateStaffRoleRequest $request, StaffRole $staffRole)
+    public function update(Request $request, StaffRole $staffRole)
     {
         $tenantId = auth()->user()->tenant_id;
         
@@ -97,7 +108,19 @@ class StaffRoleController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $validated = $request->validated();
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('staff_roles')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                })->ignore($staffRole->id),
+            ],
+            'description' => 'nullable|string|max:1000',
+            'is_active' => 'boolean',
+        ]);
+        
         $result = $this->settingsService->updateStaffRole($staffRole, $validated);
 
         if (!$result['status']) {

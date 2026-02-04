@@ -86,45 +86,6 @@ class AttendanceService extends BaseService
     }
 
     /**
-     * Get attendance report
-     */
-    public function getAttendanceReport(int $tenantId, string $startDate, string $endDate): array
-    {
-        $attendances = Attendance::where('tenant_id', $tenantId)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->with('staff')
-            ->get();
-
-        $totalRecords = $attendances->count();
-        $present = $attendances->where('status', 'present')->count();
-        $absent = $attendances->where('status', 'absent')->count();
-        $late = $attendances->where('status', 'late')->count();
-        $halfDay = $attendances->where('status', 'half_day')->count();
-
-        $attendanceRate = $totalRecords > 0 ? round(($present / $totalRecords) * 100, 2) : 0;
-
-        // Group by date
-        $byDate = $attendances->groupBy(function ($attendance) {
-            return $attendance->date->format('Y-m-d');
-        });
-
-        // Group by staff
-        $byStaff = $attendances->groupBy('staff_id');
-
-        return [
-            'total_records' => $totalRecords,
-            'present' => $present,
-            'absent' => $absent,
-            'late' => $late,
-            'half_day' => $halfDay,
-            'attendance_rate' => $attendanceRate,
-            'by_date' => $byDate,
-            'by_staff' => $byStaff,
-            'attendances' => $attendances,
-        ];
-    }
-
-    /**
      * Get staff attendance statistics
      */
     public function getStaffAttendanceStats(int $staffId, string $startDate, string $endDate): array
