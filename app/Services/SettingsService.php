@@ -45,7 +45,7 @@ class SettingsService
                   ->orderBy('name', 'asc');
         }
         
-        return $query->paginate($perPage)->appends($filters);
+        return $query->with('creator')->paginate($perPage)->appends($filters);
     }
 
     public function createOrderStatus(array $data, int $tenantId): array
@@ -168,7 +168,7 @@ class SettingsService
                   ->orderBy('name', 'asc');
         }
         
-        return $query->paginate($perPage)->appends($filters);
+        return $query->with('creator')->paginate($perPage)->appends($filters);
     }
 
     public function createEventTime(array $data, int $tenantId): array
@@ -287,7 +287,7 @@ class SettingsService
             $query->orderBy('name', 'asc');
         }
         
-        return $query->paginate($perPage)->appends($filters);
+        return $query->with('creator')->paginate($perPage)->appends($filters);
     }
 
     public function createOrderType(array $data, int $tenantId): array
@@ -389,7 +389,7 @@ class SettingsService
                   ->orderBy('name', 'asc');
         }
         
-        return $query->paginate($perPage)->appends($filters);
+        return $query->with('creator')->paginate($perPage)->appends($filters);
     }
 
     public function createInventoryUnit(array $data, int $tenantId): array
@@ -508,7 +508,7 @@ class SettingsService
             $query->orderBy('name', 'asc');
         }
         
-        return $query->paginate($perPage)->appends($filters);
+        return $query->with('creator')->paginate($perPage)->appends($filters);
     }
 
     public function createStaffRole(array $data, int $tenantId): array

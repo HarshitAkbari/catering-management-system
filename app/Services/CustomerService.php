@@ -31,7 +31,7 @@ class CustomerService extends BaseService
         
         return $this->repository->filterAndPaginate(
             $filters,
-            [],
+            ['creator'],
             ['orders'],
             $perPage
         );

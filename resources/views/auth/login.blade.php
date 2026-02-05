@@ -12,20 +12,22 @@
 							<a href="{{ route('dashboard') }}"><img src="{{ asset('images/logo-full.png') }}" alt=""></a>
 						</div> --}}
                         <h4 class="text-center mb-4">Sign in your account</h4>
-                        <form method="POST" action="{{ route('login') }}">
+                        <form method="POST" action="{{ route('login') }}" class="needs-validation" novalidate>
                             @csrf
-                            <div class="mb-3">
-                                <label class="mb-1"><strong>Email</strong></label>
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+                            <div class="mb-4">
+                                <label class="form-label" for="email">Email</label>
+                                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+                                <div class="invalid-feedback">Please enter an email address.</div>
                                 @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="mb-3">
-                                <label class="mb-1"><strong>Password</strong></label>
-                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
+                            <div class="mb-4">
+                                <label class="form-label" for="password">Password</label>
+                                <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required>
+                                <div class="invalid-feedback">Please enter a password.</div>
                                 @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="row d-flex justify-content-between mt-4 mb-2">

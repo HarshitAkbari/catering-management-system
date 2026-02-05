@@ -41,7 +41,7 @@ class EquipmentController extends Controller
         }
         
         $equipment = $this->equipmentService->getByTenant($tenantId, 15, $filters);
-        $equipment->load(['equipmentCategory']);
+        $equipment->load(['equipmentCategory', 'creator']);
         
         // Pass filter values to view for form preservation
         $filterValues = [

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('staff_role_id')->nullable()->constrained('staff_roles')->nullOnDelete();
             $table->text('address')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->index('staff_role');
             $table->index('staff_role_id');
             $table->index('status');
+            $table->index('user_id');
         });
     }
 

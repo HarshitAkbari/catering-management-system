@@ -62,6 +62,12 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Status</th>
+                                    <th>
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -74,6 +80,12 @@
                                             <span class="badge badge-{{ $category->is_active ? 'success' : 'danger' }} status-badge" data-status-id="{{ $category->id }}">
                                                 {{ $category->is_active ? 'Active' : 'In-Active' }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {{ $category->created_by ? ($category->creator->name ?? 'N/A') : 'System Created' }}
+                                        </td>
+                                        <td>
+                                            {{ $category->created_at ? $category->created_at->format('M d, Y H:i') : 'N/A' }}
                                         </td>
                                         <td>
                                             <a href="{{ route('settings.equipment-categories.edit', $category) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
@@ -94,7 +106,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-5">
+                                        <td colspan="6" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>

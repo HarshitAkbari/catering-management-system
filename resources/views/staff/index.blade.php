@@ -76,6 +76,12 @@
                                 <th>Role</th>
                                 <th>Status</th>
                                 <th>Total Events</th>
+                                <th>
+                                    <x-table.sort-link field="created_by" label="Created By" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="created_at" label="Created At" />
+                                </th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -121,6 +127,12 @@
                                             {{ $member->orders_count }} {{ Str::plural('event', $member->orders_count) }}
                                         </span>
                                     </td>
+                                    <td class="py-2">
+                                        {{ $member->creator->name ?? 'N/A' }}
+                                    </td>
+                                    <td class="py-2">
+                                        {{ $member->created_at ? $member->created_at->format('M d, Y H:i') : 'N/A' }}
+                                    </td>
                                     <td class="py-2 text-end">
                                         <a href="{{ route('staff.show', $member) }}" class="btn btn-primary btn-xs" title="View">
                                             View
@@ -152,7 +164,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <div class="d-flex flex-column align-items-center">
                                             <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>

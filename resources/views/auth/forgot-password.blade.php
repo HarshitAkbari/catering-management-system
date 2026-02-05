@@ -17,13 +17,14 @@
                             <x-alert type="success" message="{{ session('status') }}" />
                         @endif
 
-                        <form method="POST" action="{{ route('password.email') }}">
+                        <form method="POST" action="{{ route('password.email') }}" class="needs-validation" novalidate>
                             @csrf
-                            <div class="mb-3">
-                                <label><strong>Email</strong></label>
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+                            <div class="mb-4">
+                                <label class="form-label" for="email">Email</label>
+                                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+                                <div class="invalid-feedback">Please enter an email address.</div>
                                 @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="text-center">

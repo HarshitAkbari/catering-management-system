@@ -63,6 +63,12 @@
                                     <th>Name</th>
                                     <th>Description</th>
                                     <th>Status</th>
+                                    <th>
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -76,6 +82,12 @@
                                             <span class="badge badge-{{ $role->is_active ? 'success' : 'danger' }} status-badge" data-status-id="{{ $role->id }}">
                                                 {{ $role->is_active ? 'Active' : 'In-Active' }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {{ $role->created_by ? ($role->creator->name ?? 'N/A') : 'System Created' }}
+                                        </td>
+                                        <td>
+                                            {{ $role->created_at ? $role->created_at->format('M d, Y H:i') : 'N/A' }}
                                         </td>
                                         <td>
                                             <a href="{{ route('settings.staff-roles.edit', $role) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
@@ -105,7 +117,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>

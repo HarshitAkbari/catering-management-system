@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\Blameable;
 use App\Traits\HasTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class InventoryUnit extends Model
 {
-    use HasTenant, SoftDeletes;
+    use HasTenant, Blameable, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',

@@ -41,7 +41,7 @@ class UserService extends BaseService
         
         return $this->repository->filterAndPaginate(
             $filters,
-            [],
+            ['creator'],
             [],
             $perPage
         );

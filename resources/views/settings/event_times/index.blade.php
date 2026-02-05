@@ -62,6 +62,12 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Status</th>
+                                    <th>
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -74,6 +80,12 @@
                                             <span class="badge badge-{{ $eventTime->is_active ? 'success' : 'danger' }} status-badge" data-status-id="{{ $eventTime->id }}">
                                                 {{ $eventTime->is_active ? 'Active' : 'In-Active' }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {{ $eventTime->created_by ? ($eventTime->creator->name ?? 'N/A') : 'System Created' }}
+                                        </td>
+                                        <td>
+                                            {{ $eventTime->created_at ? $eventTime->created_at->format('M d, Y H:i') : 'N/A' }}
                                         </td>
                                         <td>
                                             @if(!$eventTime->is_system)
@@ -96,7 +108,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-5">
+                                        <td colspan="6" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>

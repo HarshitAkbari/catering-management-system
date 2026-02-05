@@ -88,6 +88,12 @@
                                     <th>
                                         <x-table.sort-link field="status" label="Status" />
                                     </th>
+                                    <th>
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -120,6 +126,12 @@
                                             </span>
                                         </td>
                                         <td>
+                                            {{ $user->creator->name ?? 'N/A' }}
+                                        </td>
+                                        <td>
+                                            {{ $user->created_at ? $user->created_at->format('M d, Y H:i') : 'N/A' }}
+                                        </td>
+                                        <td>
                                             @hasPermission('users.edit')
                                             <a href="{{ route('users.edit', $user) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
                                             @endhasPermission
@@ -150,7 +162,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
