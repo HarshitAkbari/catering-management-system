@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Customer;
 use App\Models\InventoryItem;
 use App\Models\Order;
@@ -203,11 +204,14 @@ class DashboardController extends Controller
         // Today's deliveries - filtered by role
         $todayDeliveriesSchedule = $this->getTodayDeliveriesSchedule($tenantId, $isStaff, $staffModel);
 
+        // Activity logs
+        $activities = $this->getActivities($tenantId, $user->id);
+
         return view('dashboard', compact(
             'stats', 'upcomingEvents', 'todayDeliveries', 'lowStockItems', 'lowStockItemsCount', 
             'pendingPayments', 'chartData', 'totalStaff', 'todayPresent', 'todayAbsent', 
             'upcomingStaffAssignments', 'calendarEvents', 'upcomingSchedule', 'todayDeliveriesSchedule',
-            'isAdmin', 'isManager', 'isStaff'
+            'activities', 'isAdmin', 'isManager', 'isStaff'
         ));
     }
 
@@ -514,5 +518,110 @@ class DashboardController extends Controller
         }
 
         return $schedule;
+    }
+
+    /**
+     * Get activities grouped by date for dashboard
+     */
+    private function getActivities(int $tenantId, int $currentUserId): array
+    {
+        // Get activities from last 3 days
+        $startDate = now()->subDays(2)->startOfDay();
+
+        // Following tab: Activities from other users in the same tenant
+        $followingActivities = ActivityLog::where('tenant_id', $tenantId)
+            ->where('user_id', '!=', $currentUserId)
+            ->whereNotNull('user_id')
+            ->where('visited_at', '>=', $startDate)
+            ->with('user')
+            ->orderBy('visited_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        // You tab: Activities from current user
+        $yourActivities = ActivityLog::where('tenant_id', $tenantId)
+            ->where('user_id', $currentUserId)
+            ->where('visited_at', '>=', $startDate)
+            ->with('user')
+            ->orderBy('visited_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        return [
+            'following' => $this->groupActivitiesByDate($followingActivities),
+            'you' => $this->groupActivitiesByDate($yourActivities),
+        ];
+    }
+
+    /**
+     * Group activities by date (Today, Yesterday)
+     */
+    private function groupActivitiesByDate($activities): array
+    {
+        $today = now()->startOfDay();
+        $yesterday = now()->subDay()->startOfDay();
+
+        $grouped = [
+            'today' => [],
+            'yesterday' => [],
+        ];
+
+        foreach ($activities as $activity) {
+            $visitedAt = $activity->visited_at;
+            
+            if ($visitedAt >= $today) {
+                $grouped['today'][] = $this->formatActivity($activity);
+            } elseif ($visitedAt >= $yesterday) {
+                $grouped['yesterday'][] = $this->formatActivity($activity);
+            }
+        }
+
+        return $grouped;
+    }
+
+    /**
+     * Format activity for display
+     */
+    private function formatActivity(ActivityLog $activity): array
+    {
+        $user = $activity->user;
+        $userName = $user ? $user->name : 'Unknown User';
+        $initials = $this->getUserInitials($userName);
+        
+        // Get badge color based on user_id hash for consistency
+        $badgeColors = ['badge-primary', 'badge-warning', 'badge-secondary', 'badge-info', 'badge-success', 'badge-danger'];
+        $colorIndex = $user ? ($user->id % count($badgeColors)) : 0;
+        $badgeColor = $badgeColors[$colorIndex];
+
+        return [
+            'id' => $activity->id,
+            'user_name' => $userName,
+            'user_initials' => $initials,
+            'badge_color' => $badgeColor,
+            'description' => $activity->description ?? 'performed an action',
+            'time' => $activity->visited_at->format('g:i A'),
+            'visited_at' => $activity->visited_at,
+        ];
+    }
+
+    /**
+     * Get user initials from name
+     */
+    private function getUserInitials(?string $name): string
+    {
+        if (!$name) {
+            return 'U';
+        }
+
+        $name = trim($name);
+        $parts = explode(' ', $name);
+        
+        if (count($parts) >= 2) {
+            // First letter of first name + first letter of last name
+            return strtoupper(substr($parts[0], 0, 1) . substr($parts[count($parts) - 1], 0, 1));
+        } else {
+            // First two letters of single name
+            return strtoupper(substr($name, 0, 2));
+        }
     }
 }

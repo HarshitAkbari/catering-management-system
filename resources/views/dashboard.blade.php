@@ -469,6 +469,112 @@
 
 <!-- Low Stock Alert -->
 
+<!-- Activity Feed Row -->
+<div class="row mt-4">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header border-0 flex-wrap">
+                <div class="course-details-tab style-2 tab-lg">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active nt-unseen" id="nav-following-tab" data-bs-toggle="tab" data-bs-target="#nav-following" type="button" role="tab" aria-controls="nav-following" aria-selected="true">Following</button>
+                            <button class="nav-link" id="nav-you-tab" data-bs-toggle="tab" data-bs-target="#nav-you" type="button" role="tab" aria-controls="nav-you" aria-selected="false">You</button>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade active show" id="nav-following" role="tabpanel" aria-labelledby="nav-following-tab">
+                        <div id="DZ_W_TimeLine11" class="widget-timeline style-3">
+                            @if(!empty($activities['following']['today']) || !empty($activities['following']['yesterday']))
+                                @if(!empty($activities['following']['today']))
+                                    <h3 class="mt-3">Today</h3>
+                                    <ul class="timeline-active">
+                                        @foreach($activities['following']['today'] as $activity)
+                                            <li class="d-flex align-items-baseline">
+                                                <h4 class="font-w400 time">{{ $activity['time'] }}</h4>
+                                                <div class="panel">
+                                                    <a class="timeline-panel text-muted d-flex align-items-center" href="#">
+                                                        <div class="badge badge-xl {{ $activity['badge_color'] }}">{{ $activity['user_initials'] }}</div>
+                                                        <h4 class="mb-0"><strong>{{ $activity['user_name'] }}</strong> {{ $activity['description'] }}</h4>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                                @if(!empty($activities['following']['yesterday']))
+                                    <h3 class="mt-3">Yesterday</h3>
+                                    <ul class="timeline-active">
+                                        @foreach($activities['following']['yesterday'] as $activity)
+                                            <li class="d-flex align-items-baseline">
+                                                <h4 class="font-w400 time">{{ $activity['time'] }}</h4>
+                                                <div class="panel">
+                                                    <a class="timeline-panel text-muted d-flex align-items-center" href="#">
+                                                        <div class="badge badge-xl {{ $activity['badge_color'] }}">{{ $activity['user_initials'] }}</div>
+                                                        <h4 class="mb-0"><strong>{{ $activity['user_name'] }}</strong> {{ $activity['description'] }}</h4>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <p>No activities from other users</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nav-you" role="tabpanel" aria-labelledby="nav-you-tab">
+                        <div id="DZ_W_TimeLine12" class="widget-timeline style-3">
+                            @if(!empty($activities['you']['today']) || !empty($activities['you']['yesterday']))
+                                @if(!empty($activities['you']['today']))
+                                    <h3 class="mt-3">Today</h3>
+                                    <ul class="timeline-active">
+                                        @foreach($activities['you']['today'] as $activity)
+                                            <li class="d-flex align-items-baseline">
+                                                <h4 class="font-w400 time">{{ $activity['time'] }}</h4>
+                                                <div class="panel">
+                                                    <a class="timeline-panel text-muted d-flex align-items-center" href="#">
+                                                        <div class="badge badge-xl {{ $activity['badge_color'] }}">{{ $activity['user_initials'] }}</div>
+                                                        <h4 class="mb-0"><strong>{{ $activity['user_name'] }}</strong> {{ $activity['description'] }}</h4>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                                @if(!empty($activities['you']['yesterday']))
+                                    <h3 class="mt-3">Yesterday</h3>
+                                    <ul class="timeline-active">
+                                        @foreach($activities['you']['yesterday'] as $activity)
+                                            <li class="d-flex align-items-baseline">
+                                                <h4 class="font-w400 time">{{ $activity['time'] }}</h4>
+                                                <div class="panel">
+                                                    <a class="timeline-panel text-muted d-flex align-items-center" href="#">
+                                                        <div class="badge badge-xl {{ $activity['badge_color'] }}">{{ $activity['user_initials'] }}</div>
+                                                        <h4 class="mb-0"><strong>{{ $activity['user_name'] }}</strong> {{ $activity['description'] }}</h4>
+                                                    </a>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <p>No activities found</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Calendar Widget Row - Full Width -->
 <div class="row mt-4">
     <div class="col-xl-12">
