@@ -84,6 +84,12 @@
                                     <x-table.sort-link field="price_per_unit" label="Price/Unit" />
                                 </th>
                                 <th>Status</th>
+                                <th>
+                                    <x-table.sort-link field="created_by" label="Created By" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="created_at" label="Created At" />
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -103,6 +109,12 @@
                                         @endif
                                     </td>
                                     <td>
+                                        {{ $item->creator->name ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $item->created_at ? $item->created_at->format('M d, Y H:i') : 'N/A' }}
+                                    </td>
+                                    <td>
                                         <a href="{{ route('inventory.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
                                         <x-edit-button module="inventory" route="inventory.edit" :model="$item" />
                                         <x-delete-button 
@@ -114,7 +126,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <p class="text-muted">No inventory items found</p>
                                     </td>
                                 </tr>

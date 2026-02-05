@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name');
             $table->boolean('is_active')->default(true);
             $table->boolean('is_system')->default(false)->comment('0 = Tenant, 1 = System');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
             

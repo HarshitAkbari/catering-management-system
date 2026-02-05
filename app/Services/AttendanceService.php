@@ -40,7 +40,7 @@ class AttendanceService extends BaseService
         
         return $this->repository->filterAndPaginate(
             $filters,
-            ['staff'],
+            ['staff', 'creator'],
             [],
             $perPage
         );

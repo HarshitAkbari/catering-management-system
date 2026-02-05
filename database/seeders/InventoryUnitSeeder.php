@@ -33,6 +33,7 @@ class InventoryUnitSeeder extends Seeder
                 [
                     'is_system' => 1,
                     'is_active' => 1,
+                    'created_by' => null,
                 ]
             );
         }

@@ -32,7 +32,7 @@ class EquipmentService extends BaseService
         
         return $this->repository->filterAndPaginate(
             $filters,
-            [],
+            ['creator'],
             [],
             $perPage
         );
@@ -85,7 +85,7 @@ class EquipmentService extends BaseService
             $query->orderBy('name', 'asc');
         }
         
-        return $query->paginate($perPage)->appends($filters);
+        return $query->with('creator')->paginate($perPage)->appends($filters);
     }
 
     public function createEquipmentCategory(array $data, int $tenantId): array

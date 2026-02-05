@@ -34,7 +34,7 @@ class StaffService extends BaseService
         
         return $this->repository->filterAndPaginate(
             $filters,
-            [],
+            ['creator'],
             [],
             $perPage
         );

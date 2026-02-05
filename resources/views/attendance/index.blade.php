@@ -91,6 +91,12 @@
                                 <th>Check-in</th>
                                 <th>Check-out</th>
                                 <th>Notes</th>
+                                <th>
+                                    <x-table.sort-link field="created_by" label="Created By" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="created_at" label="Created At" />
+                                </th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -113,13 +119,19 @@
                                     <td>{{ $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : '-' }}</td>
                                     <td>{{ $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : '-' }}</td>
                                     <td>{{ $attendance->notes ?? '-' }}</td>
+                                    <td>
+                                        {{ $attendance->creator->name ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $attendance->created_at ? $attendance->created_at->format('M d, Y H:i') : 'N/A' }}
+                                    </td>
                                     <td class="text-end">
                                         <x-edit-button module="attendance" route="attendance.edit" :model="$attendance" />
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <p class="text-muted">No attendance records found</p>
                                     </td>
                                 </tr>

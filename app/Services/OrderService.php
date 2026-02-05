@@ -46,7 +46,7 @@ class OrderService extends BaseService
         $mergedFilters = array_merge($baseFilters, $filters);
         
         // Get filtered orders (return Query Builder, not Collection)
-        $query = $this->repository->filter($mergedFilters, ['customer', 'eventTime', 'orderType', 'orderStatus'], [], true);
+        $query = $this->repository->filter($mergedFilters, ['customer', 'eventTime', 'orderType', 'orderStatus', 'creator'], [], true);
         
         // Apply customer search if provided
         if ($customerSearch) {

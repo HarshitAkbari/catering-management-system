@@ -19,6 +19,7 @@ class ActivityLog extends Model
         'route_name',
         'url',
         'http_method',
+        'description',
         'ip_address',
         'user_agent',
         'visited_at',

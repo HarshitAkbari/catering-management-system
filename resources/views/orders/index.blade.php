@@ -114,6 +114,12 @@
                                 <th>
                                     <x-table.sort-link field="total_amount" label="Amount" />
                                 </th>
+                                <th>
+                                    <x-table.sort-link field="created_by" label="Created By" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="created_at" label="Created At" />
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -146,6 +152,12 @@
                                     </td>
                                     <td><strong>₹{{ number_format($group['total_amount'], 2) }}</strong></td>
                                     <td>
+                                        {{ $firstOrder->creator->name ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $firstOrder->created_at ? $firstOrder->created_at->format('M d, Y H:i') : 'N/A' }}
+                                    </td>
+                                    <td>
                                         <a href="{{ route('orders.show', $firstOrder) }}" class="btn btn-primary btn-xs" title="View">
                                             View
                                         </a>
@@ -153,7 +165,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-5">
+                                    <td colspan="8" class="text-center py-5">
                                         <p class="text-muted">No orders found</p>
                                     </td>
                                 </tr>
