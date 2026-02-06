@@ -50,6 +50,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'tenant'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/activities/load-more', [DashboardController::class, 'loadMoreActivities'])->name('dashboard.activities.load-more');
     
     // Profile Routes
     Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
