@@ -1,8 +1,8 @@
 <!--**********************************
     Header start
 ***********************************-->
-<div class="header">
-    <div class="header-content">
+<div class="header bg-white">
+    <div class="header-content ">
         <nav class="navbar navbar-expand">
             <div class="collapse navbar-collapse justify-content-between">
                 <div class="header-left">

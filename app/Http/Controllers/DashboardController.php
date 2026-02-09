@@ -523,7 +523,7 @@ class DashboardController extends Controller
     /**
      * Get activities grouped by date for dashboard
      */
-    private function getActivities(int $tenantId, int $currentUserId): array
+    private function getActivities(int $tenantId, int $currentUserId, int $limit = 10): array
     {
         // Get activities from last 3 days
         $startDate = now()->subDays(2)->startOfDay();
@@ -535,7 +535,7 @@ class DashboardController extends Controller
             ->where('visited_at', '>=', $startDate)
             ->with('user')
             ->orderBy('visited_at', 'desc')
-            ->limit(50)
+            ->limit($limit)
             ->get();
 
         // You tab: Activities from current user
@@ -544,13 +544,80 @@ class DashboardController extends Controller
             ->where('visited_at', '>=', $startDate)
             ->with('user')
             ->orderBy('visited_at', 'desc')
-            ->limit(50)
+            ->limit($limit)
             ->get();
 
         return [
             'following' => $this->groupActivitiesByDate($followingActivities),
             'you' => $this->groupActivitiesByDate($yourActivities),
         ];
+    }
+
+    /**
+     * Load more activities via AJAX
+     */
+    public function loadMoreActivities(Request $request)
+    {
+        $user = auth()->user();
+        $tenantId = $user->tenant_id;
+        $currentUserId = $user->id;
+
+        $request->validate([
+            'tab' => 'required|in:following,you',
+            'date_filter' => 'required|in:today,yesterday',
+            'offset' => 'required|integer|min:0',
+        ]);
+
+        $tab = $request->input('tab');
+        $dateFilter = $request->input('date_filter');
+        $offset = (int) $request->input('offset');
+        $limit = 10;
+
+        // Get activities from last 3 days
+        $startDate = now()->subDays(2)->startOfDay();
+        $today = now()->startOfDay();
+        $yesterday = now()->subDay()->startOfDay();
+
+        // Build query based on tab
+        $query = ActivityLog::where('tenant_id', $tenantId)
+            ->where('visited_at', '>=', $startDate)
+            ->with('user')
+            ->orderBy('visited_at', 'desc');
+
+        if ($tab === 'following') {
+            $query->where('user_id', '!=', $currentUserId)
+                  ->whereNotNull('user_id');
+        } else {
+            $query->where('user_id', $currentUserId);
+        }
+
+        // Apply date filter
+        if ($dateFilter === 'today') {
+            $query->where('visited_at', '>=', $today);
+        } else {
+            $query->where('visited_at', '>=', $yesterday)
+                  ->where('visited_at', '<', $today);
+        }
+
+        // Get total count before pagination
+        $totalCount = $query->count();
+
+        // Apply offset and limit
+        $activities = $query->skip($offset)
+            ->take($limit)
+            ->get();
+
+        // Format activities
+        $formattedActivities = $activities->map(function ($activity) {
+            return $this->formatActivity($activity);
+        })->toArray();
+
+        return response()->json([
+            'success' => true,
+            'activities' => $formattedActivities,
+            'has_more' => ($offset + $limit) < $totalCount,
+            'total' => $totalCount,
+        ]);
     }
 
     /**
