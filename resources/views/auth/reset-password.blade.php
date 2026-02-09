@@ -8,8 +8,10 @@
             <div class="row no-gutters">
                 <div class="col-xl-12">
                     <div class="auth-form">
-						<div class="text-center mb-3">
-							<a href="{{ route('dashboard') }}"><img src="{{ asset('images/logo-full.png') }}" alt=""></a>
+						<div class="text-center mb-4">
+							<a href="{{ route('dashboard') }}">
+								<img src="{{ asset('images/catering-logo.png') }}" alt="Brand Logo" style="max-width: 200px; height: auto;">
+							</a>
 						</div>
                         <h4 class="text-center mb-4">Reset Password</h4>
                         
