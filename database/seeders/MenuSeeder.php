@@ -46,6 +46,22 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        // Activity (parent)
+        Menu::updateOrCreate(
+            [
+                'tenant_id' => $tenant->id,
+                'name' => 'activity',
+            ],
+            [
+                'display_name' => 'Activity',
+                'route' => 'activities.index',
+                'icon' => 'bi bi-clock-history',
+                'parent_id' => null,
+                'order' => $order++,
+                'is_active' => true,
+            ]
+        );
+
         // Orders (parent)
         $orders = Menu::firstOrCreate(
             [
