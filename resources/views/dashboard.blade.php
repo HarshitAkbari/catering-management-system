@@ -207,7 +207,7 @@
                                 <tr>
                                     <td>
                                         <strong>{{ $item->name }}</strong><br>
-                                        <small class="text-muted">{{ $item->inventoryUnit?->name ?? 'N/A' }}</small>
+                                        <small class="text-muted">{{ $item->inventoryUnit?->short_name ?? 'N/A' }}</small>
                                     </td>
                                     <td>
                                         <strong class="text-danger">{{ number_format($item->current_stock, 2) }}</strong>

@@ -16,9 +16,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->foreignId('staff_id')->constrained()->onDelete('cascade');
             $table->date('date');
-            $table->enum('status', ['present', 'absent', 'late', 'half_day'])->default('present');
-            $table->time('check_in_time')->nullable();
-            $table->time('check_out_time')->nullable();
+            $table->enum('status', ['present', 'absent', 'half_day'])->default('present');
             $table->text('notes')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

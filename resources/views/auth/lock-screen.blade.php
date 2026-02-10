@@ -8,12 +8,14 @@
             <div class="row no-gutters">
                 <div class="col-xl-12">
                     <div class="auth-form">
-						<div class="text-center mb-4">
-							<a href="{{ route('dashboard') }}">
-								<img src="{{ asset('images/catering-logo.png') }}" alt="Brand Logo" style="max-width: 200px; height: auto;">
-							</a>
-						</div>
-                        <h4 class="text-center mb-4">Account Locked</h4>
+					<div class="text-center mb-4">
+						<a href="{{ route('dashboard') }}">
+							<img src="{{ asset('images/catering-logo.png') }}" alt="Brand Logo" style="max-width: 200px; height: auto;">
+						</a>
+						<h1 class="text-center fs-24 font-w800 text-gray-800">Catering Pro</h3>
+					</div>
+                    <hr>
+                        <h4 class="text-center fs-20 font-w800 text-gray-800">Account Locked</h4>
                         <form method="POST" action="#" class="needs-validation" novalidate>
                             @csrf
                             <div class="mb-4">

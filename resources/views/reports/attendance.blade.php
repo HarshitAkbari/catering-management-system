@@ -94,21 +94,6 @@
                             </div>
                         </div>
                         <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
-                            <div class="widget-stat card bg-warning">
-                                <div class="card-body p-4">
-                                    <div class="media ai-icon">
-                                        <span class="me-3 bgl-warning text-warning">
-                                            <i class="flaticon-381-diamond"></i>
-                                        </span>
-                                        <div class="media-body">
-                                            <p class="mb-1">Late</p>
-                                            <h4 class="mb-0">{{ $summary['late'] }}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
                             <div class="widget-stat card bg-info">
                                 <div class="card-body p-4">
                                     <div class="media ai-icon">
@@ -195,8 +180,6 @@
                                                     <th><strong>Staff Name</strong></th>
                                                     <th><strong>Date</strong></th>
                                                     <th><strong>Status</strong></th>
-                                                    <th><strong>Check-in</strong></th>
-                                                    <th><strong>Check-out</strong></th>
                                                     <th><strong>Notes</strong></th>
                                                 </tr>
                                             </thead>
@@ -209,8 +192,6 @@
                                                             $statusClass = 'badge-success';
                                                         } elseif ($status === 'absent') {
                                                             $statusClass = 'badge-danger';
-                                                        } elseif ($status === 'late') {
-                                                            $statusClass = 'badge-warning';
                                                         } elseif ($status === 'half_day') {
                                                             $statusClass = 'badge-info';
                                                         }
@@ -223,13 +204,11 @@
                                                                 {{ ucfirst(str_replace('_', ' ', $status)) }}
                                                             </span>
                                                         </td>
-                                                        <td>{{ $attendance->check_in_time ?? '-' }}</td>
-                                                        <td>{{ $attendance->check_out_time ?? '-' }}</td>
                                                         <td>{{ $attendance->notes ?? '-' }}</td>
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td colspan="6" class="text-center">No attendance records found</td>
+                                                        <td colspan="4" class="text-center">No attendance records found</td>
                                                     </tr>
                                                 @endforelse
                                             </tbody>
@@ -362,7 +341,6 @@
             const statusColors = {
                 'Present': ['rgba(16, 185, 129, 0.8)', 'rgb(16, 185, 129)'],
                 'Absent': ['rgba(239, 68, 68, 0.8)', 'rgb(239, 68, 68)'],
-                'Late': ['rgba(245, 158, 11, 0.8)', 'rgb(245, 158, 11)'],
                 'Half Day': ['rgba(59, 130, 246, 0.8)', 'rgb(59, 130, 246)'],
             };
 

@@ -648,7 +648,7 @@ class SettingsController extends Controller
         $tenantId = auth()->user()->tenant_id;
 
         $validated = $request->validate([
-            'name' => [
+            'full_name' => [
                 'required',
                 'string',
                 'max:255',
@@ -656,6 +656,11 @@ class SettingsController extends Controller
                     return $query->where('tenant_id', $tenantId)
                                  ->orWhereNull('tenant_id');
                 }),
+            ],
+            'short_name' => [
+                'required',
+                'string',
+                'max:10',
             ],
         ]);
 
@@ -700,7 +705,7 @@ class SettingsController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => [
+            'full_name' => [
                 'required',
                 'string',
                 'max:255',
@@ -708,6 +713,11 @@ class SettingsController extends Controller
                     return $query->where('tenant_id', $tenantId)
                                  ->orWhereNull('tenant_id');
                 })->ignore($inventoryUnit->id),
+            ],
+            'short_name' => [
+                'required',
+                'string',
+                'max:10',
             ],
         ]);
 

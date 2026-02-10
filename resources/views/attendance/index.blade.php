@@ -73,7 +73,6 @@
                                 <option value="">All Status</option>
                                 <option value="present" {{ ($filterValues['status'] ?? '') == 'present' ? 'selected' : '' }}>Present</option>
                                 <option value="absent" {{ ($filterValues['status'] ?? '') == 'absent' ? 'selected' : '' }}>Absent</option>
-                                <option value="late" {{ ($filterValues['status'] ?? '') == 'late' ? 'selected' : '' }}>Late</option>
                                 <option value="half_day" {{ ($filterValues['status'] ?? '') == 'half_day' ? 'selected' : '' }}>Half Day</option>
                             </select>
                         </div>
@@ -88,8 +87,6 @@
                                 <th>Date</th>
                                 <th>Staff Name</th>
                                 <th>Status</th>
-                                <th>Check-in</th>
-                                <th>Check-out</th>
                                 <th>Notes</th>
                                 <th>
                                     <x-table.sort-link field="created_by" label="Created By" />
@@ -110,14 +107,10 @@
                                             <span class="badge badge-success light">Present</span>
                                         @elseif($attendance->status === 'absent')
                                             <span class="badge badge-danger light">Absent</span>
-                                        @elseif($attendance->status === 'late')
-                                            <span class="badge badge-warning light">Late</span>
                                         @else
                                             <span class="badge badge-info light">Half Day</span>
                                         @endif
                                     </td>
-                                    <td>{{ $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : '-' }}</td>
-                                    <td>{{ $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : '-' }}</td>
                                     <td>{{ $attendance->notes ?? '-' }}</td>
                                     <td>
                                         {{ $attendance->creator->name ?? 'N/A' }}
@@ -131,7 +124,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-5">
+                                    <td colspan="7" class="text-center py-5">
                                         <p class="text-muted">No attendance records found</p>
                                     </td>
                                 </tr>

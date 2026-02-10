@@ -20,7 +20,11 @@
                     {{-- Tips Section --}}
                     <x-tips-section>
                         <x-tip-item>
-                            Use standard unit names for inventory units (e.g., "kg", "liter", "piece", "box")
+                            Enter the full name (e.g., "Kilogram", "Liter", "Piece") and short name (e.g., "kg", "L", "pc") for inventory units
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Full name is displayed in dropdowns and forms, while short name is used in tables and compact displays
                         </x-tip-item>
                         
                         <x-tip-item>

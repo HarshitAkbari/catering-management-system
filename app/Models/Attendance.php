@@ -18,8 +18,6 @@ class Attendance extends Model
         'staff_id',
         'date',
         'status',
-        'check_in_time',
-        'check_out_time',
         'notes',
     ];
 
