@@ -171,7 +171,6 @@ class ReportController extends Controller
         $totalRecords = $attendances->count();
         $present = $attendances->where('status', 'present')->count();
         $absent = $attendances->where('status', 'absent')->count();
-        $late = $attendances->where('status', 'late')->count();
         $halfDay = $attendances->where('status', 'half_day')->count();
         $attendanceRate = $totalRecords > 0 ? round(($present / $totalRecords) * 100, 2) : 0;
 
@@ -179,7 +178,6 @@ class ReportController extends Controller
             'total_records' => $totalRecords,
             'present' => $present,
             'absent' => $absent,
-            'late' => $late,
             'half_day' => $halfDay,
             'attendance_rate' => $attendanceRate,
         ];
@@ -608,7 +606,6 @@ class ReportController extends Controller
         $statusColors = [
             'present' => 'rgba(16, 185, 129, 0.8)',
             'absent' => 'rgba(239, 68, 68, 0.8)',
-            'late' => 'rgba(245, 158, 11, 0.8)',
             'half_day' => 'rgba(59, 130, 246, 0.8)',
         ];
 

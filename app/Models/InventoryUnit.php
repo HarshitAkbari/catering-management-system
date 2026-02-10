@@ -17,7 +17,8 @@ class InventoryUnit extends Model
 
     protected $fillable = [
         'tenant_id',
-        'name',
+        'full_name',
+        'short_name',
         'is_active',
         'is_system',
     ];

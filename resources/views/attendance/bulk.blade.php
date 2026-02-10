@@ -39,8 +39,6 @@
                                     <th>Staff Name</th>
                                     <th>Role</th>
                                     <th>Status</th>
-                                    <th>Check-in</th>
-                                    <th>Check-out</th>
                                     <th>Notes</th>
                                 </tr>
                             </thead>
@@ -57,15 +55,8 @@
                                             <select name="attendance[{{ $index }}][status]" class="form-control form-control-sm status-input" disabled>
                                                 <option value="present">Present</option>
                                                 <option value="absent">Absent</option>
-                                                <option value="late">Late</option>
                                                 <option value="half_day">Half Day</option>
                                             </select>
-                                        </td>
-                                        <td>
-                                            <input type="time" name="attendance[{{ $index }}][check_in_time]" class="form-control form-control-sm time-input" disabled>
-                                        </td>
-                                        <td>
-                                            <input type="time" name="attendance[{{ $index }}][check_out_time]" class="form-control form-control-sm time-input" disabled>
                                         </td>
                                         <td>
                                             <input type="text" name="attendance[{{ $index }}][notes]" class="form-control form-control-sm notes-input" placeholder="Notes" disabled>
@@ -97,7 +88,7 @@ function toggleAll(checkbox) {
 
 function toggleRow(checkbox, index) {
     const row = checkbox.closest('tr');
-    const inputs = row.querySelectorAll('.status-input, .time-input, .notes-input');
+    const inputs = row.querySelectorAll('.status-input, .notes-input');
     inputs.forEach(input => {
         input.disabled = !checkbox.checked;
     });

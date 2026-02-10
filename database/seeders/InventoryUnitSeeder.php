@@ -15,22 +15,23 @@ class InventoryUnitSeeder extends Seeder
     public function run(): void
     {
         $units = [
-            'kg',
-            'gram',
-            'liter',
-            'mL',
-            'piece',
-            'box',
-            'packet',
+            ['full_name' => 'Kilogram', 'short_name' => 'kg'],
+            ['full_name' => 'Gram', 'short_name' => 'g'],
+            ['full_name' => 'Liter', 'short_name' => 'L'],
+            ['full_name' => 'Milliliter', 'short_name' => 'mL'],
+            ['full_name' => 'Piece', 'short_name' => 'pc'],
+            ['full_name' => 'Box', 'short_name' => 'box'],
+            ['full_name' => 'Packet', 'short_name' => 'pkt'],
         ];
 
-        foreach ($units as $unitName) {
+        foreach ($units as $unit) {
             InventoryUnit::firstOrCreate(
                 [
-                    'name' => $unitName,
+                    'full_name' => $unit['full_name'],
                     'tenant_id' => null,
                 ],
                 [
+                    'short_name' => $unit['short_name'],
                     'is_system' => 1,
                     'is_active' => 1,
                     'created_by' => null,

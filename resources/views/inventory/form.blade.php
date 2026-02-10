@@ -12,7 +12,7 @@
             <option value="">Select Unit</option>
             @foreach($inventoryUnits as $unit)
                 <option value="{{ $unit->id }}" {{ old('inventory_unit_id', $inventoryItem->inventory_unit_id ?? '') == $unit->id ? 'selected' : '' }}>
-                    {{ $unit->name }}
+                    {{ $unit->full_name }}
                 </option>
             @endforeach
         </select>

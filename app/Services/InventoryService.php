@@ -195,7 +195,7 @@ class InventoryService extends BaseService
               ->orWhere('tenant_id', $tenantId);
         })->where('is_active', true)
             ->orderBy('is_system', 'desc')
-            ->orderBy('name')
+            ->orderBy('full_name')
             ->get();
     }
 }

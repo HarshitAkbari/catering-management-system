@@ -31,8 +31,6 @@ class AttendanceExport implements FromQuery, WithHeadings, WithMapping, WithStyl
             'Staff Name',
             'Date',
             'Status',
-            'Check-in Time',
-            'Check-out Time',
             'Notes',
         ];
     }
@@ -42,7 +40,6 @@ class AttendanceExport implements FromQuery, WithHeadings, WithMapping, WithStyl
         $statusLabels = [
             'present' => 'Present',
             'absent' => 'Absent',
-            'late' => 'Late',
             'half_day' => 'Half Day',
         ];
 
@@ -50,8 +47,6 @@ class AttendanceExport implements FromQuery, WithHeadings, WithMapping, WithStyl
             $attendance->staff->name ?? '-',
             $attendance->date->format('Y-m-d'),
             $statusLabels[$attendance->status] ?? ucfirst($attendance->status),
-            $attendance->check_in_time ?? '-',
-            $attendance->check_out_time ?? '-',
             $attendance->notes ?? '-',
         ];
     }

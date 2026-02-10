@@ -88,9 +88,7 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'staff_id' => 'required|exists:staff,id',
             'date' => 'required|date|before_or_equal:today',
-            'status' => 'required|in:present,absent,late,half_day',
-            'check_in_time' => 'nullable|date_format:H:i',
-            'check_out_time' => 'nullable|date_format:H:i|after:check_in_time',
+            'status' => 'required|in:present,absent,half_day',
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -126,9 +124,7 @@ class AttendanceController extends Controller
             'date' => 'required|date|before_or_equal:today',
             'attendance' => 'required|array',
             'attendance.*.staff_id' => 'required|exists:staff,id',
-            'attendance.*.status' => 'required|in:present,absent,late,half_day',
-            'attendance.*.check_in_time' => 'nullable|date_format:H:i',
-            'attendance.*.check_out_time' => 'nullable|date_format:H:i',
+            'attendance.*.status' => 'required|in:present,absent,half_day',
             'attendance.*.notes' => 'nullable|string|max:500',
         ]);
 
@@ -139,8 +135,6 @@ class AttendanceController extends Controller
             $attendanceData[] = [
                 'staff_id' => $data['staff_id'],
                 'status' => $data['status'],
-                'check_in_time' => $data['check_in_time'] ?? null,
-                'check_out_time' => $data['check_out_time'] ?? null,
                 'notes' => $data['notes'] ?? null,
             ];
         }
@@ -174,9 +168,7 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'staff_id' => 'required|exists:staff,id',
             'date' => 'required|date|before_or_equal:today',
-            'status' => 'required|in:present,absent,late,half_day',
-            'check_in_time' => 'nullable|date_format:H:i',
-            'check_out_time' => 'nullable|date_format:H:i|after:check_in_time',
+            'status' => 'required|in:present,absent,half_day',
             'notes' => 'nullable|string|max:500',
         ]);
 

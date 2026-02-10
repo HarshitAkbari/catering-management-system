@@ -51,14 +51,12 @@ class AttendanceRepository extends BaseRepository
         $total = $attendances->count();
         $present = $attendances->where('status', 'present')->count();
         $absent = $attendances->where('status', 'absent')->count();
-        $late = $attendances->where('status', 'late')->count();
         $halfDay = $attendances->where('status', 'half_day')->count();
 
         return [
             'total' => $total,
             'present' => $present,
             'absent' => $absent,
-            'late' => $late,
             'half_day' => $halfDay,
             'attendance_rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
         ];

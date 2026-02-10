@@ -69,8 +69,6 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Status</th>
-                                <th>Check-in</th>
-                                <th>Check-out</th>
                                 <th>Notes</th>
                             </tr>
                         </thead>
@@ -83,19 +81,15 @@
                                             <span class="badge badge-success light">Present</span>
                                         @elseif($attendance->status === 'absent')
                                             <span class="badge badge-danger light">Absent</span>
-                                        @elseif($attendance->status === 'late')
-                                            <span class="badge badge-warning light">Late</span>
                                         @else
                                             <span class="badge badge-info light">Half Day</span>
                                         @endif
                                     </td>
-                                    <td>{{ $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : '-' }}</td>
-                                    <td>{{ $attendance->check_out_time ? \Carbon\Carbon::parse($attendance->check_out_time)->format('H:i') : '-' }}</td>
                                     <td>{{ $attendance->notes ?? '-' }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-5">
+                                    <td colspan="3" class="text-center py-5">
                                         <p class="text-muted">No attendance records found for this period</p>
                                     </td>
                                 </tr>

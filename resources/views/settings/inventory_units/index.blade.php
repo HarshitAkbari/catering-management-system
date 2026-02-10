@@ -61,6 +61,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
+                                    <th>Short Name</th>
                                     <th>Status</th>
                                     <th>
                                         <x-table.sort-link field="created_by" label="Created By" />
@@ -75,7 +76,8 @@
                                 @forelse($inventoryUnits as $unit)
                                     <tr data-status-id="{{ $unit->id }}">
                                         <td>{{ $unit->id }}</td>
-                                        <td>{{ $unit->name }}</td>
+                                        <td>{{ $unit->full_name }}</td>
+                                        <td>{{ $unit->short_name }}</td>
                                         <td>
                                             <span class="badge badge-{{ $unit->is_active ? 'success' : 'danger' }} status-badge" data-status-id="{{ $unit->id }}">
                                                 {{ $unit->is_active ? 'Active' : 'In-Active' }}
@@ -93,13 +95,13 @@
                                                 @if($unit->is_active)
                                                     <button type="button" 
                                                         class="btn btn-danger btn-xs" 
-                                                        onclick="showSettingsDeactivationModal('inventory-unit-deactivation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
+                                                        onclick="showSettingsDeactivationModal('inventory-unit-deactivation-modal', '{{ $unit->full_name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
                                                         Deactivate
                                                     </button>
                                                 @else
                                                     <button type="button" 
                                                         class="btn btn-success btn-xs" 
-                                                        onclick="showSettingsActivationModal('inventory-unit-activation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
+                                                        onclick="showSettingsActivationModal('inventory-unit-activation-modal', '{{ $unit->full_name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
                                                         Activate
                                                     </button>
                                                 @endif

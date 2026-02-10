@@ -372,7 +372,7 @@ class SettingsService
         
         // Apply name filter
         if (isset($filters['name_like']) && !empty($filters['name_like'])) {
-            $query->where('name', 'like', '%' . $filters['name_like'] . '%');
+            $query->where('full_name', 'like', '%' . $filters['name_like'] . '%');
         }
         
         // Apply status filter
@@ -380,13 +380,13 @@ class SettingsService
             $query->where('is_active', $filters['is_active']);
         }
         
-        // Apply sorting - system inventory units first, then by name
+        // Apply sorting - system inventory units first, then by full_name
         if (isset($filters['sort_by']) && !empty($filters['sort_by'])) {
             $sortOrder = $filters['sort_order'] ?? 'asc';
             $query->orderBy($filters['sort_by'], $sortOrder);
         } else {
             $query->orderBy('is_system', 'desc')
-                  ->orderBy('name', 'asc');
+                  ->orderBy('full_name', 'asc');
         }
         
         return $query->with('creator')->paginate($perPage)->appends($filters);

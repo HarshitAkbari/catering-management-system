@@ -40,28 +40,13 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required onchange="toggleTimeInputs()">
+                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
                                 <option value="present" {{ old('status', 'present') == 'present' ? 'selected' : '' }}>Present</option>
                                 <option value="absent" {{ old('status') == 'absent' ? 'selected' : '' }}>Absent</option>
-                                <option value="late" {{ old('status') == 'late' ? 'selected' : '' }}>Late</option>
                                 <option value="half_day" {{ old('status') == 'half_day' ? 'selected' : '' }}>Half Day</option>
                             </select>
                             <div class="invalid-feedback">Please select a status.</div>
                             @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3" id="checkInGroup">
-                            <label for="check_in_time" class="form-label">Check-in Time</label>
-                            <input type="time" class="form-control @error('check_in_time') is-invalid @enderror" id="check_in_time" name="check_in_time" value="{{ old('check_in_time') }}">
-                            @error('check_in_time')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-md-6 mb-3" id="checkOutGroup">
-                            <label for="check_out_time" class="form-label">Check-out Time</label>
-                            <input type="time" class="form-control @error('check_out_time') is-invalid @enderror" id="check_out_time" name="check_out_time" value="{{ old('check_out_time') }}">
-                            @error('check_out_time')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -82,25 +67,5 @@
     </div>
 </div>
 
-<script>
-function toggleTimeInputs() {
-    const status = document.getElementById('status').value;
-    const checkInGroup = document.getElementById('checkInGroup');
-    const checkOutGroup = document.getElementById('checkOutGroup');
-    
-    if (status === 'absent') {
-        checkInGroup.style.display = 'none';
-        checkOutGroup.style.display = 'none';
-        document.getElementById('check_in_time').value = '';
-        document.getElementById('check_out_time').value = '';
-    } else {
-        checkInGroup.style.display = 'block';
-        checkOutGroup.style.display = 'block';
-    }
-}
-
-// Initialize on page load
-toggleTimeInputs();
-</script>
 @endsection
 

@@ -29,10 +29,10 @@
                             @forelse($lowStockItems as $item)
                                 <tr>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->unit }}</td>
+                                    <td>{{ $item->inventoryUnit->short_name ?? '-' }}</td>
                                     <td><strong class="text-danger">{{ number_format($item->current_stock, 2) }}</strong></td>
                                     <td>{{ number_format($item->minimum_stock, 2) }}</td>
-                                    <td><strong class="text-danger">{{ number_format($item->minimum_stock - $item->current_stock, 2) }} {{ $item->unit }}</strong></td>
+                                    <td><strong class="text-danger">{{ number_format($item->minimum_stock - $item->current_stock, 2) }} {{ $item->inventoryUnit->short_name ?? '-' }}</strong></td>
                                     <td>
                                         <a href="{{ route('inventory.stock-in') }}?item={{ $item->id }}" class="btn btn-success btn-sm">
                                             <i class="bi bi-box-arrow-in-down me-2"></i>Add Stock
