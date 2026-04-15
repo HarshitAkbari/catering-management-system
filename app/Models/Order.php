@@ -106,4 +106,13 @@ class Order extends Model
     {
         return $this->belongsTo(OrderType::class);
     }
+
+    /**
+     * Get the event menu items for the order.
+     */
+    public function eventMenuItems(): BelongsToMany
+    {
+        return $this->belongsToMany(EventMenuItem::class, 'order_event_menu_item')
+            ->withTimestamps();
+    }
 }

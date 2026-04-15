@@ -73,7 +73,29 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
     });
-    // Orders - View
+    
+    // Event Menu Items - Must be before orders/{order} route to avoid route conflicts
+    // Event Menu Items - List
+    Route::middleware(['permission:orders,orders.view'])->group(function () {
+        Route::get('orders/event-menu-items', [\App\Http\Controllers\EventMenuItemController::class, 'index'])->name('orders.event-menu-items');
+    });
+    // Event Menu Items - Create
+    Route::middleware(['permission:orders.create'])->group(function () {
+        Route::get('orders/event-menu-items/create', [\App\Http\Controllers\EventMenuItemController::class, 'create'])->name('orders.event-menu-items.create');
+        Route::post('orders/event-menu-items', [\App\Http\Controllers\EventMenuItemController::class, 'store'])->name('orders.event-menu-items.store');
+    });
+    // Event Menu Items - Edit
+    Route::middleware(['permission:orders.edit'])->group(function () {
+        Route::get('orders/event-menu-items/{eventMenuItem}/edit', [\App\Http\Controllers\EventMenuItemController::class, 'edit'])->name('orders.event-menu-items.edit');
+        Route::put('orders/event-menu-items/{eventMenuItem}', [\App\Http\Controllers\EventMenuItemController::class, 'update'])->name('orders.event-menu-items.update');
+        Route::patch('orders/event-menu-items/{eventMenuItem}/toggle', [\App\Http\Controllers\EventMenuItemController::class, 'toggle'])->name('orders.event-menu-items.toggle');
+    });
+    // Event Menu Items - Delete
+    Route::middleware(['permission:orders.delete'])->group(function () {
+        Route::delete('orders/event-menu-items/{eventMenuItem}', [\App\Http\Controllers\EventMenuItemController::class, 'destroy'])->name('orders.event-menu-items.destroy');
+    });
+    
+    // Orders - View (must be after event-menu-items routes)
     Route::middleware(['permission:orders,orders.view'])->group(function () {
         Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     });
