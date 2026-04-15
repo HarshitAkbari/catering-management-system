@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\EventMenuItem;
 use App\Models\EventTime;
 use App\Models\OrderType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -65,7 +66,23 @@ class StoreOrderRequest extends FormRequest
                     }
                 },
             ],
-            'events.*.event_menu' => ['required', 'string', 'max:255'],
+            'events.*.event_menu_items' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'events.*.event_menu_items.*' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) use ($tenantId) {
+                    if (!EventMenuItem::where('id', $value)
+                        ->where('tenant_id', $tenantId)
+                        ->where('is_active', true)
+                        ->exists()) {
+                        $fail('The selected event menu item is invalid.');
+                    }
+                },
+            ],
             'events.*.guest_count' => ['required', 'integer', 'min:1'],
             'events.*.order_type_id' => [
                 'nullable',
@@ -109,9 +126,11 @@ class StoreOrderRequest extends FormRequest
             'events.*.event_date.date' => 'The event date must be a valid date.',
             'events.*.event_time_id.required' => 'The event time is required.',
             'events.*.event_time_id.integer' => 'The event time must be a valid selection.',
-            'events.*.event_menu.required' => 'The event menu is required.',
-            'events.*.event_menu.string' => 'The event menu must be a string.',
-            'events.*.event_menu.max' => 'The event menu cannot exceed 255 characters.',
+            'events.*.event_menu_items.required' => 'At least one event menu item is required.',
+            'events.*.event_menu_items.array' => 'Event menu items must be an array.',
+            'events.*.event_menu_items.min' => 'At least one event menu item is required.',
+            'events.*.event_menu_items.*.required' => 'Event menu item ID is required.',
+            'events.*.event_menu_items.*.integer' => 'Event menu item ID must be an integer.',
             'events.*.guest_count.required' => 'The guest count is required.',
             'events.*.guest_count.integer' => 'The guest count must be an integer.',
             'events.*.guest_count.min' => 'The guest count must be at least 1.',

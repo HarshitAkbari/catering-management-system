@@ -122,8 +122,13 @@
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="modal-event-menu" class="form-label">Event Menu <span class="text-danger">*</span></label>
-                            <input type="text" id="modal-event-menu" required class="form-control">
+                            <label for="modal-event-menu-items" class="form-label">Event Menu <span class="text-danger">*</span></label>
+                            <select id="modal-event-menu-items" multiple required class="form-control default-select">
+                                @foreach($eventMenuItems as $eventMenuItem)
+                                    <option value="{{ $eventMenuItem->id }}">{{ $eventMenuItem->name }}</option>
+                                @endforeach
+                            </select>
+                            <small class="form-text text-muted">Select one or more menu items (e.g., Chhas, Papad, Rotli)</small>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -166,6 +171,7 @@
         // Pass PHP data to JavaScript
         const eventTimes = @json($eventTimes->keyBy('id'));
         const orderTypes = @json($orderTypes->keyBy('id'));
+        const eventMenuItems = @json($eventMenuItems->keyBy('id'));
         
         (function () {
           'use strict'
@@ -290,10 +296,19 @@
                     }
                 }
 
+                // Get selected event menu items
+                const eventMenuItemsSelect = document.getElementById('modal-event-menu-items');
+                const selectedMenuItems = Array.from(eventMenuItemsSelect.selectedOptions).map(option => parseInt(option.value));
+                
+                if (selectedMenuItems.length === 0) {
+                    alert('Please select at least one event menu item.');
+                    return;
+                }
+
                 const eventData = {
                     event_date: eventDate,
                     event_time_id: parseInt(document.getElementById('modal-event-time').value),
-                    event_menu: document.getElementById('modal-event-menu').value,
+                    event_menu_items: selectedMenuItems,
                     guest_count: parseInt(document.getElementById('modal-guest-count').value),
                     order_type_id: document.getElementById('modal-order-type').value ? parseInt(document.getElementById('modal-order-type').value) : null,
                     dish_price: parseFloat(document.getElementById('modal-dish-price').value),
@@ -391,11 +406,16 @@
 
             container.classList.remove('d-none');
             tbody.innerHTML = events.map((event, index) => {
+                // Format event menu items names
+                const menuItemNames = event.event_menu_items ? 
+                    event.event_menu_items.map(id => eventMenuItems[id]?.name || 'Unknown').join(', ') : 
+                    '-';
+                
                 return `
                     <tr>
                         <td>${formatDateForDisplay(event.event_date)}</td>
                         <td>${eventTimes[event.event_time_id]?.name || '-'}</td>
-                        <td>${event.event_menu}</td>
+                        <td>${menuItemNames}</td>
                         <td>${event.guest_count}</td>
                         <td>${event.order_type_id ? (orderTypes[event.order_type_id]?.name || '-') : '-'}</td>
                         <td>₹${event.dish_price.toFixed(2)}</td>
@@ -406,7 +426,7 @@
                                 data-bs-toggle="modal" 
                                 data-bs-target="#deleteEventModal"
                                 data-event-index="${index}"
-                                data-event-name="${event.event_menu} - ${formatDateForDisplay(event.event_date)}">
+                                data-event-name="${menuItemNames} - ${formatDateForDisplay(event.event_date)}">
                                 Delete
                             </button>
                         </td>
@@ -429,7 +449,13 @@
             }
             
             document.getElementById('modal-event-time').value = event.event_time_id;
-            document.getElementById('modal-event-menu').value = event.event_menu;
+            
+            // Set selected event menu items
+            const eventMenuItemsSelect = document.getElementById('modal-event-menu-items');
+            Array.from(eventMenuItemsSelect.options).forEach(option => {
+                option.selected = event.event_menu_items && event.event_menu_items.includes(parseInt(option.value));
+            });
+            
             document.getElementById('modal-guest-count').value = event.guest_count;
             document.getElementById('modal-order-type').value = event.order_type_id || '';
             document.getElementById('modal-dish-price').value = event.dish_price;

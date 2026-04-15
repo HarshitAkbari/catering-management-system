@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\EventMenuItem;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Repositories\OrderRepository;
@@ -182,6 +183,23 @@ class OrderService extends BaseService
                 // Create orders for each event
                 $createdOrders = [];
                 foreach ($eventsData as $event) {
+                    // Get event menu items if provided
+                    $eventMenuItems = [];
+                    $eventMenuString = '';
+                    
+                    if (isset($event['event_menu_items']) && is_array($event['event_menu_items']) && !empty($event['event_menu_items'])) {
+                        $eventMenuItems = EventMenuItem::where('tenant_id', $tenantId)
+                            ->whereIn('id', $event['event_menu_items'])
+                            ->where('is_active', true)
+                            ->get();
+                        
+                        // Create comma-separated string for backward compatibility
+                        $eventMenuString = $eventMenuItems->pluck('name')->implode(', ');
+                    } else {
+                        // Fallback to string if provided
+                        $eventMenuString = $event['event_menu'] ?? '';
+                    }
+
                     $order = $this->repository->create([
                         'tenant_id' => $tenantId,
                         'customer_id' => $customer->id,
@@ -189,13 +207,18 @@ class OrderService extends BaseService
                         'address' => $address,
                         'event_date' => $event['event_date'],
                         'event_time_id' => $event['event_time_id'],
-                        'event_menu' => $event['event_menu'],
+                        'event_menu' => $eventMenuString,
                         'order_type_id' => $event['order_type_id'] ?? null,
                         'guest_count' => $event['guest_count'],
                         'estimated_cost' => $event['cost'],
                         'order_status_id' => $defaultStatus?->id,
                         'payment_status' => 'pending',
                     ]);
+
+                    // Sync event menu items via many-to-many relationship
+                    if (!empty($eventMenuItems)) {
+                        $order->eventMenuItems()->sync($eventMenuItems->pluck('id')->toArray());
+                    }
 
                     $createdOrders[] = $order;
                 }
@@ -281,11 +304,28 @@ class OrderService extends BaseService
 
                 // Update or create orders for each event
                 foreach ($eventsData as $event) {
-                    // Check if this event matches an existing order (by date, time, menu)
+                    // Get event menu items if provided
+                    $eventMenuItems = [];
+                    $eventMenuString = '';
+                    
+                    if (isset($event['event_menu_items']) && is_array($event['event_menu_items']) && !empty($event['event_menu_items'])) {
+                        $eventMenuItems = EventMenuItem::where('tenant_id', $tenantId)
+                            ->whereIn('id', $event['event_menu_items'])
+                            ->where('is_active', true)
+                            ->get();
+                        
+                        // Create comma-separated string for backward compatibility
+                        $eventMenuString = $eventMenuItems->pluck('name')->implode(', ');
+                    } else {
+                        // Fallback to string if provided
+                        $eventMenuString = $event['event_menu'] ?? '';
+                    }
+
+                    // Check if this event matches an existing order (by date, time)
+                    // Note: We can't match by menu string anymore since it's now an array
                     $existingOrder = $existingOrders->first(function ($order) use ($event) {
                         return $order->event_date->format('Y-m-d') === $event['event_date'] &&
-                               $order->event_time_id == $event['event_time_id'] &&
-                               $order->event_menu === $event['event_menu'];
+                               $order->event_time_id == $event['event_time_id'];
                     });
 
                     if ($existingOrder) {
@@ -295,11 +335,19 @@ class OrderService extends BaseService
                             'address' => $address,
                             'event_date' => $event['event_date'],
                             'event_time_id' => $event['event_time_id'],
-                            'event_menu' => $event['event_menu'],
+                            'event_menu' => $eventMenuString,
                             'order_type_id' => $event['order_type_id'] ?? null,
                             'guest_count' => $event['guest_count'],
                             'estimated_cost' => $event['cost'],
                         ]);
+                        
+                        // Sync event menu items
+                        if (!empty($eventMenuItems)) {
+                            $existingOrder->eventMenuItems()->sync($eventMenuItems->pluck('id')->toArray());
+                        } else {
+                            $existingOrder->eventMenuItems()->detach();
+                        }
+                        
                         $updatedOrderIds[] = $existingOrder->id;
                     } else {
                         // Create new order for this event
@@ -310,12 +358,18 @@ class OrderService extends BaseService
                             'address' => $address,
                             'event_date' => $event['event_date'],
                             'event_time_id' => $event['event_time_id'],
-                            'event_menu' => $event['event_menu'],
+                            'event_menu' => $eventMenuString,
                             'order_type_id' => $event['order_type_id'] ?? null,
                             'guest_count' => $event['guest_count'],
                             'estimated_cost' => $event['cost'],
                             'payment_status' => 'pending',
                         ]);
+                        
+                        // Sync event menu items
+                        if (!empty($eventMenuItems)) {
+                            $newOrder->eventMenuItems()->sync($eventMenuItems->pluck('id')->toArray());
+                        }
+                        
                         $updatedOrderIds[] = $newOrder->id;
                     }
                 }

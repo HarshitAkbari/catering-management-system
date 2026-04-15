@@ -109,6 +109,37 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        // Menus (parent)
+        $menus = Menu::firstOrCreate(
+            [
+                'tenant_id' => $tenant->id,
+                'name' => 'menus',
+            ],
+            [
+                'display_name' => 'Menus',
+                'route' => null,
+                'icon' => 'bi bi-menu-button-wide',
+                'parent_id' => null,
+                'order' => $order++,
+                'is_active' => true,
+            ]
+        );
+
+        Menu::firstOrCreate(
+            [
+                'tenant_id' => $tenant->id,
+                'name' => 'menus.event-menu-items',
+            ],
+            [
+                'display_name' => 'Menu Item List',
+                'route' => 'orders.event-menu-items',
+                'icon' => null,
+                'parent_id' => $menus->id,
+                'order' => 1,
+                'is_active' => true,
+            ]
+        );
+
         // Customers (parent)
         $customers = Menu::firstOrCreate(
             [
