@@ -51,7 +51,7 @@ class PaymentService extends BaseService
         }
         
         // Get filtered orders
-        $allOrders = $this->orderRepository->filter($baseFilters, ['customer'], [], false);
+        $allOrders = $this->orderRepository->filter($baseFilters, ['customer', 'creator'], [], false);
         
         // Group orders by order_number
         $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) use ($tenantId) {

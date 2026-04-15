@@ -11,12 +11,35 @@
                 <div class="card-header">
                     <h3 class="card-title">Add {{ $page_title ?? 'Inventory Unit' }}</h3>
                     <div class="card-tools">
-                        <a href="{{ route('settings.inventory-units') }}" class="btn btn-default btn-sm">
-                            <i class="bi bi-arrow-left"></i> Back to List
+                        <a href="{{ route('settings.inventory-units') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Tips Section --}}
+                    <x-tips-section>
+                        <x-tip-item>
+                            Enter the full name (e.g., "Kilogram", "Liter", "Piece") and short name (e.g., "kg", "L", "pc") for inventory units
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Full name is displayed in dropdowns and forms, while short name is used in tables and compact displays
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Inventory units help standardize measurements across your inventory items
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            You can activate/deactivate units as needed from the inventory units list
+                        </x-tip-item>
+                        
+                        <x-tip-item>
+                            Deactivated units won't appear in dropdowns but existing inventory items keep their unit
+                        </x-tip-item>
+                    </x-tips-section>
+                    
                     <div class="form-validation">
                         <form class="needs-validation" method="POST" action="{{ route('settings.inventory-units.store') }}" novalidate>
                             @csrf
@@ -30,25 +53,6 @@
             </div>
         </div>
     </div>
-    
-    {{-- Tips Section --}}
-    <x-tips-section>
-        <x-tip-item>
-            Use standard unit names for inventory units (e.g., "kg", "liter", "piece", "box")
-        </x-tip-item>
-        
-        <x-tip-item>
-            Inventory units help standardize measurements across your inventory items
-        </x-tip-item>
-        
-        <x-tip-item>
-            You can activate/deactivate units as needed from the inventory units list
-        </x-tip-item>
-        
-        <x-tip-item>
-            Deactivated units won't appear in dropdowns but existing inventory items keep their unit
-        </x-tip-item>
-    </x-tips-section>
 </div>
 @endsection
 

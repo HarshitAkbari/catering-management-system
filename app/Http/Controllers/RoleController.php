@@ -6,22 +6,48 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Services\MenuService;
 use App\Services\RoleService;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
     public function __construct(
-        private readonly RoleService $roleService
+        private readonly RoleService $roleService,
+        private readonly MenuService $menuService
     ) {}
 
     public function index()
     {
         $tenantId = auth()->user()->tenant_id;
-        $roles = $this->roleService->getByTenant($tenantId);
-        $permissions = $this->roleService->getPermissionsByTenant($tenantId);
+        $roles = $this->roleService->getManagerAndStaffRoles($tenantId);
+        $menus = $this->menuService->getMenusByTenant($tenantId);
 
-        return view('roles.index', compact('roles', 'permissions'));
+        return view('roles.index', compact('roles', 'menus'));
+    }
+
+    public function create()
+    {
+        $tenantId = auth()->user()->tenant_id;
+        $menus = $this->menuService->getMenusByTenant($tenantId);
+        $parentMenus = $this->menuService->getParentMenus($tenantId);
+
+        return view('roles.create', compact('menus', 'parentMenus'));
+    }
+
+    public function edit(Role $role)
+    {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($role->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized');
+        }
+
+        $menus = $this->menuService->getMenusByTenant($tenantId);
+        $parentMenus = $this->menuService->getParentMenus($tenantId);
+        $role->load('menus');
+
+        return view('roles.edit', compact('role', 'menus', 'parentMenus'));
     }
 
     public function store(Request $request)
@@ -29,11 +55,14 @@ class RoleController extends Controller
         $tenantId = auth()->user()->tenant_id;
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name,NULL,id,tenant_id,' . $tenantId,
+            'name' => 'required|string|max:255|in:manager,staff|unique:roles,name,NULL,id,tenant_id,' . $tenantId,
             'display_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'exists:permissions,id',
+            'permission_type' => 'required|in:read,write',
+            'write_permissions' => 'nullable|array',
+            'write_permissions.*' => 'in:add,edit,delete,export',
+            'menu_ids' => 'required|array|min:1',
+            'menu_ids.*' => 'exists:menus,id',
         ]);
 
         $result = $this->roleService->createRole($validated, $tenantId);
@@ -58,8 +87,11 @@ class RoleController extends Controller
         $validated = $request->validate([
             'display_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'exists:permissions,id',
+            'permission_type' => 'required|in:read,write',
+            'write_permissions' => 'nullable|array',
+            'write_permissions.*' => 'in:add,edit,delete,export',
+            'menu_ids' => 'required|array|min:1',
+            'menu_ids.*' => 'exists:menus,id',
         ]);
 
         $result = $this->roleService->updateRole($role, $validated, $tenantId);

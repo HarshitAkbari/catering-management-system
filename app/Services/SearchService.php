@@ -100,6 +100,7 @@ class SearchService
             'tenant_id' => $tenantId,
         ], [], [], true)
             ->where('name', 'like', "%{$query}%")
+            ->with('inventoryUnit')
             ->orderBy('name')
             ->limit($limit);
 
@@ -109,7 +110,7 @@ class SearchService
             return [
                 'id' => $item->id,
                 'title' => $item->name,
-                'subtitle' => 'Stock: ' . $item->current_stock . ' ' . ($item->unit ?? ''),
+                'subtitle' => 'Stock: ' . $item->current_stock . ' ' . ($item->inventoryUnit->short_name ?? ''),
                 'url' => route('inventory.show', $item),
                 'type' => 'Inventory',
             ];

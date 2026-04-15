@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name'); // admin, manager, staff
             $table->string('display_name')->nullable();
             $table->text('description')->nullable();
+            $table->enum('permission_type', ['read', 'write'])->nullable();
+            $table->json('write_permissions')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

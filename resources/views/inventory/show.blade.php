@@ -9,27 +9,27 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title">{{ $inventoryItem->name }}</h4>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('inventory.index') }}">
-                        <i class="bi bi-arrow-left me-2"></i>Back to List
+                    <a href="{{ route('inventory.index') }}" class="btn btn-dark btn-sm">
+                        <i class="bi bi-arrow-left me-2"></i>Back
                     </a>
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $inventoryItem->name }}</strong></p>
+                        <p class="mb-0"><strong>Name :</strong> <span class="text-muted">{{ $inventoryItem->name }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Unit :</span> <strong>{{ $inventoryItem->unit }}</strong></p>
+                        <p class="mb-0"><strong>Unit :</strong> <span class="text-muted">{{ $inventoryItem->inventoryUnit->full_name ?? '-' }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Current Stock :</span> <strong>{{ number_format($inventoryItem->current_stock, 2) }}</strong></p>
+                        <p class="mb-0"><strong>Current Stock :</strong> <span class="text-muted">{{ number_format($inventoryItem->current_stock, 2) }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Minimum Stock :</span> <strong>{{ number_format($inventoryItem->minimum_stock, 2) }}</strong></p>
+                        <p class="mb-0"><strong>Minimum Stock :</strong> <span class="text-muted">{{ number_format($inventoryItem->minimum_stock, 2) }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
-                        <p class="mb-0"><span class="text-muted">Price Per Unit :</span> <strong>₹{{ number_format($inventoryItem->price_per_unit, 2) }}</strong></p>
+                        <p class="mb-0"><strong>Price Per Unit :</strong> <span class="text-muted">₹{{ number_format($inventoryItem->price_per_unit, 2) }}</span></p>
                     </div>
                     <div class="col-lg-4 col-md-6 mb-3">
                         <p class="mb-0"><span class="text-muted">Status :</span> 
@@ -42,7 +42,7 @@
                     </div>
                     @if($inventoryItem->description)
                     <div class="col-lg-12 mb-3">
-                        <p class="mb-0"><span class="text-muted">Description :</span> <strong>{{ $inventoryItem->description }}</strong></p>
+                        <p class="mb-0"><strong>Description :</strong> <span class="text-muted">{{ $inventoryItem->description }}</span></p>
                     </div>
                     @endif
                 </div>
@@ -78,7 +78,7 @@
                                             {{ strtoupper($transaction->type) }}
                                         </span>
                                     </td>
-                                    <td>{{ number_format($transaction->quantity, 2) }} {{ $inventoryItem->unit }}</td>
+                                    <td>{{ number_format($transaction->quantity, 2) }} {{ $inventoryItem->inventoryUnit->short_name ?? '-' }}</td>
                                     <td>
                                         @if($transaction->price)
                                             ₹{{ number_format($transaction->price, 2) }}

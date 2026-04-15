@@ -61,7 +61,14 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
+                                    <th>Short Name</th>
                                     <th>Status</th>
+                                    <th>
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -69,11 +76,18 @@
                                 @forelse($inventoryUnits as $unit)
                                     <tr data-status-id="{{ $unit->id }}">
                                         <td>{{ $unit->id }}</td>
-                                        <td>{{ $unit->name }}</td>
+                                        <td>{{ $unit->full_name }}</td>
+                                        <td>{{ $unit->short_name }}</td>
                                         <td>
                                             <span class="badge badge-{{ $unit->is_active ? 'success' : 'danger' }} status-badge" data-status-id="{{ $unit->id }}">
                                                 {{ $unit->is_active ? 'Active' : 'In-Active' }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {{ $unit->created_by ? ($unit->creator->name ?? 'N/A') : 'System Created' }}
+                                        </td>
+                                        <td>
+                                            {{ $unit->created_at ? $unit->created_at->format('M d, Y H:i') : 'N/A' }}
                                         </td>
                                         <td>
                                             @if(!$unit->is_system)
@@ -81,13 +95,13 @@
                                                 @if($unit->is_active)
                                                     <button type="button" 
                                                         class="btn btn-danger btn-xs" 
-                                                        onclick="showSettingsDeactivationModal('inventory-unit-deactivation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
+                                                        onclick="showSettingsDeactivationModal('inventory-unit-deactivation-modal', '{{ $unit->full_name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
                                                         Deactivate
                                                     </button>
                                                 @else
                                                     <button type="button" 
                                                         class="btn btn-success btn-xs" 
-                                                        onclick="showSettingsActivationModal('inventory-unit-activation-modal', '{{ $unit->name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
+                                                        onclick="showSettingsActivationModal('inventory-unit-activation-modal', '{{ $unit->full_name }}', 'inventory unit', '{{ route('settings.inventory-units.toggle', $unit) }}', 'PATCH')">
                                                         Activate
                                                     </button>
                                                 @endif
@@ -96,7 +110,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-5">
+                                        <td colspan="6" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>

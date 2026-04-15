@@ -8,22 +8,27 @@
             <div class="row no-gutters">
                 <div class="col-xl-12">
                     <div class="auth-form">
-						<div class="text-center mb-3">
-							<a href="{{ route('dashboard') }}"><img src="{{ asset('images/logo-full.png') }}" alt=""></a>
-						</div>
-                        <h4 class="text-center mb-4">Forgot Password</h4>
+					<div class="text-center mb-4">
+						<a href="{{ route('dashboard') }}">
+							<img src="{{ asset('images/catering-logo.png') }}" alt="Brand Logo" style="max-width: 200px; height: auto;">
+						</a>
+						<h1 class="text-center fs-24 font-w800 text-gray-800">Catering Pro</h3>
+					</div>
+                    <hr>
+                        <h4 class="text-center fs-20 font-w800 text-gray-800">Forgot Password</h4>
                         
                         @if (session('status'))
                             <x-alert type="success" message="{{ session('status') }}" />
                         @endif
 
-                        <form method="POST" action="{{ route('password.email') }}">
+                        <form method="POST" action="{{ route('password.email') }}" class="needs-validation" novalidate>
                             @csrf
-                            <div class="mb-3">
-                                <label><strong>Email</strong></label>
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+                            <div class="mb-4">
+                                <label class="form-label" for="email">Email</label>
+                                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+                                <div class="invalid-feedback">Please enter an email address.</div>
                                 @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="text-center">

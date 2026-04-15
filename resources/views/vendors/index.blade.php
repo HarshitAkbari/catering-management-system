@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
                         <div class="d-flex align-items-center gap-2">
                             <h4 class="card-title mb-0">{{ $page_title ?? 'Vendors' }}</h4>
@@ -18,6 +18,7 @@
                             </div>
                         @endif
                     </div>
+                <x-add-button module="vendors" route="vendors.create" label="Add Vendor" />
                 </div>
                 <div class="card-body">
                     <!-- Filter Form -->
@@ -70,6 +71,12 @@
                                     <th>
                                         <x-table.sort-link field="email" label="Email" />
                                     </th>
+                                    <th>
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -103,10 +110,17 @@
                                                 N/A
                                             @endif
                                         </td>
+                                        <td class="py-2">
+                                            {{ $vendor->creator->name ?? 'N/A' }}
+                                        </td>
+                                        <td class="py-2">
+                                            {{ $vendor->created_at ? $vendor->created_at->format('M d, Y H:i') : 'N/A' }}
+                                        </td>
                                         <td class="py-2 text-end">
                                             <a href="{{ route('vendors.show', $vendor) }}" class="btn btn-primary btn-xs btn-view">View</a>
-                                            <a href="{{ route('vendors.edit', $vendor) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                            <x-edit-button module="vendors" route="vendors.edit" :model="$vendor" />
                                             <x-delete-button 
+                                                module="vendors"
                                                 item-name="{{ $vendor->name }}"
                                                 delete-url="{{ route('vendors.destroy', $vendor) }}"
                                                 modal-id="deleteVendorModal"
@@ -115,7 +129,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>

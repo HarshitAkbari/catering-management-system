@@ -31,8 +31,8 @@ class LowStockAlertNotification extends Notification implements ShouldQueue
             ->greeting('Hello ' . $notifiable->name . ',')
             ->line('This is an alert that the following inventory item is running low on stock:')
             ->line('**Item:** ' . $this->item->name)
-            ->line('**Current Stock:** ' . $this->item->current_stock . ' ' . ($this->item->unit ?? ''))
-            ->line('**Minimum Stock:** ' . $this->item->minimum_stock . ' ' . ($this->item->unit ?? ''))
+            ->line('**Current Stock:** ' . $this->item->current_stock . ' ' . ($this->item->inventoryUnit->short_name ?? ''))
+            ->line('**Minimum Stock:** ' . $this->item->minimum_stock . ' ' . ($this->item->inventoryUnit->short_name ?? ''))
             ->action('View Inventory', route('inventory.show', $this->item))
             ->line('Please restock this item soon to avoid running out.');
     }

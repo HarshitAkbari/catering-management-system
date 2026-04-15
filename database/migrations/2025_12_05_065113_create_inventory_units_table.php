@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('inventory_units', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('name');
+            $table->string('full_name');
+            $table->string('short_name');
             $table->boolean('is_active')->default(true)->comment('0 = Inactive, 1 = Active');
             $table->boolean('is_system')->default(false)->comment('0 = Tenant, 1 = System');
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
             

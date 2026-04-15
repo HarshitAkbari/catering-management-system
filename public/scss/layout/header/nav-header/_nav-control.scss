@@ -20,7 +20,8 @@
 }
 .brand-logo {
 	img{
-		width: 11rem;
+		max-width: 11rem;
+		height: auto;
 	}
 }
 .nav-header {
@@ -56,13 +57,13 @@
         display: flex;
         height: 100%;
         width: 100%;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         font-size: 1.125rem;
         color: $white;
         text-decoration: none;
-		padding-left: 3rem;
-		padding-right: 3rem;
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
         font-weight: 700;
 		
 		@include respond('laptop') {
@@ -80,6 +81,21 @@
             padding-left: 0;
             padding-right: 0;
             justify-content: center;
+        }
+        
+        .logo-abbr {
+            max-width: 100%;
+            height: auto;
+            max-height: 4rem;
+            object-fit: contain;
+            
+            @include respond('laptop') {
+                max-height: 3.5rem;
+            }
+            
+            @include respond('phone') {
+                max-height: 2.5rem;
+            }
         }
     }
     .brand-title {

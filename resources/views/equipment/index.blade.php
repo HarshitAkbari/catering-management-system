@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('components.flash-messages')
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
@@ -18,9 +19,9 @@
                             </div>
                         @endif
                     </div>
-                    <a href="{{ route('equipment.create') }}" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle me-1"></i>Add Equipment
-                    </a>
+                    @hasPermission('equipment.create')
+                    <x-add-button module="equipment" route="equipment.create" label="Add Equipment" />
+                    @endhasPermission
                 </div>
                 <div class="card-body">
                     <!-- Filter Form -->
@@ -50,17 +51,6 @@
                                     @endforeach
                                 </select>
                             </div>
-
-                            <!-- Status Filter -->
-                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                                <label for="status_filter" class="form-label">Status</label>
-                                <select name="equipment_status_id" id="status_filter" class="form-control form-control-sm">
-                                    <option value="">All Status</option>
-                                    @foreach($statuses ?? [] as $status)
-                                        <option value="{{ $status->id }}" {{ ($filterValues['equipment_status_id'] ?? '') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
                         </div>
 
                         <!-- Filter Buttons -->
@@ -84,7 +74,10 @@
                                         <x-table.sort-link field="available_quantity" label="Available" />
                                     </th>
                                     <th>
-                                        <x-table.sort-link field="status" label="Status" />
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
                                     </th>
                                     <th class="text-end">Actions</th>
                                 </tr>
@@ -105,16 +98,16 @@
                                             {{ $item->available_quantity }}
                                         </td>
                                         <td class="py-2">
-                                            @if($item->equipmentStatus)
-                                                <span class="badge light badge-success">{{ $item->equipmentStatus->name }}</span>
-                                            @else
-                                                <span class="badge light badge-secondary">-</span>
-                                            @endif
+                                            {{ $item->creator->name ?? 'N/A' }}
+                                        </td>
+                                        <td class="py-2">
+                                            {{ $item->created_at ? $item->created_at->format('M d, Y H:i') : 'N/A' }}
                                         </td>
                                         <td class="py-2 text-end">
                                             <a href="{{ route('equipment.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
-                                            <a href="{{ route('equipment.edit', $item) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
+                                            <x-edit-button module="equipment" route="equipment.edit" :model="$item" />
                                             <x-delete-button 
+                                                module="equipment"
                                                 item-name="{{ $item->name }}"
                                                 delete-url="{{ route('equipment.destroy', $item) }}"
                                             />
@@ -122,7 +115,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>

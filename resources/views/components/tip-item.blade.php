@@ -1,5 +1,5 @@
 <li class="mb-3 d-flex align-items-start">
-    <i class="bi bi-chevron-right me-2"></i>
+    <i class="bi bi-chevron-right me-2 text-danger"></i>
     <span>{{ $slot }}</span>
 </li>
 

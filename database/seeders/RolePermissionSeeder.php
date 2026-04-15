@@ -55,7 +55,8 @@ class RolePermissionSeeder extends Seeder
         $permissions = [];
 
         // Module-level permissions
-        $modules = ['orders', 'customers', 'inventory', 'invoices', 'payments', 'reports', 'users', 'roles', 'vendors', 'equipment'];
+        // Note: 'staff' and 'attendance' modules added for Staff Management Module
+        $modules = ['orders', 'customers', 'inventory', 'invoices', 'payments', 'reports', 'users', 'roles', 'vendors', 'equipment', 'staff', 'attendance'];
         foreach ($modules as $module) {
             $permissions[$module] = Permission::firstOrCreate(
                 [
@@ -70,8 +71,10 @@ class RolePermissionSeeder extends Seeder
         }
 
         // Action-level permissions
+        // Creates: staff.view, staff.create, staff.edit, staff.delete, staff.export
+        // Creates: attendance.view, attendance.create, attendance.edit, attendance.delete, attendance.export
         $actions = ['view', 'create', 'edit', 'delete', 'export'];
-        $modulesWithActions = ['orders', 'customers', 'inventory', 'invoices', 'payments', 'vendors', 'equipment'];
+        $modulesWithActions = ['orders', 'customers', 'inventory', 'invoices', 'payments', 'vendors', 'equipment', 'staff', 'attendance'];
         
         foreach ($modulesWithActions as $module) {
             foreach ($actions as $action) {

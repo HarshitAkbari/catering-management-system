@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\EquipmentCategory;
-use App\Models\EquipmentStatus;
 use App\Models\EventTime;
 use App\Models\InventoryUnit;
 use App\Models\OrderStatus;
@@ -13,6 +12,7 @@ use App\Models\OrderType;
 use App\Services\EquipmentService;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SettingsController extends Controller
 {
@@ -84,11 +84,20 @@ class SettingsController extends Controller
 
     public function storeOrderStatus(Request $request)
     {
+        $tenantId = auth()->user()->tenant_id;
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('order_statuses')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId)
+                                 ->orWhereNull('tenant_id');
+                }),
+            ],
         ]);
 
-        $tenantId = auth()->user()->tenant_id;
         $result = $this->settingsService->createOrderStatus($validated, $tenantId);
 
         if (!$result['status']) {
@@ -130,7 +139,15 @@ class SettingsController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('order_statuses')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId)
+                                 ->orWhereNull('tenant_id');
+                })->ignore($orderStatus->id),
+            ],
         ]);
 
         $result = $this->settingsService->updateOrderStatus($orderStatus, $validated);
@@ -262,11 +279,20 @@ class SettingsController extends Controller
 
     public function storeEventTime(Request $request)
     {
+        $tenantId = auth()->user()->tenant_id;
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('event_times')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId)
+                                 ->orWhereNull('tenant_id');
+                }),
+            ],
         ]);
 
-        $tenantId = auth()->user()->tenant_id;
         $result = $this->settingsService->createEventTime($validated, $tenantId);
 
         if (!$result['status']) {
@@ -308,7 +334,15 @@ class SettingsController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('event_times')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId)
+                                 ->orWhereNull('tenant_id');
+                })->ignore($eventTime->id),
+            ],
         ]);
 
         $result = $this->settingsService->updateEventTime($eventTime, $validated);
@@ -440,11 +474,19 @@ class SettingsController extends Controller
 
     public function storeOrderType(Request $request)
     {
+        $tenantId = auth()->user()->tenant_id;
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('order_types')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                }),
+            ],
         ]);
 
-        $tenantId = auth()->user()->tenant_id;
         $result = $this->settingsService->createOrderType($validated, $tenantId);
 
         if (!$result['status']) {
@@ -478,7 +520,14 @@ class SettingsController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('order_types')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                })->ignore($orderType->id),
+            ],
         ]);
 
         $result = $this->settingsService->updateOrderType($orderType, $validated);
@@ -596,11 +645,25 @@ class SettingsController extends Controller
 
     public function storeInventoryUnit(Request $request)
     {
+        $tenantId = auth()->user()->tenant_id;
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'full_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('inventory_units')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId)
+                                 ->orWhereNull('tenant_id');
+                }),
+            ],
+            'short_name' => [
+                'required',
+                'string',
+                'max:10',
+            ],
         ]);
 
-        $tenantId = auth()->user()->tenant_id;
         $result = $this->settingsService->createInventoryUnit($validated, $tenantId);
 
         if (!$result['status']) {
@@ -642,7 +705,20 @@ class SettingsController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'full_name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('inventory_units')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId)
+                                 ->orWhereNull('tenant_id');
+                })->ignore($inventoryUnit->id),
+            ],
+            'short_name' => [
+                'required',
+                'string',
+                'max:10',
+            ],
         ]);
 
         $result = $this->settingsService->updateInventoryUnit($inventoryUnit, $validated);
@@ -774,11 +850,19 @@ class SettingsController extends Controller
 
     public function storeEquipmentCategory(Request $request)
     {
+        $tenantId = auth()->user()->tenant_id;
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('equipment_categories')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                }),
+            ],
         ]);
 
-        $tenantId = auth()->user()->tenant_id;
         $result = $this->equipmentService->createEquipmentCategory($validated, $tenantId);
 
         if (!$result['status']) {
@@ -812,7 +896,14 @@ class SettingsController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('equipment_categories')->where(function ($query) use ($tenantId) {
+                    return $query->where('tenant_id', $tenantId);
+                })->ignore($equipmentCategory->id),
+            ],
         ]);
 
         $result = $this->equipmentService->updateEquipmentCategory($equipmentCategory, $validated);
@@ -882,162 +973,6 @@ class SettingsController extends Controller
             ->with('success', $result['is_active'] 
                 ? 'Equipment category activated successfully!' 
                 : 'Equipment category deactivated successfully!');
-    }
-
-    // Equipment Statuses Methods
-    public function equipmentStatuses(Request $request)
-    {
-        $tenantId = auth()->user()->tenant_id;
-        
-        // Build filters from request
-        $filters = ['tenant_id' => $tenantId];
-        
-        // Name filter
-        if ($request->has('name_like') && !empty($request->name_like)) {
-            $filters['name_like'] = $request->name_like;
-        }
-        
-        // Status filter
-        if ($request->has('status') && !empty($request->status)) {
-            $filters['is_active'] = $request->status === 'active' ? 1 : 0;
-        }
-        
-        // Sorting parameters
-        if ($request->has('sort_by') && !empty($request->sort_by)) {
-            $filters['sort_by'] = $request->sort_by;
-        }
-        if ($request->has('sort_order') && !empty($request->sort_order)) {
-            $filters['sort_order'] = $request->sort_order;
-        }
-        
-        $equipmentStatuses = $this->equipmentService->getEquipmentStatuses($tenantId, 15, $filters);
-        
-        // Pass filter values to view for form preservation
-        $filterValues = [
-            'name_like' => $request->input('name_like', ''),
-            'status' => $request->input('status', ''),
-        ];
-        
-        $page_title = 'Equipment Statuses';
-        return view('settings.equipment_statuses.index', compact('equipmentStatuses', 'filterValues', 'page_title'));
-    }
-
-    public function createEquipmentStatus()
-    {
-        $page_title = 'Create Equipment Status';
-        return view('settings.equipment_statuses.create', compact('page_title'));
-    }
-
-    public function storeEquipmentStatus(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $tenantId = auth()->user()->tenant_id;
-        $result = $this->equipmentService->createEquipmentStatus($validated, $tenantId);
-
-        if (!$result['status']) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => $result['message']]);
-        }
-
-        return redirect()->route('settings.equipment-statuses')
-            ->with('success', 'Equipment status created successfully!');
-    }
-
-    public function editEquipmentStatus(EquipmentStatus $equipmentStatus)
-    {
-        $tenantId = auth()->user()->tenant_id;
-        
-        if ($equipmentStatus->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized');
-        }
-
-        $page_title = 'Edit Equipment Status';
-        return view('settings.equipment_statuses.edit', compact('equipmentStatus', 'page_title'));
-    }
-
-    public function updateEquipmentStatus(Request $request, EquipmentStatus $equipmentStatus)
-    {
-        $tenantId = auth()->user()->tenant_id;
-        
-        if ($equipmentStatus->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized');
-        }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
-        $result = $this->equipmentService->updateEquipmentStatus($equipmentStatus, $validated);
-
-        if (!$result['status']) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => $result['message']]);
-        }
-
-        return redirect()->route('settings.equipment-statuses')
-            ->with('success', 'Equipment status updated successfully!');
-    }
-
-    public function destroyEquipmentStatus(EquipmentStatus $equipmentStatus)
-    {
-        $tenantId = auth()->user()->tenant_id;
-        
-        if ($equipmentStatus->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized');
-        }
-
-        $result = $this->equipmentService->deleteEquipmentStatus($equipmentStatus);
-
-        if (!$result['status']) {
-            return redirect()->route('settings.equipment-statuses')
-                ->with('error', $result['message']);
-        }
-
-        return redirect()->route('settings.equipment-statuses')
-            ->with('success', 'Equipment status deleted successfully!');
-    }
-
-    public function toggleEquipmentStatus(EquipmentStatus $equipmentStatus)
-    {
-        $tenantId = auth()->user()->tenant_id;
-        
-        if ($equipmentStatus->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized');
-        }
-
-        $result = $this->equipmentService->toggleEquipmentStatus($equipmentStatus);
-
-        if (!$result['status']) {
-            if (request()->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $result['message'],
-                ], 422);
-            }
-
-            return redirect()->route('settings.equipment-statuses')
-                ->with('error', $result['message']);
-        }
-
-        if (request()->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'is_active' => $result['is_active'],
-                'message' => $result['is_active'] 
-                    ? 'Equipment status activated successfully!' 
-                    : 'Equipment status deactivated successfully!',
-            ]);
-        }
-
-        return redirect()->route('settings.equipment-statuses')
-            ->with('success', $result['is_active'] 
-                ? 'Equipment status activated successfully!' 
-                : 'Equipment status deactivated successfully!');
     }
 }
 

@@ -52,6 +52,8 @@
                                 <th>Contact Number</th>
                                 <th>Total Amount</th>
                                 <th>Payment Status</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -59,6 +61,7 @@
                             @forelse($orders as $group)
                                 @php
                                     $paymentStatus = $group['payment_status'];
+                                    $firstOrder = $group['orders']->first();
                                 @endphp
                                 <tr>
                                     <td>
@@ -79,6 +82,12 @@
                                             {{ $paymentStatus === 'mixed' ? 'badge-info' : '' }}">
                                             {{ ucfirst($paymentStatus) }}
                                         </span>
+                                    </td>
+                                    <td>
+                                        {{ $firstOrder->creator->name ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $firstOrder->created_at ? $firstOrder->created_at->format('M d, Y H:i') : 'N/A' }}
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
@@ -102,7 +111,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-5">
+                                    <td colspan="7" class="text-center py-5">
                                         <p class="text-muted">No payments found</p>
                                     </td>
                                 </tr>
