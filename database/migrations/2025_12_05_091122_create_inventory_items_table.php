@@ -15,14 +15,17 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('unit'); // kg, liter, piece, etc.
+            $table->foreignId('inventory_unit_id')->nullable()->constrained('inventory_units')->onDelete('set null');
             $table->decimal('current_stock', 10, 2)->default(0);
             $table->decimal('minimum_stock', 10, 2)->default(0);
             $table->decimal('price_per_unit', 10, 2)->default(0);
             $table->text('description')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->index('tenant_id');
+            $table->index('inventory_unit_id');
         });
     }
 

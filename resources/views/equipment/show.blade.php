@@ -10,11 +10,8 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">{{ $equipment->name }}</h4>
                     <div class="d-flex gap-2">
-                        <a href="{{ route('equipment.edit', $equipment) }}" class="btn btn-secondary btn-sm">
-                            <i class="bi bi-pencil me-1"></i>Edit
-                        </a>
-                        <a href="{{ route('equipment.index') }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-arrow-left me-1"></i>Back
+                        <a href="{{ route('equipment.index') }}">
+                            <i class="bi bi-arrow-left me-1"></i>Back to List
                         </a>
                     </div>
                 </div>
@@ -23,9 +20,9 @@
                         <div class="col-lg-6 col-md-6 mb-3">
                             <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $equipment->name }}</strong></p>
                         </div>
-                        @if($equipment->category)
+                        @if($equipment->equipmentCategory)
                             <div class="col-lg-6 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Category :</span> <strong>{{ $equipment->category }}</strong></p>
+                                <p class="mb-0"><span class="text-muted">Category :</span> <strong>{{ $equipment->equipmentCategory->name }}</strong></p>
                             </div>
                         @endif
                         <div class="col-lg-6 col-md-6 mb-3">
@@ -36,10 +33,10 @@
                         </div>
                         <div class="col-lg-6 col-md-6 mb-3">
                             <p class="mb-0"><span class="text-muted">Status :</span> 
-                                @if($equipment->status === 'available')
-                                    <span class="badge light badge-success">{{ ucfirst($equipment->status) }}</span>
+                                @if($equipment->equipmentStatus)
+                                    <span class="badge light badge-success">{{ $equipment->equipmentStatus->name }}</span>
                                 @else
-                                    <span class="badge light badge-danger">{{ ucfirst($equipment->status) }}</span>
+                                    <span class="badge light badge-secondary">-</span>
                                 @endif
                             </p>
                         </div>

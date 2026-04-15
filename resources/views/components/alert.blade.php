@@ -1,75 +1,58 @@
 @props([
     'type' => 'info',
-    'dismissible' => false,
+    'dismissible' => true,
     'icon' => null,
     'title' => null,
+    'message' => null,
 ])
 
 @php
     $typeConfig = [
+        'primary' => [
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>',
+        ],
+        'secondary' => [
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>',
+        ],
         'success' => [
-            'bg' => 'bg-green-50 dark:bg-green-800/20',
-            'border' => 'border-green-200 dark:border-green-800',
-            'text' => 'text-green-800 dark:text-green-200',
-            'icon' => '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>',
-        ],
-        'error' => [
-            'bg' => 'bg-red-50 dark:bg-red-800/20',
-            'border' => 'border-red-200 dark:border-red-800',
-            'text' => 'text-red-800 dark:text-red-200',
-            'icon' => '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>',
-        ],
-        'warning' => [
-            'bg' => 'bg-yellow-50 dark:bg-yellow-800/20',
-            'border' => 'border-yellow-200 dark:border-yellow-800',
-            'text' => 'text-yellow-800 dark:text-yellow-200',
-            'icon' => '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>',
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>',
         ],
         'info' => [
-            'bg' => 'bg-blue-50 dark:bg-blue-800/20',
-            'border' => 'border-blue-200 dark:border-blue-800',
-            'text' => 'text-blue-800 dark:text-blue-200',
-            'icon' => '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>',
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
+        ],
+        'warning' => [
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+        ],
+        'danger' => [
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+        ],
+        'dark' => [
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+        ],
+        'light' => [
+            'icon' => '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="me-2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
         ],
     ];
     
     $config = $typeConfig[$type] ?? $typeConfig['info'];
     $displayIcon = $icon ?? $config['icon'];
+    $alertClasses = 'alert alert-' . $type . ' solid';
+    if ($dismissible) {
+        $alertClasses .= ' alert-dismissible fade show';
+    }
 @endphp
 
-<div 
-    {{ $attributes->merge(['class' => "p-4 mb-4 rounded-lg border {$config['bg']} {$config['border']} {$config['text']}"]) }}
-    @if($dismissible)
-        x-data="{ show: true }"
-        x-show="show"
-        x-transition
+<div class="{{ $alertClasses }}" role="alert">
+    {!! $displayIcon !!}
+    @if($title)
+        <strong>{{ $title }}</strong>
     @endif
-    role="alert"
->
-    <div class="flex items-start">
-        <div class="flex-shrink-0">
-            {!! $displayIcon !!}
-        </div>
-        <div class="ml-3 flex-1">
-            @if($title)
-                <h3 class="text-sm font-semibold mb-1">{{ $title }}</h3>
-            @endif
-            <div class="text-sm">
-                {{ $slot }}
-            </div>
-        </div>
-        @if($dismissible)
-            <button 
-                type="button" 
-                class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 {$config['text']} hover:bg-opacity-20 focus:ring-2 focus:ring-offset-2"
-                @click="show = false"
-                aria-label="Close"
-            >
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                </svg>
-            </button>
-        @endif
-    </div>
+    @if($message)
+        {{ $message }}
+    @else
+        {{ $slot }}
+    @endif
+    @if($dismissible)
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="btn-close"></button>
+    @endif
 </div>
-

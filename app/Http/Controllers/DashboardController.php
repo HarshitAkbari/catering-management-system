@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\InventoryItem;
 use App\Models\Order;
+use App\Models\OrderStatus;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,18 +18,25 @@ class DashboardController extends Controller
     {
         $tenantId = auth()->user()->tenant_id;
 
+        // Get status IDs by name for this tenant
+        $confirmedStatusId = OrderStatus::where('tenant_id', $tenantId)->where('name', 'confirmed')->value('id');
+        $pendingStatusId = OrderStatus::where('tenant_id', $tenantId)->where('name', 'pending')->value('id');
+        $completedStatusId = OrderStatus::where('tenant_id', $tenantId)->where('name', 'completed')->value('id');
+        
+        $statusIds = array_filter([$pendingStatusId, $confirmedStatusId]);
+
         $stats = [
-            'total_orders' => Order::where('tenant_id', $tenantId)->where('status', 'confirmed')->count(),
-            'upcoming_events' => Order::where('tenant_id', $tenantId)
+            'total_orders' => $confirmedStatusId ? Order::where('tenant_id', $tenantId)->where('order_status_id', $confirmedStatusId)->count() : 0,
+            'upcoming_events' => !empty($statusIds) ? Order::where('tenant_id', $tenantId)
                 ->where('event_date', '>', today())
-                ->whereIn('status', ['pending', 'confirmed'])
-                ->count(),
+                ->whereIn('order_status_id', $statusIds)
+                ->count() : 0,
             'pending_payments' => Order::where('tenant_id', $tenantId)
                 ->whereIn('payment_status', ['pending', 'partial'])
                 ->count(),
-            'completed_events' => Order::where('tenant_id', $tenantId)
-                ->where('status', 'completed')
-                ->count(),
+            'completed_events' => $completedStatusId ? Order::where('tenant_id', $tenantId)
+                ->where('order_status_id', $completedStatusId)
+                ->count() : 0,
             'total_customers' => Customer::where('tenant_id', $tenantId)->count(),
             'this_month_revenue' => Payment::where('tenant_id', $tenantId)
                 ->whereMonth('payment_date', now()->month)
@@ -37,20 +45,20 @@ class DashboardController extends Controller
             'total_revenue' => Payment::where('tenant_id', $tenantId)->sum('amount'),
         ];
 
-        $upcomingEvents = Order::where('tenant_id', $tenantId)
+        $upcomingEvents = !empty($statusIds) ? Order::where('tenant_id', $tenantId)
             ->where('event_date', '>', today())
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->with('customer')
+            ->whereIn('order_status_id', $statusIds)
+            ->with('customer', 'orderStatus', 'eventTime')
             ->orderBy('event_date')
             ->limit(5)
-            ->get();
+            ->get() : collect();
 
-        $todayDeliveries = Order::where('tenant_id', $tenantId)
+        $todayDeliveries = $completedStatusId ? Order::where('tenant_id', $tenantId)
             ->where('event_date', today())
-            ->where('status', '!=', 'completed')
-            ->with('customer')
-            ->orderBy('event_time')
-            ->get();
+            ->where('order_status_id', '!=', $completedStatusId)
+            ->with('customer', 'orderStatus', 'eventTime')
+            ->orderBy('event_time_id')
+            ->get() : collect();
 
         $lowStockItems = InventoryItem::where('tenant_id', $tenantId)
             ->whereRaw('current_stock <= minimum_stock')
@@ -95,12 +103,22 @@ class DashboardController extends Controller
         }
 
         // Orders over time - last 6 months
+        $confirmedStatusId = OrderStatus::where('tenant_id', $tenantId)->where('name', 'confirmed')->value('id');
+        $completedStatusId = OrderStatus::where('tenant_id', $tenantId)->where('name', 'completed')->value('id');
+        
         $ordersData = Order::where('tenant_id', $tenantId)
             ->where('created_at', '>=', now()->subMonths(6)->startOfMonth())
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count, status')
-            ->groupBy('month', 'status')
-            ->orderBy('month')
-            ->get();
+            ->with('orderStatus')
+            ->get()
+            ->groupBy(function ($order) {
+                return $order->created_at->format('Y-m');
+            })
+            ->map(function ($monthOrders) {
+                return [
+                    'confirmed' => $monthOrders->where('orderStatus.name', 'confirmed')->count(),
+                    'completed' => $monthOrders->where('orderStatus.name', 'completed')->count(),
+                ];
+            });
 
         $orderMonths = [];
         $confirmedOrders = [];
@@ -109,9 +127,9 @@ class DashboardController extends Controller
         for ($i = 5; $i >= 0; $i--) {
             $month = now()->subMonths($i)->format('Y-m');
             $orderMonths[] = now()->subMonths($i)->format('M Y');
-            $monthData = $ordersData->where('month', $month);
-            $confirmedOrders[] = $monthData->where('status', 'confirmed')->sum('count');
-            $completedOrders[] = $monthData->where('status', 'completed')->sum('count');
+            $monthData = $ordersData->get($month, ['confirmed' => 0, 'completed' => 0]);
+            $confirmedOrders[] = $monthData['confirmed'];
+            $completedOrders[] = $monthData['completed'];
         }
 
         // Payment status distribution

@@ -32,6 +32,9 @@ RUN mkdir -p /home/$user/.composer && \
 COPY docker/entrypoint.sh /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container
 
+# Copy custom PHP configuration
+COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
+
 # Set working directory
 WORKDIR /var/www
 

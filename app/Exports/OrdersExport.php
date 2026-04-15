@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Exports;
 
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithStyles
+class OrdersExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 {
-    protected Collection $orders;
+    protected Builder $query;
 
-    public function __construct(Collection $orders)
+    public function __construct(Builder $query)
     {
-        $this->orders = $orders;
+        $this->query = $query;
     }
 
-    public function collection(): Collection
+    public function query(): Builder
     {
-        return $this->orders;
+        return $this->query;
     }
 
     public function headings(): array
@@ -42,16 +42,18 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping, WithSty
 
     public function map($order): array
     {
+        // $order is now an Order model instance from the query
+        // total_amount is added via join in the controller
         return [
-            $order['order_number'],
-            $order['customer']->name ?? '-',
-            $order['event_date']->format('Y-m-d'),
-            $order['orders']->first()->event_time ?? '-',
-            $order['orders']->first()->order_type ?? '-',
-            $order['orders']->first()->guest_count ?? '-',
-            $order['total_amount'],
-            $order['status'],
-            $order['payment_status'],
+            $order->order_number,
+            $order->customer->name ?? '-',
+            $order->event_date->format('Y-m-d'),
+            $order->eventTime->name ?? '-',
+            $order->orderType->name ?? '-',
+            $order->guest_count ?? '-',
+            $order->total_amount ?? $order->estimated_cost ?? 0,
+            $order->orderStatus->name ?? '-',
+            $order->payment_status ?? '-',
         ];
     }
 

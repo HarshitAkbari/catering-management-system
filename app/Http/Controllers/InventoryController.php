@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\InventoryItem;
+use App\Models\Vendor;
 use App\Services\InventoryService;
 use App\Services\VendorService;
 use Illuminate\Http\Request;
@@ -29,8 +30,8 @@ class InventoryController extends Controller
         }
         
         // Unit filter
-        if ($request->has('unit') && !empty($request->unit)) {
-            $filters['unit'] = $request->unit;
+        if ($request->has('inventory_unit_id') && !empty($request->inventory_unit_id)) {
+            $filters['inventory_unit_id'] = $request->inventory_unit_id;
         }
         
         // Stock status filter (low stock)
@@ -50,38 +51,38 @@ class InventoryController extends Controller
         }
         
         $inventoryItems = $this->inventoryService->getByTenant($tenantId, 15, $filters);
+        $inventoryItems->load('inventoryUnit');
         
         // Pass filter values to view for form preservation
         $filterValues = [
             'name_like' => $request->input('name_like', ''),
-            'unit' => $request->input('unit', ''),
+            'inventory_unit_id' => $request->input('inventory_unit_id', ''),
             'stock_status' => $request->input('stock_status', ''),
         ];
         
-        // Get unique units for filter dropdown
-        $units = $this->inventoryService->getAll()
-            ->where('tenant_id', $tenantId)
-            ->pluck('unit')
-            ->unique()
-            ->sort()
-            ->values();
+        // Get inventory units for filter dropdown
+        $inventoryUnits = $this->inventoryService->getInventoryUnits($tenantId);
         
         $page_title = 'Inventory';
         $subtitle = 'Manage your inventory items';
         
-        return view('inventory.index', compact('inventoryItems', 'filterValues', 'units', 'page_title', 'subtitle'));
+        return view('inventory.index', compact('inventoryItems', 'filterValues', 'inventoryUnits', 'page_title', 'subtitle'));
     }
 
     public function create()
     {
-        return view('inventory.create');
+        $tenantId = auth()->user()->tenant_id;
+        $inventoryUnits = $this->inventoryService->getInventoryUnits($tenantId);
+        $page_title = 'Inventory Item';
+        
+        return view('inventory.create', compact('inventoryUnits', 'page_title'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'unit' => 'required|string|max:50',
+            'inventory_unit_id' => 'required|exists:inventory_units,id',
             'current_stock' => 'required|numeric|min:0',
             'minimum_stock' => 'required|numeric|min:0',
             'price_per_unit' => 'required|numeric|min:0',
@@ -121,14 +122,16 @@ class InventoryController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        return view('inventory.edit', compact('inventoryItem'));
+        $inventoryUnits = $this->inventoryService->getInventoryUnits($tenantId);
+
+        return view('inventory.edit', compact('inventoryItem', 'inventoryUnits'));
     }
 
     public function update(Request $request, InventoryItem $inventoryItem)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'unit' => 'required|string|max:50',
+            'inventory_unit_id' => 'required|exists:inventory_units,id',
             'current_stock' => 'required|numeric|min:0',
             'minimum_stock' => 'required|numeric|min:0',
             'price_per_unit' => 'required|numeric|min:0',
@@ -170,15 +173,32 @@ class InventoryController extends Controller
 
     public function storeStockIn(Request $request)
     {
+        $tenantId = auth()->user()->tenant_id;
+        
         $validated = $request->validate([
-            'inventory_item_id' => 'required|exists:inventory_items,id',
-            'quantity' => 'required|numeric|min:0.01',
-            'price' => 'nullable|numeric|min:0',
-            'vendor_id' => 'nullable|exists:vendors,id',
-            'notes' => 'nullable|string',
+            'inventory_item_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) use ($tenantId) {
+                    if (!InventoryItem::where('id', $value)->where('tenant_id', $tenantId)->exists()) {
+                        $fail('The selected inventory item is invalid.');
+                    }
+                },
+            ],
+            'quantity' => ['required', 'numeric', 'min:0.01'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'vendor_id' => [
+                'nullable',
+                'integer',
+                function ($attribute, $value, $fail) use ($tenantId) {
+                    if ($value && !Vendor::where('id', $value)->where('tenant_id', $tenantId)->exists()) {
+                        $fail('The selected vendor is invalid.');
+                    }
+                },
+            ],
+            'notes' => ['nullable', 'string'],
         ]);
 
-        $tenantId = auth()->user()->tenant_id;
         $result = $this->inventoryService->stockIn($validated, $tenantId);
 
         if (!$result['status']) {
@@ -200,13 +220,22 @@ class InventoryController extends Controller
 
     public function storeStockOut(Request $request)
     {
+        $tenantId = auth()->user()->tenant_id;
+        
         $validated = $request->validate([
-            'inventory_item_id' => 'required|exists:inventory_items,id',
-            'quantity' => 'required|numeric|min:0.01',
-            'notes' => 'nullable|string',
+            'inventory_item_id' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) use ($tenantId) {
+                    if (!InventoryItem::where('id', $value)->where('tenant_id', $tenantId)->exists()) {
+                        $fail('The selected inventory item is invalid.');
+                    }
+                },
+            ],
+            'quantity' => ['required', 'numeric', 'min:0.01'],
+            'notes' => ['nullable', 'string'],
         ]);
 
-        $tenantId = auth()->user()->tenant_id;
         $result = $this->inventoryService->stockOut($validated, $tenantId);
 
         if (!$result['status']) {

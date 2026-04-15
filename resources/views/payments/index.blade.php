@@ -5,18 +5,45 @@
 @section('page_content')
 <div class="row">
     <div class="col-12">
+        @include('components.flash-messages')
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Payments</h4>
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
 
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('payments.index') }}" class="mb-4">
+                    <div class="row g-2 align-items-end mb-3">
+                        <!-- Name Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="name_filter" class="form-label">Name</label>
+                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm">
+                        </div>
+
+                        <!-- Contact Number Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="mobile_filter" class="form-label">Contact Number</label>
+                            <input type="text" name="mobile_like" id="mobile_filter" value="{{ $filterValues['mobile_like'] ?? '' }}" class="form-control form-control-sm">
+                        </div>
+
+                        <!-- Payment Status Filter -->
+                        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                            <label for="payment_status_filter" class="form-label">Payment Status</label>
+                            <select name="payment_status" id="payment_status_filter" class="form-control form-control-sm">
+                                <option value="">All Status</option>
+                                <option value="pending" {{ ($filterValues['payment_status'] ?? '') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="partial" {{ ($filterValues['payment_status'] ?? '') == 'partial' ? 'selected' : '' }}>Partial</option>
+                                <option value="paid" {{ ($filterValues['payment_status'] ?? '') == 'paid' ? 'selected' : '' }}>Paid</option>
+                                <option value="mixed" {{ ($filterValues['payment_status'] ?? '') == 'mixed' ? 'selected' : '' }}>Mixed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <x-filter-buttons resetRoute="{{ route('payments.index') }}" />
+                </form>
+                <hr>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
@@ -67,15 +94,9 @@
                                                     <i class="bi bi-file-earmark-plus me-1"></i>Generate Invoice
                                                 </a>
                                             @endif
-                                            @if($group['orders']->count() > 1)
-                                                <button type="button" onclick="openPaymentModal('{{ $group['order_number'] }}', {{ $group['orders']->count() }}, '{{ $paymentStatus }}')" class="btn btn-primary btn-sm" title="Update Payment">
-                                                    <i class="bi bi-pencil me-1"></i>Update Payment
-                                                </button>
-                                            @else
-                                                <a href="{{ route('orders.edit', $group['orders']->first()) }}" class="btn btn-primary btn-sm" title="Update Payment">
-                                                    <i class="bi bi-pencil me-1"></i>Update Payment
-                                                </a>
-                                            @endif
+                                            <button type="button" onclick="openPaymentModal('{{ $group['order_number'] }}', '{{ $paymentStatus }}')" class="btn btn-primary btn-sm" title="Update Payment">
+                                                <i class="bi bi-pencil me-1"></i>Update Payment
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -91,7 +112,7 @@
                 </div>
                 @if(method_exists($orders, 'links'))
                     <div class="mt-3">
-                        {{ $orders->links() }}
+                        {{ $orders->appends(request()->query())->links() }}
                     </div>
                 @endif
             </div>
@@ -110,31 +131,9 @@
             <form id="payment-update-form" class="needs-validation" action="{{ route('payments.update-group') }}" method="POST" novalidate>
                 @csrf
                 <div class="modal-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>There were errors with your submission:</strong>
-                            <ul class="mb-0 mt-2">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                    @include('error.alerts')
 
-                    <div class="mb-3">
-                        <label for="modal-order-number" class="form-label">Order Number <span class="text-danger">*</span></label>
-                        <input type="text" id="modal-order-number" readonly class="form-control bg-light">
-                        <input type="hidden" name="order_number" id="hidden-order-number">
-                        <div class="invalid-feedback">
-                            Order number is required.
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="modal-order-count" class="form-label">Number of Orders</label>
-                        <input type="text" id="modal-order-count" readonly class="form-control bg-light">
-                    </div>
+                    <input type="hidden" name="order_number" id="hidden-order-number">
                     
                     <div class="mb-3">
                         <label for="modal-payment-status" class="form-label">Payment Status <span class="text-danger">*</span></label>
@@ -190,11 +189,9 @@
         paymentModal = new bootstrap.Modal(document.getElementById('payment-modal'));
     });
 
-    function openPaymentModal(orderNumber, orderCount, currentStatus) {
-        // Set form values
-        document.getElementById('modal-order-number').value = orderNumber;
+    function openPaymentModal(orderNumber, currentStatus) {
+        // Set hidden order number field
         document.getElementById('hidden-order-number').value = orderNumber;
-        document.getElementById('modal-order-count').value = orderCount + ' order(s)';
         
         // Set payment status, defaulting to 'pending' if 'mixed'
         const selectElement = document.getElementById('modal-payment-status');

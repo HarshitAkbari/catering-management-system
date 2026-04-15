@@ -31,10 +31,27 @@ class PaymentService extends BaseService
     /**
      * Get payments grouped by order number
      */
-    public function getGroupedOrders(int $tenantId, int $perPage = 15): LengthAwarePaginator
+    public function getGroupedOrders(int $tenantId, int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        // Get all orders
-        $allOrders = $this->orderRepository->getByTenant($tenantId, ['customer']);
+        // Build base filters
+        $baseFilters = ['tenant_id' => $tenantId];
+        
+        // Build customer filters if name_like or mobile_like are provided
+        $customerFilters = [];
+        if (isset($filters['name_like']) && !empty($filters['name_like'])) {
+            $customerFilters['name_like'] = $filters['name_like'];
+        }
+        if (isset($filters['mobile_like']) && !empty($filters['mobile_like'])) {
+            $customerFilters['mobile_like'] = $filters['mobile_like'];
+        }
+        
+        // Get orders with customer filters applied
+        if (!empty($customerFilters)) {
+            $baseFilters['customer'] = $customerFilters;
+        }
+        
+        // Get filtered orders
+        $allOrders = $this->orderRepository->filter($baseFilters, ['customer'], [], false);
         
         // Group orders by order_number
         $groupedOrders = $allOrders->groupBy('order_number')->map(function ($orderGroup, $orderNumber) use ($tenantId) {
@@ -57,7 +74,17 @@ class PaymentService extends BaseService
                 'created_at' => $firstOrder->created_at,
                 'invoice' => $invoice,
             ];
-        })->values()->sortByDesc('created_at')->values();
+        })->values();
+        
+        // Apply payment status filter if provided
+        if (isset($filters['payment_status']) && !empty($filters['payment_status'])) {
+            $groupedOrders = $groupedOrders->filter(function ($group) use ($filters) {
+                return $group['payment_status'] === $filters['payment_status'];
+            })->values();
+        }
+        
+        // Sort by created_at desc
+        $groupedOrders = $groupedOrders->sortByDesc('created_at')->values();
         
         // Manual pagination
         $currentPage = request()->get('page', 1);

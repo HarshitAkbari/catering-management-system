@@ -104,17 +104,12 @@
                                             @endif
                                         </td>
                                         <td class="py-2 text-end">
-                                            <a href="{{ route('vendors.show', $vendor) }}" class="btn btn-primary btn-sm me-1" title="View">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="{{ route('vendors.edit', $vendor) }}" class="btn btn-info btn-sm me-1" title="Edit">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
+                                            <a href="{{ route('vendors.show', $vendor) }}" class="btn btn-primary btn-xs btn-view">View</a>
+                                            <a href="{{ route('vendors.edit', $vendor) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
                                             <x-delete-button 
                                                 item-name="{{ $vendor->name }}"
                                                 delete-url="{{ route('vendors.destroy', $vendor) }}"
                                                 modal-id="deleteVendorModal"
-                                                delete-button-text="Delete Vendor"
                                             />
                                         </td>
                                     </tr>

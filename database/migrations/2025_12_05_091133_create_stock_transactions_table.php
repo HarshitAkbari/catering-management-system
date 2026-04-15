@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->nullable();
             $table->foreignId('vendor_id')->nullable()->constrained()->onDelete('set null');
             $table->text('notes')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->index('tenant_id');

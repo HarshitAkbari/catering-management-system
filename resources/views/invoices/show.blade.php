@@ -318,17 +318,7 @@
         </div>
         @endif
         
-        @if(session('success'))
-        <div style="background: #d1fae5; color: #065f46; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px;">
-            {{ session('success') }}
-        </div>
-        @endif
-        
-        @if(session('info'))
-        <div style="background: #dbeafe; color: #1e40af; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px;">
-            {{ session('info') }}
-        </div>
-        @endif
+        @include('components.flash-messages')
         
         <!-- Header -->
         <div class="invoice-header">
@@ -404,7 +394,7 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $order->event_date ? $order->event_date->format('M d, Y') : 'N/A' }}</td>
-                    <td>{{ ucfirst(str_replace('_', ' ', $order->event_time ?? 'N/A')) }}</td>
+                    <td>{{ $order->eventTime ? $order->eventTime->name : 'N/A' }}</td>
                     <td>{{ $order->event_menu ?? 'N/A' }}</td>
                     <td>{{ $order->guest_count ?? 'N/A' }}</td>
                     <td class="text-right">₹{{ number_format($order->estimated_cost ?? 0, 2) }}</td>

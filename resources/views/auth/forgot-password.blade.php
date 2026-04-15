@@ -12,17 +12,22 @@
 							<a href="{{ route('dashboard') }}"><img src="{{ asset('images/logo-full.png') }}" alt=""></a>
 						</div>
                         <h4 class="text-center mb-4">Forgot Password</h4>
-                        <form method="POST" action="#">
+                        
+                        @if (session('status'))
+                            <x-alert type="success" message="{{ session('status') }}" />
+                        @endif
+
+                        <form method="POST" action="{{ route('password.email') }}">
                             @csrf
                             <div class="mb-3">
                                 <label><strong>Email</strong></label>
-                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
+                                <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary btn-block">SUBMIT</button>
+                                <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
                             </div>
                         </form>
                         <div class="text-center mt-3">

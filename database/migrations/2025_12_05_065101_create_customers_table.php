@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('mobile');
             $table->string('email')->nullable();
             $table->text('address')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->unique(['tenant_id', 'mobile']);

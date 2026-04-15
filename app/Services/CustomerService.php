@@ -99,7 +99,7 @@ class CustomerService extends BaseService
      */
     private function getGroupStatus($orderGroup): string
     {
-        $statuses = $orderGroup->pluck('status')->unique()->filter();
+        $statuses = $orderGroup->pluck('orderStatus.name')->unique()->filter();
         return $statuses->count() === 1 ? $statuses->first() : 'mixed';
     }
 

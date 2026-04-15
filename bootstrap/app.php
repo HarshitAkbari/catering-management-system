@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\LogUserActivity;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
+            'log.activity' => LogUserActivity::class,
         ]);
+
+        $middleware->append(LogUserActivity::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

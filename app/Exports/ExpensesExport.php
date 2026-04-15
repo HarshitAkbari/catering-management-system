@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Exports;
 
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ExpensesExport implements FromCollection, WithHeadings, WithMapping, WithStyles
+class ExpensesExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 {
-    protected Collection $expenses;
+    protected Builder $query;
 
-    public function __construct(Collection $expenses)
+    public function __construct(Builder $query)
     {
-        $this->expenses = $expenses;
+        $this->query = $query;
     }
 
-    public function collection(): Collection
+    public function query(): Builder
     {
-        return $this->expenses;
+        return $this->query;
     }
 
     public function headings(): array

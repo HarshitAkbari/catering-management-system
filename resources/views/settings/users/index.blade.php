@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('components.flash-messages')
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
@@ -18,26 +19,9 @@
                             </div>
                         @endif
                     </div>
-                    @hasPermission('users.create')
-                    <a href="{{ route('users.create') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>Create New User
-                    </a>
-                    @endhasPermission
+                    <a href="{{ route('users.create') }}" class="btn btn-sm btn-primary btn-add">Add {{ $page_title ?? 'User' }}</a>
                 </div>
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
 
                     <!-- Filter Form -->
                     <form method="GET" action="{{ route('users.index') }}" class="mb-4">
@@ -101,10 +85,10 @@
                                     <th>
                                         <x-table.sort-link field="role" label="Role" />
                                     </th>
+                                    <th>Roles</th>
                                     <th>
                                         <x-table.sort-link field="status" label="Status" />
                                     </th>
-                                    <th>Roles</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -132,25 +116,38 @@
                                             </span>
                                         </td>
                                         <td class="py-2">
-                                            <span class="badge badge-{{ $user->status === 'active' ? 'success' : 'secondary' }}">
-                                                {{ ucfirst($user->status) }}
-                                            </span>
-                                        </td>
-                                        <td class="py-2">
                                             @if($user->roles->count() > 0)
-                                                @foreach($user->roles as $role)
-                                                    <span class="badge badge-primary light me-1">{{ $role->display_name ?? $role->name }}</span>
-                                                @endforeach
+                                            @foreach($user->roles as $role)
+                                            <span class="badge badge-primary light me-1">{{ $role->display_name ?? $role->name }}</span>
+                                            @endforeach
                                             @else
-                                                <span class="text-muted">No roles assigned</span>
+                                            <span class="text-muted">No roles assigned</span>
                                             @endif
                                         </td>
-                                        <td class="py-2 text-end">
+                                        <td>
+                                            <span class="badge badge-{{ $user->is_active ? 'success' : 'danger' }}">
+                                                {{ $user->is_active ? 'Active' : 'In-Active' }}
+                                            </span>
+                                        </td>
+                                        <td>
                                             @hasPermission('users.edit')
-                                            <a href="{{ route('users.edit', $user) }}" class="btn btn-primary btn-sm me-1" title="Edit">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
+                                            <a href="{{ route('users.edit', $user) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
                                             @endhasPermission
+                                            @if($user->id !== auth()->id())
+                                                @if($user->is_active)
+                                                    <button type="button" 
+                                                        class="btn btn-danger btn-xs" 
+                                                        onclick="showSettingsDeactivationModal('user-deactivation-modal', '{{ $user->name }}', 'user', '{{ route('users.toggle', $user) }}', 'PATCH')">
+                                                        Deactivate
+                                                    </button>
+                                                @else
+                                                    <button type="button" 
+                                                        class="btn btn-success btn-xs" 
+                                                        onclick="showSettingsActivationModal('user-activation-modal', '{{ $user->name }}', 'user', '{{ route('users.toggle', $user) }}', 'PATCH')">
+                                                        Activate
+                                                    </button>
+                                                @endif
+                                            @endif
                                             @hasPermission('users.delete')
                                             @if($user->id !== auth()->id())
                                             <x-delete-button 
@@ -188,5 +185,21 @@
 </div>
 
 <x-delete-modal id="deleteModal" />
+
+{{-- Settings Deactivation Modal --}}
+<x-settings-deactivation-modal 
+    modal-id="user-deactivation-modal"
+    setting-type="user"
+    form-method="POST"
+    csrf-method="PATCH"
+/>
+
+{{-- Settings Activation Modal --}}
+<x-settings-activation-modal 
+    modal-id="user-activation-modal"
+    setting-type="user"
+    form-method="POST"
+    csrf-method="PATCH"
+/>
 @endsection
 

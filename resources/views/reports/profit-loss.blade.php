@@ -28,7 +28,7 @@
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                                 <div class="form-group">
                                     <label class="form-label">&nbsp;</label>
-                                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                                    <button type="submit" class="btn btn-danger btn-block">Filter</button>
                                 </div>
                             </div>
                             <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
@@ -44,7 +44,7 @@
 
                     <!-- Summary Cards -->
                     <div class="row">
-                        <div class="col-xl-4 col-lg-6 col-sm-6">
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
                             <div class="widget-stat card bg-success">
                                 <div class="card-body p-4">
                                     <div class="media ai-icon">
@@ -59,7 +59,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-4 col-lg-6 col-sm-6">
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
                             <div class="widget-stat card bg-danger">
                                 <div class="card-body p-4">
                                     <div class="media ai-icon">
@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-4 col-lg-6 col-sm-6">
+                        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3">
                             <div class="widget-stat card {{ $profit >= 0 ? 'bg-primary' : 'bg-warning' }}">
                                 <div class="card-body p-4">
                                     <div class="media ai-icon">

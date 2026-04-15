@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name'); // e.g., orders.create, orders.edit
             $table->string('display_name')->nullable();
             $table->text('description')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             
             $table->unique(['tenant_id', 'name']);
