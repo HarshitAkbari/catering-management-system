@@ -268,9 +268,11 @@ class DashboardController extends Controller
     private function getChartData(int $tenantId): array
     {
         // Revenue trend - last 6 months
+        $monthExpression = $this->getMonthFormatExpression('payment_date');
+
         $revenueData = Payment::where('tenant_id', $tenantId)
             ->where('payment_date', '>=', now()->subMonths(6)->startOfMonth())
-            ->selectRaw('DATE_FORMAT(payment_date, "%Y-%m") as month, SUM(amount) as total')
+            ->selectRaw("{$monthExpression} as month, SUM(amount) as total")
             ->groupBy('month')
             ->orderBy('month')
             ->get();
@@ -504,5 +506,16 @@ class DashboardController extends Controller
         }
 
         return $schedule;
+    }
+
+    /**
+     * Get DB-driver-safe month format SQL expression.
+     */
+    private function getMonthFormatExpression(string $column): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'pgsql' => "to_char({$column}, 'YYYY-MM')",
+            default => "DATE_FORMAT({$column}, '%Y-%m')",
+        };
     }
 }
