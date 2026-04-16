@@ -29,7 +29,7 @@ WORKDIR /var/www
 # Copy project
 COPY . .
 
-# Install frontend dependencies & build assets ✅
+# Install frontend dependencies & build assets
 RUN npm install && npm run build
 
 # Install Laravel dependencies
@@ -45,5 +45,5 @@ USER laravel
 # Expose port
 EXPOSE 10000
 
-# Clear stale caches, then start Laravel
-CMD ["sh", "-lc", "php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=10000"]
+# 🚀 FINAL CMD (with migration + cache clear)
+CMD ["sh", "-lc", "php artisan optimize:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000"]
