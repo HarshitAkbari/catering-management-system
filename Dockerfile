@@ -1,8 +1,8 @@
 FROM php:8.2-fpm
 
-# Arguments defined in docker-compose.yml
-ARG user
-ARG uid
+# Host UID/GID mapping (override with: docker build --build-arg uid=1000 --build-arg user=laravel)
+ARG user=laravel
+ARG uid=1000
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
