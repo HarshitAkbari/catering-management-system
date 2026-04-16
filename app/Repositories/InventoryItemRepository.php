@@ -35,6 +35,7 @@ class InventoryItemRepository extends BaseRepository
         return $this->model
             ->where('tenant_id', $tenantId)
             ->whereRaw('current_stock <= minimum_stock')
+            ->with('inventoryUnit')
             ->get();
     }
 }

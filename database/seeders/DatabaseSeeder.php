@@ -19,12 +19,10 @@ class DatabaseSeeder extends Seeder
         $this->call(OrderStatusSeeder::class);
         $this->call(EventTimeSeeder::class);
         $this->call(InventoryUnitSeeder::class);
+        
+        // Seed menus
+        $this->call(MenuSeeder::class);
 
         // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
     }
 }

@@ -6,6 +6,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            @include('components.flash-messages')
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex flex-column">
@@ -18,7 +19,7 @@
                             </div>
                         @endif
                     </div>
-                    <a href="{{ route('inventory.create') }}" class="btn btn-sm btn-primary btn-add">Add {{ $page_title ?? 'Inventory Item' }}</a>
+                    <x-add-button module="inventory" route="inventory.create" label="Add Inventory Item" />
                 </div>
             <div class="card-body">
                 <!-- Filter Form -->
@@ -35,7 +36,7 @@
                         <!-- Name Filter -->
                         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
                             <label for="name_filter" class="form-label">Name</label>
-                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm" placeholder="Search by name">
+                            <input type="text" name="name_like" id="name_filter" value="{{ $filterValues['name_like'] ?? '' }}" class="form-control form-control-sm">
                         </div>
 
                         <!-- Unit Filter -->
@@ -44,7 +45,7 @@
                             <select name="inventory_unit_id" id="unit_filter" class="form-control form-control-sm">
                                 <option value="">All Units</option>
                                 @foreach($inventoryUnits ?? [] as $unit)
-                                    <option value="{{ $unit->id }}" {{ ($filterValues['inventory_unit_id'] ?? '') == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                    <option value="{{ $unit->id }}" {{ ($filterValues['inventory_unit_id'] ?? '') == $unit->id ? 'selected' : '' }}>{{ $unit->full_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -83,6 +84,12 @@
                                     <x-table.sort-link field="price_per_unit" label="Price/Unit" />
                                 </th>
                                 <th>Status</th>
+                                <th>
+                                    <x-table.sort-link field="created_by" label="Created By" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="created_at" label="Created At" />
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -90,7 +97,13 @@
                             @forelse($inventoryItems as $item)
                                 <tr>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->inventoryUnit->name ?? '-' }}</td>
+                                    <td>
+                                        @if($item->inventoryUnit)
+                                            {{ $item->inventoryUnit->full_name }} ({{ $item->inventoryUnit->short_name }})
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>{{ number_format($item->current_stock, 2) }}</td>
                                     <td>{{ number_format($item->minimum_stock, 2) }}</td>
                                     <td>₹{{ number_format($item->price_per_unit, 2) }}</td>
@@ -102,10 +115,16 @@
                                         @endif
                                     </td>
                                     <td>
+                                        {{ $item->creator->name ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $item->created_at ? $item->created_at->format('M d, Y H:i') : 'N/A' }}
+                                    </td>
+                                    <td>
                                         <a href="{{ route('inventory.show', $item) }}" class="btn btn-primary btn-xs btn-view">View</a>
-                                        <a href="{{ route('inventory.edit', $item) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
-
+                                        <x-edit-button module="inventory" route="inventory.edit" :model="$item" />
                                         <x-delete-button 
+                                            module="inventory"
                                             item-name="{{ $item->name }}"
                                             delete-url="{{ route('inventory.destroy', $item) }}"
                                         />
@@ -113,7 +132,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <p class="text-muted">No inventory items found</p>
                                     </td>
                                 </tr>

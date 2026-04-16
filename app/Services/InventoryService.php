@@ -40,14 +40,14 @@ class InventoryService extends BaseService
         if (isset($filters['stock_status']) && $filters['stock_status'] === 'low') {
             unset($filters['stock_status']);
             // Use a custom query for low stock
-            $query = $this->repository->filter($filters, [], [], true);
+            $query = $this->repository->filter($filters, ['inventoryUnit', 'creator'], [], true);
             $query->whereRaw('current_stock <= minimum_stock');
             return $this->repository->applyPagination($query, $filters, $perPage);
         }
         
         return $this->repository->filterAndPaginate(
             $filters,
-            [],
+            ['inventoryUnit', 'creator'],
             [],
             $perPage
         );
@@ -116,7 +116,7 @@ class InventoryService extends BaseService
     {
         try {
             return DB::transaction(function () use ($data, $tenantId) {
-                $item = $this->repository->find($data['inventory_item_id']);
+                $item = $this->repository->find((int) $data['inventory_item_id']);
 
                 if (!$item || $item->tenant_id !== $tenantId) {
                     return ['status' => false, 'message' => 'Inventory item not found'];
@@ -153,7 +153,7 @@ class InventoryService extends BaseService
     {
         try {
             return DB::transaction(function () use ($data, $tenantId) {
-                $item = $this->repository->find($data['inventory_item_id']);
+                $item = $this->repository->find((int) $data['inventory_item_id']);
 
                 if (!$item || $item->tenant_id !== $tenantId) {
                     return ['status' => false, 'message' => 'Inventory item not found'];
@@ -195,7 +195,7 @@ class InventoryService extends BaseService
               ->orWhere('tenant_id', $tenantId);
         })->where('is_active', true)
             ->orderBy('is_system', 'desc')
-            ->orderBy('name')
+            ->orderBy('full_name')
             ->get();
     }
 }

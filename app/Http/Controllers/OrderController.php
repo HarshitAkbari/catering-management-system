@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
+use App\Models\EventMenuItem;
 use App\Models\EventTime;
 use App\Models\Order;
 use App\Models\OrderStatus;
@@ -105,9 +106,10 @@ class OrderController extends Controller
               ->orWhere('tenant_id', $tenantId);
         })->where('is_active', true)->orderBy('is_system', 'desc')->orderBy('name')->get();
         $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $eventMenuItems = EventMenuItem::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
         
         $page_title = 'Create New Order';
-        return view('orders.create', compact('page_title', 'eventTimes', 'orderTypes'));
+        return view('orders.create', compact('page_title', 'eventTimes', 'orderTypes', 'eventMenuItems'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -121,6 +123,7 @@ class OrderController extends Controller
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
                 'customer_mobile' => $validated['customer_mobile'],
+                'customer_secondary_mobile' => $validated['customer_secondary_mobile'] ?? null,
             ],
             $validated['address'],
             $tenantId
@@ -149,7 +152,7 @@ class OrderController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $order->load('customer', 'invoice.payments', 'eventTime', 'orderType', 'orderStatus');
+        $order->load('customer', 'invoice.payments', 'eventTime', 'orderType', 'orderStatus', 'staff');
         
         // Build filters from request
         $filters = [];
@@ -221,7 +224,7 @@ class OrderController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $order->load('customer');
+        $order->load('customer', 'eventMenuItems');
         
         // Load all orders with same order_number
         $relatedOrders = $this->orderService->getByOrderNumber($order->order_number, $tenantId);
@@ -231,9 +234,10 @@ class OrderController extends Controller
               ->orWhere('tenant_id', $tenantId);
         })->where('is_active', true)->orderBy('is_system', 'desc')->orderBy('name')->get();
         $orderTypes = OrderType::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
+        $eventMenuItems = EventMenuItem::where('tenant_id', $tenantId)->where('is_active', true)->orderBy('name')->get();
         
         $page_title = 'Edit Order';
-        return view('orders.edit', compact('order', 'relatedOrders', 'page_title', 'eventTimes', 'orderTypes'));
+        return view('orders.edit', compact('order', 'relatedOrders', 'page_title', 'eventTimes', 'orderTypes', 'eventMenuItems'));
     }
 
     public function update(Request $request, Order $order)
@@ -270,6 +274,7 @@ class OrderController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'customer_mobile' => 'required|string|max:20',
+            'customer_secondary_mobile' => 'nullable|string|max:20',
             'address' => 'required|string',
             'events' => 'required|array|min:1',
             'events.*.event_date' => 'required|date',
@@ -284,7 +289,23 @@ class OrderController extends Controller
                     $fail('The selected event time is invalid.');
                 }
             }],
-            'events.*.event_menu' => 'required|string|max:255',
+            'events.*.event_menu_items' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'events.*.event_menu_items.*' => [
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) use ($tenantId) {
+                    if (!EventMenuItem::where('id', $value)
+                        ->where('tenant_id', $tenantId)
+                        ->where('is_active', true)
+                        ->exists()) {
+                        $fail('The selected event menu item is invalid.');
+                    }
+                },
+            ],
             'events.*.guest_count' => 'required|integer|min:1',
             'events.*.order_type_id' => ['nullable', 'integer', function ($attribute, $value, $fail) use ($tenantId) {
                 if ($value && !OrderType::where('id', $value)->where('tenant_id', $tenantId)->where('is_active', true)->exists()) {
@@ -302,6 +323,7 @@ class OrderController extends Controller
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
                 'customer_mobile' => $validated['customer_mobile'],
+                'customer_secondary_mobile' => $validated['customer_secondary_mobile'] ?? null,
             ],
             $validated['address'],
             $tenantId

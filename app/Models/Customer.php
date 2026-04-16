@@ -18,6 +18,7 @@ class Customer extends Model
         'tenant_id',
         'name',
         'mobile',
+        'secondary_mobile',
         'email',
         'address',
     ];

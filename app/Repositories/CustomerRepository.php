@@ -8,7 +8,7 @@ use App\Models\Customer;
 
 class CustomerRepository extends BaseRepository
 {
-    protected array $searchable = ['name', 'mobile', 'email'];
+    protected array $searchable = ['name', 'mobile', 'secondary_mobile', 'email'];
 
     public function __construct(Customer $model)
     {

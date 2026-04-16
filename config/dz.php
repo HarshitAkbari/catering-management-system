@@ -30,6 +30,7 @@ return [
 				'vendor/jquery-nice-select/css/nice-select.css',
 				'vendor/datatables/css/jquery.dataTables.min.css',
 				'css/style.css',
+				'css/custom.css',
 			],
 			'js' => [
 				'top'=>[
@@ -40,6 +41,7 @@ return [
 					'vendor/datatables/js/jquery.dataTables.min.js',
 					'js/custom.js',
 					'js/dlabnav-init.js',
+					'js/plugins-init/jquery.validate-init.js',
 				],
 			],
 		],
@@ -56,6 +58,9 @@ return [
 				'ReportController_customers' => [
 				],
 				'OrderController_calendar' => [
+					'vendor/fullcalendar/lib/main.min.css',
+				],
+				'DashboardController_index' => [
 					'vendor/fullcalendar/lib/main.min.css',
 				],
 				'OrderController_create' => [
@@ -92,6 +97,9 @@ return [
 					'vendor/apexchart/apexchart.js',
 				],
 				'OrderController_calendar' => [
+					'vendor/fullcalendar/lib/main.min.js',
+				],
+				'DashboardController_index' => [
 					'vendor/fullcalendar/lib/main.min.js',
 				],
 				'OrderController_create' => [

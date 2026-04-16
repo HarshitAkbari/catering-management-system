@@ -13,10 +13,10 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-lg-6 col-md-6">
-                            <p class="mb-0"><span class="text-muted">Order :</span> <strong>{{ $order->order_number }}</strong></p>
+                            <p class="mb-0"><strong>Order :</strong> <span class="text-muted">{{ $order->order_number }}</span></p>
                         </div>
                         <div class="col-lg-6 col-md-6">
-                            <p class="mb-0"><span class="text-muted">Event Date :</span> <strong>{{ $order->event_date->format('M d, Y') }}</strong></p>
+                            <p class="mb-0"><strong>Event Date :</strong> <span class="text-muted">{{ $order->event_date->format('M d, Y') }}</span></p>
                         </div>
                     </div>
                     <form action="{{ route('equipment.assign.store', $order) }}" method="POST" id="assignForm">

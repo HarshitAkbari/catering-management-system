@@ -1,100 +1,27 @@
-@extends('layout.default')
+@extends('layouts.app')
+
+@section('title', $page_title ?? 'Edit Order')
 
 @section('content')
-	<div class="container-fluid">
-        <!-- row -->
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">{{ $page_title ?? 'Edit Order' }}</h4>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            @include('error.alerts')
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Edit {{ $page_title ?? 'Order' }}</h4>
+                    <div class="card-tools">
+                        <a href="{{ route('orders.index') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
                     </div>
-                    <div class="card-body">
-                        @if ($errors->any())
-                            <div class="alert alert-alt alert-danger solid alert-dismissible fade show" role="alert">
-                                <strong>There were errors with your submission:</strong>
-                                <ul class="mb-0 mt-2">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        <div class="form-validation">
-                            <form class="needs-validation" action="{{ route('orders.update', $order) }}" method="POST" novalidate>
-                                @csrf
-                                @method('PUT')
-
-                                <div class="row">
-                                        <div class="row">
-                                            <!-- First Row: 3 Columns -->
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_name">Customer Name
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
-                                                    placeholder="Enter customer name.." value="{{ old('customer_name', $order->customer->name) }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a customer name.
-                                                </div>
-                                                @error('customer_name')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_email">Customer Email
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="email" class="form-control" id="customer_email" name="customer_email" 
-                                                    placeholder="Enter customer email.." value="{{ old('customer_email', $order->customer->email ?? '') }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a valid email.
-                                                </div>
-                                                @error('customer_email')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-4 mb-4">
-                                                <label class="form-label" for="customer_mobile">Contact Number
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" class="form-control" id="customer_mobile" name="customer_mobile" 
-                                                    placeholder="Enter contact number.." value="{{ old('customer_mobile', $order->customer->mobile) }}" required>
-                                                <div class="invalid-feedback">
-                                                    Please enter a contact number.
-                                                </div>
-                                                @error('customer_mobile')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Second Row: Full Width Address -->
-                                        <div class="row">
-                                            <div class="col-12 mb-4">
-                                                <label class="form-label" for="address">Address
-                                                    <span class="text-danger">*</span>
-                                                </label>
-                                                <textarea class="form-control" id="address" name="address" rows="3" 
-                                                    placeholder="Enter address.." required>{{ old('address', $order->address) }}</textarea>
-                                                <div class="invalid-feedback">
-                                                    Please enter an address.
-                                                </div>
-                                                @error('address')
-                                                    <div class="text-danger small mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Add Event Button -->
-                                        <div class="mb-4">
-                                            <button type="button" id="add-event-btn" class="btn btn-success">
-                                                <i class="bi bi-plus-circle me-2"></i>Add Event
-                                            </button>
-                                        </div>
-                                </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-validation">
+                        <form class="needs-validation" action="{{ route('orders.update', $order) }}" method="POST" novalidate>
+                            @csrf
+                            @method('PUT')
+                            @include('orders.form')
 
                                 <!-- Events Table -->
                                 <div class="row">
@@ -131,21 +58,18 @@
                                 <!-- Hidden input for events data -->
                                 <input type="hidden" name="events" id="events-data" value="">
 
-                                <div class="row mt-4">
-                                    <div class="col-xl-8 col-lg-10 mx-auto">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a href="{{ route('orders.index') }}" class="btn btn-secondary">Cancel</a>
-                                            <button type="submit" id="submit-btn" class="btn btn-primary">Update Order</button>
-                                        </div>
-                                    </div>
+                            <div class="row mt-4">
+                                <div class="mb-3">
+                                    <button type="submit" id="submit-btn" class="btn btn-primary btn-submit">Submit</button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 <!-- Event Modal -->
@@ -166,7 +90,6 @@
                                 name="modal-event-date" 
                                 required 
                                 minDate="today"
-                                placeholder="Select event date"
                             />
                         </div>
 
@@ -181,8 +104,13 @@
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="modal-event-menu" class="form-label">Event Menu <span class="text-danger">*</span></label>
-                            <input type="text" id="modal-event-menu" required class="form-control">
+                            <label for="modal-event-menu-items" class="form-label">Event Menu <span class="text-danger">*</span></label>
+                            <select id="modal-event-menu-items" multiple required class="form-control default-select">
+                                @foreach($eventMenuItems as $eventMenuItem)
+                                    <option value="{{ $eventMenuItem->id }}">{{ $eventMenuItem->name }}</option>
+                                @endforeach
+                            </select>
+                            <small class="form-text text-muted">Select one or more menu items (e.g., Chhas, Papad, Rotli)</small>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -225,6 +153,7 @@
         // Pass PHP data to JavaScript
         const eventTimes = @json($eventTimes->keyBy('id'));
         const orderTypes = @json($orderTypes->keyBy('id'));
+        const eventMenuItems = @json($eventMenuItems->keyBy('id'));
         
         (function () {
           'use strict'
@@ -250,10 +179,12 @@
         @php
             $eventsData = $relatedOrders->map(function($order) {
                 $dishPrice = $order->guest_count > 0 ? ($order->estimated_cost / $order->guest_count) : 0;
+                // Get event menu items IDs
+                $eventMenuItemsIds = $order->eventMenuItems->pluck('id')->toArray();
                 return [
                     'event_date' => $order->event_date ? $order->event_date->format('Y-m-d') : '',
                     'event_time_id' => $order->event_time_id ?? '',
-                    'event_menu' => $order->event_menu ?? '',
+                    'event_menu_items' => $eventMenuItemsIds,
                     'guest_count' => (int)($order->guest_count ?? 0),
                     'order_type_id' => $order->order_type_id ?? null,
                     'dish_price' => (float)number_format($dishPrice, 2, '.', ''),
@@ -370,10 +301,19 @@
                     }
                 }
 
+                // Get selected event menu items
+                const eventMenuItemsSelect = document.getElementById('modal-event-menu-items');
+                const selectedMenuItems = Array.from(eventMenuItemsSelect.selectedOptions).map(option => parseInt(option.value));
+                
+                if (selectedMenuItems.length === 0) {
+                    alert('Please select at least one event menu item.');
+                    return;
+                }
+
                 const eventData = {
                     event_date: eventDate,
                     event_time_id: parseInt(document.getElementById('modal-event-time').value),
-                    event_menu: document.getElementById('modal-event-menu').value,
+                    event_menu_items: selectedMenuItems,
                     guest_count: parseInt(document.getElementById('modal-guest-count').value),
                     order_type_id: document.getElementById('modal-order-type').value ? parseInt(document.getElementById('modal-order-type').value) : null,
                     dish_price: parseFloat(document.getElementById('modal-dish-price').value),
@@ -472,11 +412,16 @@
 
             container.classList.remove('d-none');
             tbody.innerHTML = events.map((event, index) => {
+                // Format event menu items names
+                const menuItemNames = event.event_menu_items ? 
+                    event.event_menu_items.map(id => eventMenuItems[id]?.name || 'Unknown').join(', ') : 
+                    (event.event_menu || '-');
+                
                 return `
                     <tr>
                         <td>${formatDateForDisplay(event.event_date)}</td>
                         <td>${eventTimes[event.event_time_id]?.name || '-'}</td>
-                        <td>${event.event_menu}</td>
+                        <td>${menuItemNames}</td>
                         <td>${event.guest_count}</td>
                         <td>${event.order_type_id ? (orderTypes[event.order_type_id]?.name || '-') : '-'}</td>
                         <td>₹${event.dish_price.toFixed(2)}</td>
@@ -487,7 +432,7 @@
                                 data-bs-toggle="modal" 
                                 data-bs-target="#deleteEventModal"
                                 data-event-index="${index}"
-                                data-event-name="${event.event_menu} - ${formatDateForDisplay(event.event_date)}">
+                                data-event-name="${menuItemNames} - ${formatDateForDisplay(event.event_date)}">
                                 Delete
                             </button>
                         </td>
@@ -510,7 +455,13 @@
             }
             
             document.getElementById('modal-event-time').value = event.event_time_id;
-            document.getElementById('modal-event-menu').value = event.event_menu;
+            
+            // Set selected event menu items
+            const eventMenuItemsSelect = document.getElementById('modal-event-menu-items');
+            Array.from(eventMenuItemsSelect.options).forEach(option => {
+                option.selected = event.event_menu_items && event.event_menu_items.includes(parseInt(option.value));
+            });
+            
             document.getElementById('modal-guest-count').value = event.guest_count;
             document.getElementById('modal-order-type').value = event.order_type_id || '';
             document.getElementById('modal-dish-price').value = event.dish_price;

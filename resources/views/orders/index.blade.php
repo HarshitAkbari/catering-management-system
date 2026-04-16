@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <div class="d-flex flex-column">
                     <div class="d-flex align-items-center gap-2">
                         <h4 class="card-title mb-0">{{ $page_title ?? 'Orders' }}</h4>
@@ -17,6 +17,7 @@
                         </div>
                     @endif
                 </div>
+                <x-add-button module="orders" route="orders.create" label="Create Order" />
             </div>
             <div class="card-body">
                 <!-- Filter Form -->
@@ -113,6 +114,12 @@
                                 <th>
                                     <x-table.sort-link field="total_amount" label="Amount" />
                                 </th>
+                                <th>
+                                    <x-table.sort-link field="created_by" label="Created By" />
+                                </th>
+                                <th>
+                                    <x-table.sort-link field="created_at" label="Created At" />
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -145,14 +152,20 @@
                                     </td>
                                     <td><strong>₹{{ number_format($group['total_amount'], 2) }}</strong></td>
                                     <td>
-                                        <a href="{{ route('orders.show', $firstOrder) }}" class="btn btn-primary btn-sm" title="View">
-                                            <i class="bi bi-eye"></i>
+                                        {{ $firstOrder->creator->name ?? 'N/A' }}
+                                    </td>
+                                    <td>
+                                        {{ $firstOrder->created_at ? $firstOrder->created_at->format('M d, Y H:i') : 'N/A' }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('orders.show', $firstOrder) }}" class="btn btn-primary btn-xs" title="View">
+                                            View
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-5">
+                                    <td colspan="8" class="text-center py-5">
                                         <p class="text-muted">No orders found</p>
                                     </td>
                                 </tr>

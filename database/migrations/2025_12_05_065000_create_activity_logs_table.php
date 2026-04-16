@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('route_name')->nullable();
             $table->text('url');
             $table->string('http_method', 10);
+            $table->text('description')->nullable();
             $table->ipAddress('ip_address')->nullable();
             $table->string('user_agent', 1024)->nullable();
             $table->timestamp('visited_at')->index();

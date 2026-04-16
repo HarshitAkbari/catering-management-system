@@ -44,22 +44,5 @@
             <div class="text-danger small mt-1">{{ $message }}</div>
         @enderror
     </div>
-    <div class="col-lg-6 col-md-6 mb-3">
-        <label class="form-label" for="equipment_status_id">Status <span class="text-danger">*</span></label>
-        <select name="equipment_status_id" id="equipment_status_id" class="form-control default-select @error('equipment_status_id') is-invalid @enderror" required>
-            <option value="">Select Status</option>
-            @foreach($statuses as $status)
-                <option value="{{ $status->id }}" {{ old('equipment_status_id', $equipment->equipment_status_id ?? '') == $status->id ? 'selected' : '' }}>
-                    {{ $status->name }}
-                </option>
-            @endforeach
-        </select>
-        <div class="invalid-feedback">
-            Please select a status.
-        </div>
-        @error('equipment_status_id')
-            <div class="text-danger small mt-1">{{ $message }}</div>
-        @enderror
-    </div>
 </div>
 

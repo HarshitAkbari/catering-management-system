@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Exports\AttendanceExport;
 use App\Exports\ExpensesExport;
 use App\Exports\OrdersExport;
 use App\Exports\PaymentsExport;
 use App\Exports\ProfitLossExport;
+use App\Models\Attendance;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Payment;
@@ -154,6 +156,38 @@ class ReportController extends Controller
         return view('reports.profit-loss', compact('revenue', 'expenses', 'profit', 'startDate', 'endDate', 'chartData'));
     }
 
+    public function attendance(Request $request)
+    {
+        $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', now()->format('Y-m-d'));
+
+        $attendances = Attendance::where('tenant_id', auth()->user()->tenant_id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->with('staff.staffRole')
+            ->orderBy('date', 'desc')
+            ->orderBy('staff_id', 'asc')
+            ->get();
+
+        $totalRecords = $attendances->count();
+        $present = $attendances->where('status', 'present')->count();
+        $absent = $attendances->where('status', 'absent')->count();
+        $halfDay = $attendances->where('status', 'half_day')->count();
+        $attendanceRate = $totalRecords > 0 ? round(($present / $totalRecords) * 100, 2) : 0;
+
+        $summary = [
+            'total_records' => $totalRecords,
+            'present' => $present,
+            'absent' => $absent,
+            'half_day' => $halfDay,
+            'attendance_rate' => $attendanceRate,
+        ];
+
+        // Chart data for attendance
+        $chartData = $this->getAttendanceChartData(auth()->user()->tenant_id, $startDate, $endDate, $attendances);
+
+        return view('reports.attendance', compact('attendances', 'summary', 'startDate', 'endDate', 'chartData'));
+    }
+
     public function export(Request $request)
     {
         $type = $request->get('type', 'orders');
@@ -171,6 +205,8 @@ class ReportController extends Controller
                 return $this->exportExpenses($tenantId, $startDate, $endDate);
             case 'profit-loss':
                 return $this->exportProfitLoss($tenantId, $startDate, $endDate);
+            case 'attendance':
+                return $this->exportAttendance($tenantId, $startDate, $endDate);
             default:
                 return back()->with('error', 'Invalid export type.');
         }
@@ -241,6 +277,18 @@ class ReportController extends Controller
 
         $filename = 'profit_loss_' . $startDate . '_to_' . $endDate . '.xlsx';
         return Excel::download(new ProfitLossExport($revenue, $expenses, $profit, $startDate, $endDate), $filename);
+    }
+
+    private function exportAttendance(int $tenantId, string $startDate, string $endDate)
+    {
+        $query = Attendance::where('tenant_id', $tenantId)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->with('staff')
+            ->orderBy('date', 'desc')
+            ->orderBy('staff_id', 'asc');
+
+        $filename = 'attendance_' . $startDate . '_to_' . $endDate . '.xlsx';
+        return Excel::download(new AttendanceExport($query), $filename);
     }
 
     /**
@@ -524,6 +572,81 @@ class ReportController extends Controller
             'frequency' => [
                 'labels' => $frequencyLabels,
                 'data' => $frequencyData,
+            ],
+        ];
+    }
+
+    /**
+     * Get chart data for attendance report
+     */
+    private function getAttendanceChartData(int $tenantId, string $startDate, string $endDate, $attendances): array
+    {
+        // Attendance trends over time (daily)
+        $attendanceTrends = Attendance::where('tenant_id', $tenantId)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->selectRaw('DATE(date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $trendLabels = [];
+        $trendData = [];
+        foreach ($attendanceTrends as $trend) {
+            $trendLabels[] = \Carbon\Carbon::parse($trend->date)->format('M d');
+            $trendData[] = (int) $trend->count;
+        }
+
+        // Status distribution
+        $statusData = $attendances->groupBy('status')->map(function ($group) {
+            return $group->count();
+        });
+
+        $statusLabels = [];
+        $statusValues = [];
+        $statusColors = [
+            'present' => 'rgba(16, 185, 129, 0.8)',
+            'absent' => 'rgba(239, 68, 68, 0.8)',
+            'half_day' => 'rgba(59, 130, 246, 0.8)',
+        ];
+
+        foreach ($statusData as $status => $count) {
+            $statusLabels[] = ucfirst(str_replace('_', ' ', $status));
+            $statusValues[] = $count;
+        }
+
+        // Attendance by staff (top 10 by attendance rate)
+        $staffAttendance = $attendances->groupBy('staff_id')->map(function ($staffAttendances) {
+            $total = $staffAttendances->count();
+            $present = $staffAttendances->where('status', 'present')->count();
+            return [
+                'staff' => $staffAttendances->first()->staff ?? null,
+                'total' => $total,
+                'present' => $present,
+                'rate' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+            ];
+        })->filter(function ($data) {
+            return $data['staff'] !== null;
+        })->sortByDesc('rate')->take(10);
+
+        $staffLabels = [];
+        $staffRates = [];
+        foreach ($staffAttendance as $data) {
+            $staffLabels[] = $data['staff']->name;
+            $staffRates[] = $data['rate'];
+        }
+
+        return [
+            'trends' => [
+                'labels' => $trendLabels,
+                'data' => $trendData,
+            ],
+            'status' => [
+                'labels' => $statusLabels,
+                'data' => $statusValues,
+            ],
+            'staff' => [
+                'labels' => $staffLabels,
+                'data' => $staffRates,
             ],
         ];
     }

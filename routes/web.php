@@ -12,10 +12,14 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ActivityController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -26,6 +30,7 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/loginpage', [LoginController::class, 'showLoginForm'])->name('loginpage');
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
     
@@ -47,6 +52,16 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
+    // Activities Menu
+    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+    Route::get('/activities/load-more', [ActivityController::class, 'loadMoreActivities'])->name('activities.load-more');
+    
+    // Profile Routes
+    Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('change-password', [ProfileController::class, 'showChangePassword'])->name('change-password');
+    Route::post('change-password', [ProfileController::class, 'updatePassword'])->name('change-password.update');
+    
     // Orders Menu
     // Orders - List & Calendar
     Route::middleware(['permission:orders,orders.view'])->group(function () {
@@ -58,7 +73,29 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
     });
-    // Orders - View
+    
+    // Event Menu Items - Must be before orders/{order} route to avoid route conflicts
+    // Event Menu Items - List
+    Route::middleware(['permission:orders,orders.view'])->group(function () {
+        Route::get('orders/event-menu-items', [\App\Http\Controllers\EventMenuItemController::class, 'index'])->name('orders.event-menu-items');
+    });
+    // Event Menu Items - Create
+    Route::middleware(['permission:orders.create'])->group(function () {
+        Route::get('orders/event-menu-items/create', [\App\Http\Controllers\EventMenuItemController::class, 'create'])->name('orders.event-menu-items.create');
+        Route::post('orders/event-menu-items', [\App\Http\Controllers\EventMenuItemController::class, 'store'])->name('orders.event-menu-items.store');
+    });
+    // Event Menu Items - Edit
+    Route::middleware(['permission:orders.edit'])->group(function () {
+        Route::get('orders/event-menu-items/{eventMenuItem}/edit', [\App\Http\Controllers\EventMenuItemController::class, 'edit'])->name('orders.event-menu-items.edit');
+        Route::put('orders/event-menu-items/{eventMenuItem}', [\App\Http\Controllers\EventMenuItemController::class, 'update'])->name('orders.event-menu-items.update');
+        Route::patch('orders/event-menu-items/{eventMenuItem}/toggle', [\App\Http\Controllers\EventMenuItemController::class, 'toggle'])->name('orders.event-menu-items.toggle');
+    });
+    // Event Menu Items - Delete
+    Route::middleware(['permission:orders.delete'])->group(function () {
+        Route::delete('orders/event-menu-items/{eventMenuItem}', [\App\Http\Controllers\EventMenuItemController::class, 'destroy'])->name('orders.event-menu-items.destroy');
+    });
+    
+    // Orders - View (must be after event-menu-items routes)
     Route::middleware(['permission:orders,orders.view'])->group(function () {
         Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     });
@@ -220,13 +257,14 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     });
     
     // Reports Menu
-    // Reports - Orders, Payments, Expenses, Customers, Profit-Loss
+    // Reports - Orders, Payments, Expenses, Customers, Profit-Loss, Attendance
     Route::middleware(['permission:reports,reports.view'])->prefix('reports')->name('reports.')->group(function () {
         Route::get('orders', [ReportController::class, 'orders'])->name('orders');
         Route::get('payments', [ReportController::class, 'payments'])->name('payments');
         Route::get('expenses', [ReportController::class, 'expenses'])->name('expenses');
         Route::get('customers', [ReportController::class, 'customers'])->name('customers');
         Route::get('profit-loss', [ReportController::class, 'profitLoss'])->name('profit-loss');
+        Route::get('attendance', [ReportController::class, 'attendance'])->name('attendance');
     });
     // Reports - Export
     Route::middleware(['permission:reports.export'])->prefix('reports')->name('reports.')->group(function () {
@@ -279,6 +317,52 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     // Global Search
     Route::get('search', [SearchController::class, 'search'])->name('search');
     
+    // Staff Management Menu
+    // Staff - List
+    Route::middleware(['permission:staff,staff.view'])->group(function () {
+        Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
+    });
+    // Staff - Assign to Events (must be before staff/{staff} route)
+    Route::middleware(['permission:staff.create'])->group(function () {
+        Route::get('orders/{order}/assign-staff', [StaffController::class, 'assignToEvent'])->name('staff.assign');
+        Route::post('orders/{order}/assign-staff', [StaffController::class, 'storeAssignment'])->name('staff.assign.store');
+    });
+    // Staff - Edit (must be before staff/{staff} route)
+    Route::middleware(['permission:staff.edit'])->group(function () {
+        Route::get('staff/{staff}/edit', [StaffController::class, 'edit'])->name('staff.edit');
+        Route::put('staff/{staff}', [StaffController::class, 'update'])->name('staff.update');
+        Route::patch('staff/{staff}/toggle', [StaffController::class, 'toggle'])->name('staff.toggle');
+    });
+    // Staff - View (specific routes before parameterized route)
+    Route::middleware(['permission:staff,staff.view'])->group(function () {
+        Route::get('staff/{staff}/workload', [StaffController::class, 'workload'])->name('staff.workload');
+        Route::get('staff/{staff}/performance', [StaffController::class, 'performance'])->name('staff.performance');
+        Route::get('staff/{staff}', [StaffController::class, 'show'])->name('staff.show');
+    });
+    // Staff - Delete
+    Route::middleware(['permission:staff.delete'])->group(function () {
+        Route::delete('staff/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
+    });
+    
+    // Attendance Management Menu
+    // Attendance - List, View & Report
+    Route::middleware(['permission:attendance,attendance.view'])->group(function () {
+        Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('attendance/staff/{staff}', [AttendanceController::class, 'staffHistory'])->name('attendance.staff');
+    });
+    // Attendance - Create
+    Route::middleware(['permission:attendance.create'])->group(function () {
+        Route::get('attendance/create', [AttendanceController::class, 'create'])->name('attendance.create');
+        Route::post('attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+        Route::get('attendance/bulk', [AttendanceController::class, 'bulkCreate'])->name('attendance.bulk');
+        Route::post('attendance/bulk', [AttendanceController::class, 'bulkStore'])->name('attendance.bulk.store');
+    });
+    // Attendance - Edit
+    Route::middleware(['permission:attendance.edit'])->group(function () {
+        Route::get('attendance/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
+        Route::put('attendance/{attendance}', [AttendanceController::class, 'update'])->name('attendance.update');
+    });
+    
     // Settings Menu
     Route::prefix('settings')->name('settings.')->group(function () {
         // Settings - Order Statuses
@@ -326,14 +410,14 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::patch('equipment-categories/{equipmentCategory}/toggle', [SettingsController::class, 'toggleEquipmentCategory'])->name('equipment-categories.toggle');
         Route::delete('equipment-categories/{equipmentCategory}', [SettingsController::class, 'destroyEquipmentCategory'])->name('equipment-categories.destroy');
         
-        // Settings - Equipment Statuses
-        Route::get('equipment-statuses', [SettingsController::class, 'equipmentStatuses'])->name('equipment-statuses');
-        Route::get('equipment-statuses/create', [SettingsController::class, 'createEquipmentStatus'])->name('equipment-statuses.create');
-        Route::post('equipment-statuses', [SettingsController::class, 'storeEquipmentStatus'])->name('equipment-statuses.store');
-        Route::get('equipment-statuses/{equipmentStatus}/edit', [SettingsController::class, 'editEquipmentStatus'])->name('equipment-statuses.edit');
-        Route::put('equipment-statuses/{equipmentStatus}', [SettingsController::class, 'updateEquipmentStatus'])->name('equipment-statuses.update');
-        Route::patch('equipment-statuses/{equipmentStatus}/toggle', [SettingsController::class, 'toggleEquipmentStatus'])->name('equipment-statuses.toggle');
-        Route::delete('equipment-statuses/{equipmentStatus}', [SettingsController::class, 'destroyEquipmentStatus'])->name('equipment-statuses.destroy');
+        // Settings - Staff Roles
+        Route::get('staff-roles', [\App\Http\Controllers\Settings\StaffRoleController::class, 'index'])->name('staff-roles');
+        Route::get('staff-roles/create', [\App\Http\Controllers\Settings\StaffRoleController::class, 'create'])->name('staff-roles.create');
+        Route::post('staff-roles', [\App\Http\Controllers\Settings\StaffRoleController::class, 'store'])->name('staff-roles.store');
+        Route::get('staff-roles/{staffRole}/edit', [\App\Http\Controllers\Settings\StaffRoleController::class, 'edit'])->name('staff-roles.edit');
+        Route::put('staff-roles/{staffRole}', [\App\Http\Controllers\Settings\StaffRoleController::class, 'update'])->name('staff-roles.update');
+        Route::patch('staff-roles/{staffRole}/toggle', [\App\Http\Controllers\Settings\StaffRoleController::class, 'toggle'])->name('staff-roles.toggle');
+        Route::delete('staff-roles/{staffRole}', [\App\Http\Controllers\Settings\StaffRoleController::class, 'destroy'])->name('staff-roles.destroy');
     });
 });
  

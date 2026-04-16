@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignId('equipment_category_id')->nullable()->constrained('equipment_categories')->onDelete('set null');
             $table->integer('quantity')->default(0);
             $table->integer('available_quantity')->default(0);
-            $table->foreignId('equipment_status_id')->nullable()->constrained('equipment_statuses')->onDelete('set null');
             $table->date('last_maintenance_date')->nullable();
             $table->date('next_maintenance_date')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
@@ -27,7 +26,6 @@ return new class extends Migration
             
             $table->index('tenant_id');
             $table->index('equipment_category_id');
-            $table->index('equipment_status_id');
         });
     }
 

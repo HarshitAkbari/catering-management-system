@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Menu;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Repositories\PermissionRepository;
 use App\Repositories\RoleRepository;
@@ -27,7 +29,17 @@ class RoleService extends BaseService
      */
     public function getByTenant(int $tenantId): Collection
     {
-        return $this->repository->filter(['tenant_id' => $tenantId], ['permissions'])->get();
+        return $this->repository->filter(['tenant_id' => $tenantId], ['permissions', 'menus'])->get();
+    }
+
+    /**
+     * Get Manager and Staff roles only
+     */
+    public function getManagerAndStaffRoles(int $tenantId): Collection
+    {
+        return $this->repository->filter(['tenant_id' => $tenantId], ['permissions', 'menus'], [], true)
+            ->whereIn('name', ['manager', 'staff'])
+            ->get();
     }
 
     /**
@@ -50,11 +62,17 @@ class RoleService extends BaseService
                     'name' => $data['name'],
                     'display_name' => $data['display_name'] ?? $data['name'],
                     'description' => $data['description'] ?? null,
+                    'permission_type' => $data['permission_type'] ?? null,
+                    'write_permissions' => $data['write_permissions'] ?? null,
                 ]);
 
-                if (isset($data['permissions'])) {
-                    $role->permissions()->sync($data['permissions']);
+                // Sync menus if provided
+                if (isset($data['menu_ids'])) {
+                    $role->menus()->sync($data['menu_ids']);
                 }
+
+                // Generate and sync permissions based on role configuration
+                $this->generatePermissionsFromRole($role);
 
                 return [
                     'status' => true,
@@ -81,11 +99,17 @@ class RoleService extends BaseService
                 $this->repository->update($role, [
                     'display_name' => $data['display_name'] ?? $role->display_name,
                     'description' => $data['description'] ?? $role->description,
+                    'permission_type' => $data['permission_type'] ?? $role->permission_type,
+                    'write_permissions' => $data['write_permissions'] ?? $role->write_permissions,
                 ]);
 
-                if (isset($data['permissions'])) {
-                    $role->permissions()->sync($data['permissions']);
+                // Sync menus if provided
+                if (isset($data['menu_ids'])) {
+                    $role->menus()->sync($data['menu_ids']);
                 }
+
+                // Generate and sync permissions based on role configuration
+                $this->generatePermissionsFromRole($role);
 
                 return [
                     'status' => true,
@@ -117,6 +141,60 @@ class RoleService extends BaseService
         } catch (\Exception $e) {
             return ['status' => false, 'message' => 'Failed to assign roles: ' . $e->getMessage()];
         }
+    }
+
+    /**
+     * Generate permissions from role configuration.
+     * Based on selected menus and permission_type, generates appropriate permissions.
+     */
+    public function generatePermissionsFromRole(Role $role): void
+    {
+        if (!$role->permission_type) {
+            return;
+        }
+
+        $menus = $role->menus()->get();
+        $permissionNames = [];
+
+        foreach ($menus as $menu) {
+            // Extract module name from menu name (e.g., 'orders.list' -> 'orders')
+            $menuNameParts = explode('.', $menu->name);
+            $module = $menuNameParts[0];
+
+            if ($role->permission_type === 'read') {
+                // For read permission, only generate view permission
+                $permissionNames[] = "{$module}.view";
+            } elseif ($role->permission_type === 'write') {
+                // For write permission, generate view + selected write permissions
+                $permissionNames[] = "{$module}.view";
+
+                $writePermissions = $role->write_permissions ?? [];
+                foreach ($writePermissions as $action) {
+                    $permissionNames[] = "{$module}.{$action}";
+                }
+            }
+        }
+
+        // Remove duplicates
+        $permissionNames = array_unique($permissionNames);
+
+        // Get or create permissions and sync to role
+        $permissionIds = [];
+        foreach ($permissionNames as $permissionName) {
+            $permission = Permission::firstOrCreate(
+                [
+                    'tenant_id' => $role->tenant_id,
+                    'name' => $permissionName,
+                ],
+                [
+                    'display_name' => ucfirst(str_replace('.', ' - ', $permissionName)),
+                    'description' => "Permission to {$permissionName}",
+                ]
+            );
+            $permissionIds[] = $permission->id;
+        }
+
+        $role->permissions()->sync($permissionIds);
     }
 }
 

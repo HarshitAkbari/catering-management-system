@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
@@ -77,5 +78,34 @@ class CustomerController extends Controller
             'customer' => $result['customer'],
             'groupedOrdersList' => $result['groupedOrders'],
         ]);
+    }
+
+    public function edit(Customer $customer)
+    {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($customer->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized');
+        }
+
+        $page_title = 'Edit Customer';
+        
+        return view('customers.edit', compact('customer', 'page_title'));
+    }
+
+    public function update(UpdateCustomerRequest $request, Customer $customer)
+    {
+        $tenantId = auth()->user()->tenant_id;
+        
+        if ($customer->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized');
+        }
+
+        $validated = $request->validated();
+        
+        $this->customerService->update($customer, $validated);
+
+        return redirect()->route('customers.show', $customer)
+            ->with('success', 'Customer updated successfully!');
     }
 }

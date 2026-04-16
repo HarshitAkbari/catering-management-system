@@ -10,35 +10,26 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="card-title">{{ $equipment->name }}</h4>
                     <div class="d-flex gap-2">
-                        <a href="{{ route('equipment.index') }}">
-                            <i class="bi bi-arrow-left me-1"></i>Back to List
+                        <a href="{{ route('equipment.index') }}" class="btn btn-dark btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i>Back
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $equipment->name }}</strong></p>
+                            <p class="mb-0"><strong>Name :</strong> <span class="text-muted">{{ $equipment->name }}</span></p>
                         </div>
                         @if($equipment->equipmentCategory)
                             <div class="col-lg-6 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Category :</span> <strong>{{ $equipment->equipmentCategory->name }}</strong></p>
+                                <p class="mb-0"><strong>Category :</strong> <span class="text-muted">{{ $equipment->equipmentCategory->name }}</span></p>
                             </div>
                         @endif
                         <div class="col-lg-6 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Total Quantity :</span> <strong>{{ $equipment->quantity }}</strong></p>
+                            <p class="mb-0"><strong>Total Quantity :</strong> <span class="text-muted">{{ $equipment->quantity }}</span></p>
                         </div>
                         <div class="col-lg-6 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Available Quantity :</span> <strong>{{ $equipment->available_quantity }}</strong></p>
-                        </div>
-                        <div class="col-lg-6 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Status :</span> 
-                                @if($equipment->equipmentStatus)
-                                    <span class="badge light badge-success">{{ $equipment->equipmentStatus->name }}</span>
-                                @else
-                                    <span class="badge light badge-secondary">-</span>
-                                @endif
-                            </p>
+                            <p class="mb-0"><strong>Available Quantity :</strong> <span class="text-muted">{{ $equipment->available_quantity }}</span></p>
                         </div>
                     </div>
                 </div>

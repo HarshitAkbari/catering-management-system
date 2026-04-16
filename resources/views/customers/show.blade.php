@@ -9,23 +9,34 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Customer Information</h4>
+                    <div class="d-flex gap-2">
+                        <x-edit-button module="customers" route="customers.edit" :model="$customer" class="btn btn-warning btn-xs" label="Edit" icon="bi bi-pencil" />
+                        <a href="{{ route('customers.index') }}" class="btn btn-dark btn-xs">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-4 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Name :</span> <strong>{{ $customer->name }}</strong></p>
+                            <p class="mb-0"><strong>Name :</strong> <span class="text-muted">{{ $customer->name }}</span></p>
                         </div>
                         <div class="col-lg-4 col-md-6 mb-3">
-                            <p class="mb-0"><span class="text-muted">Mobile :</span> <strong>{{ $customer->mobile }}</strong></p>
+                            <p class="mb-0"><strong>Mobile :</strong> <span class="text-muted">{{ $customer->mobile }}</span></p>
                         </div>
+                        @if($customer->secondary_mobile)
+                            <div class="col-lg-4 col-md-6 mb-3">
+                                <p class="mb-0"><strong>Secondary Mobile :</strong> <span class="text-muted">{{ $customer->secondary_mobile }}</span></p>
+                            </div>
+                        @endif
                         @if($customer->email)
                             <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Email :</span> <strong>{{ $customer->email }}</strong></p>
+                                <p class="mb-0"><strong>Email :</strong> <span class="text-muted">{{ $customer->email }}</span></p>
                             </div>
                         @endif
                         @if($customer->address)
                         <div class="col-lg-4 col-md-6 mb-3">
-                                <p class="mb-0"><span class="text-muted">Address :</span> <strong>{{ $customer->address }}</strong></p>
+                                <p class="mb-0"><strong>Address :</strong> <span class="text-muted">{{ $customer->address }}</span></p>
                             </div>
                         @endif
                     </div>
@@ -50,7 +61,6 @@
                                         <th>Amount</th>
                                         <th>Status</th>
                                         <th>Payment Status</th>
-                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,11 +111,6 @@
                                                 @else
                                                     <span class="badge light badge-secondary">{{ ucfirst($paymentStatus) }}</span>
                                                 @endif
-                                            </td>
-                                            <td class="py-2 text-end">
-                                                <a href="{{ route('orders.show', $firstOrder) }}" class="btn btn-primary btn-sm" title="View">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach

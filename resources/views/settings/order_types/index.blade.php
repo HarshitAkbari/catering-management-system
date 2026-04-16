@@ -62,6 +62,12 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Status</th>
+                                    <th>
+                                        <x-table.sort-link field="created_by" label="Created By" />
+                                    </th>
+                                    <th>
+                                        <x-table.sort-link field="created_at" label="Created At" />
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -74,6 +80,12 @@
                                             <span class="badge badge-{{ $orderType->is_active ? 'success' : 'danger' }} status-badge" data-status-id="{{ $orderType->id }}">
                                                 {{ $orderType->is_active ? 'Active' : 'In-Active' }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {{ $orderType->created_by ? ($orderType->creator->name ?? 'N/A') : 'System Created' }}
+                                        </td>
+                                        <td>
+                                            {{ $orderType->created_at ? $orderType->created_at->format('M d, Y H:i') : 'N/A' }}
                                         </td>
                                         <td>
                                             <a href="{{ route('settings.order-types.edit', $orderType) }}" class="btn btn-secondary btn-xs btn-edit">Edit</a>
@@ -94,7 +106,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-5">
+                                        <td colspan="6" class="text-center py-5">
                                             <div class="d-flex flex-column align-items-center">
                                                 <svg class="mb-3" width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #9ca3af;">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>

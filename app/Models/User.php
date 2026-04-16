@@ -9,6 +9,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -25,6 +26,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'mobile',
+        'address',
         'password',
         'tenant_id',
         'role',
@@ -74,6 +77,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the staff entry associated with this user (if role is staff or manager).
+     */
+    public function staff(): HasOne
+    {
+        return $this->hasOne(Staff::class, 'phone', 'mobile')
+            ->where('tenant_id', $this->tenant_id);
+    }
+
+    /**
      * Check if user has a specific role.
      * Checks both enum role field and Role model.
      */
@@ -91,6 +103,7 @@ class User extends Authenticatable
     /**
      * Check if user has a specific permission.
      * Supports both module-level and action-level permissions.
+     * Now also checks permission_type and write_permissions from roles.
      */
     public function hasPermission(string $permissionName): bool
     {
@@ -99,26 +112,75 @@ class User extends Authenticatable
             return true;
         }
 
-        // Check if user has the permission through roles
-        $hasPermission = $this->roles()
-            ->whereHas('permissions', function ($query) use ($permissionName) {
-                $query->where('name', $permissionName);
-            })
-            ->exists();
+        // Get user's roles with permissions
+        $roles = $this->roles()->with('permissions')->get();
 
-        if ($hasPermission) {
-            return true;
+        // Check each role
+        foreach ($roles as $role) {
+            // First, check if permission exists in role's permissions (for backward compatibility)
+            $hasPermission = $role->permissions()
+                ->where('name', $permissionName)
+                ->exists();
+
+            if ($hasPermission) {
+                // If permission exists, check permission_type and write_permissions
+                if ($role->permission_type === 'read') {
+                    // For read permission type, only allow view permissions
+                    if (str_ends_with($permissionName, '.view') || $permissionName === 'view') {
+                        return true;
+                    }
+                } elseif ($role->permission_type === 'write') {
+                    // For write permission type, check if action is in write_permissions
+                    $parts = explode('.', $permissionName);
+                    if (count($parts) === 2) {
+                        $action = $parts[1];
+                        $writePermissions = $role->write_permissions ?? [];
+                        
+                        // Allow view for all write roles
+                        if ($action === 'view') {
+                            return true;
+                        }
+                        
+                        // Check if action is in write_permissions array
+                        if (in_array($action, $writePermissions)) {
+                            return true;
+                        }
+                    } elseif ($permissionName === 'view') {
+                        return true;
+                    }
+                } else {
+                    // If no permission_type set, allow the permission (backward compatibility)
+                    return true;
+                }
+            }
         }
 
         // Check for module-level permission (e.g., if checking "orders.create", also check "orders")
         $parts = explode('.', $permissionName);
         if (count($parts) === 2) {
             $module = $parts[0];
-            return $this->roles()
+            $hasModulePermission = $this->roles()
                 ->whereHas('permissions', function ($query) use ($module) {
                     $query->where('name', $module);
                 })
                 ->exists();
+
+            if ($hasModulePermission) {
+                // Check permission_type for module-level permissions
+                foreach ($roles as $role) {
+                    if ($role->permission_type === 'read' && str_ends_with($permissionName, '.view')) {
+                        return true;
+                    } elseif ($role->permission_type === 'write') {
+                        $parts = explode('.', $permissionName);
+                        if (count($parts) === 2) {
+                            $action = $parts[1];
+                            if ($action === 'view' || in_array($action, $role->write_permissions ?? [])) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return false;
