@@ -6,6 +6,7 @@ use App\Models\InventoryItem;
 use App\Services\MenuService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         // Bind 'inventory' route parameter to InventoryItem model
         Route::bind('inventory', function ($value) {
             return InventoryItem::where('tenant_id', auth()->user()->tenant_id)

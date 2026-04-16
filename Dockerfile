@@ -45,5 +45,5 @@ USER laravel
 # Expose port
 EXPOSE 10000
 
-# Start Laravel
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# Clear stale caches, then start Laravel
+CMD ["sh", "-lc", "php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=10000"]
