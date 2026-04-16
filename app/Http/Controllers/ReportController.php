@@ -122,7 +122,7 @@ class ReportController extends Controller
         $customers = Customer::where('tenant_id', auth()->user()->tenant_id)
             ->withCount('orders')
             ->withSum('orders', 'estimated_cost')
-            ->having('orders_count', '>', 0)
+            ->has('orders')
             ->orderBy('orders_count', 'desc')
             ->get();
 
