@@ -425,9 +425,12 @@ class ReportController extends Controller
     private function getProfitLossChartData(int $tenantId, string $startDate, string $endDate): array
     {
         // Revenue vs Expenses comparison (monthly)
+        $paymentMonthExpression = $this->getMonthFormatExpression('payment_date');
+        $expenseMonthExpression = $this->getMonthFormatExpression('created_at');
+
         $revenueData = Payment::where('tenant_id', $tenantId)
             ->whereBetween('payment_date', [$startDate, $endDate])
-            ->selectRaw('DATE_FORMAT(payment_date, "%Y-%m") as month, SUM(amount) as total')
+            ->selectRaw("{$paymentMonthExpression} as month, SUM(amount) as total")
             ->groupBy('month')
             ->orderBy('month')
             ->get();
@@ -435,7 +438,7 @@ class ReportController extends Controller
         $expenseData = \App\Models\StockTransaction::where('tenant_id', $tenantId)
             ->where('type', 'in')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(price) as total')
+            ->selectRaw("{$expenseMonthExpression} as month, SUM(price) as total")
             ->groupBy('month')
             ->orderBy('month')
             ->get();
@@ -649,6 +652,17 @@ class ReportController extends Controller
                 'data' => $staffRates,
             ],
         ];
+    }
+
+    /**
+     * Get DB-driver-safe month format SQL expression.
+     */
+    private function getMonthFormatExpression(string $column): string
+    {
+        return match (DB::connection()->getDriverName()) {
+            'pgsql' => "to_char({$column}, 'YYYY-MM')",
+            default => "DATE_FORMAT({$column}, '%Y-%m')",
+        };
     }
 }
 
