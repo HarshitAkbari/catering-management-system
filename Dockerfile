@@ -1,7 +1,7 @@
 FROM php:8.2-fpm
 
 # Install system dependencies + Node.js
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     zip \
@@ -14,10 +14,13 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     nodejs \
     npm \
-    && docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite pgsql sqlite3 mbstring exif pcntl bcmath gd zip
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions required by the app and CI tests.
+RUN docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite pgsql mbstring exif pcntl bcmath gd zip
 
 # Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get clean
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
