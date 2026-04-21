@@ -57,3 +57,24 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## CI/CD with Render (Docker)
+
+This project includes a GitHub Actions workflow at `.github/workflows/render-cicd.yml`.
+
+- Pull requests to `main` run CI in Docker (build + migrations + test suite).
+- Pushes to `main` run the same CI checks.
+- If CI passes on `main`, GitHub triggers a Render deploy using a deploy hook URL.
+
+### One-time setup
+
+1. In Render, open your service and create/copy the **Deploy Hook** URL.
+2. In GitHub, add a repository secret:
+   - Name: `RENDER_DEPLOY_HOOK_URL`
+   - Value: your Render deploy hook URL
+3. In Render, disable automatic deploy from git (optional but recommended) so deploys are controlled by CI.
+
+### Deployment behavior
+
+- CI uses Docker build arg `INSTALL_DEV=true` so PHPUnit is available during tests.
+- Render production builds keep optimized dependencies (`--no-dev`) by default.

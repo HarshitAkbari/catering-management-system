@@ -10,10 +10,11 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libpq-dev \
+    libsqlite3-dev \
     libzip-dev \
     nodejs \
     npm \
-    && docker-php-ext-install pdo_mysql pdo_pgsql pgsql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite pgsql sqlite3 mbstring exif pcntl bcmath gd zip
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -33,8 +34,15 @@ COPY . .
 # Install frontend dependencies & build assets
 RUN npm install && npm run build
 
+# CI can enable dev dependencies by passing --build-arg INSTALL_DEV=true.
+ARG INSTALL_DEV=false
+
 # Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN if [ "$INSTALL_DEV" = "true" ]; then \
+        composer install --no-interaction --prefer-dist --optimize-autoloader; \
+    else \
+        composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader; \
+    fi
 
 # Set permissions
 RUN chown -R laravel:www-data /var/www \
